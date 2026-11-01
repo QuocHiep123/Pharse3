@@ -1,0 +1,6852 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "call_id": "call-1000",
+    "scenario_id": "S0",
+    "title": "Healthy P2P",
+    "start_ts": "2026-10-31T10:20:00Z",
+    "end_ts": "2026-10-31T10:22:00.200000Z",
+    "caller": "alice",
+    "callee": "bob",
+    "measured_endpoint": "alice",
+    "turn_server": "turn-01",
+    "clock_model": "single_synthetic_clock",
+    "expected_metrics": [
+      "alice/rtt_ms",
+      "alice/jitter_ms",
+      "alice/packet_loss_pct",
+      "alice/bitrate_kbps",
+      "alice/client_cpu_pct",
+      "turn-01/turn_cpu_pct"
+    ],
+    "missing_sources": [
+      "bob/getStats: không thu thập trong MVP"
+    ]
+  },
+  "events": [
+    {
+      "event_id": "ev-001",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": "call-1000",
+      "phase": "call_setup",
+      "component": "signaling",
+      "type": "CALL_CREATED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-002",
+      "ts": "2026-10-31T10:20:00.050000Z",
+      "call_id": "call-1000",
+      "phase": "call_setup",
+      "component": "signaling",
+      "type": "INVITE_SENT",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-003",
+      "ts": "2026-10-31T10:20:00.120000Z",
+      "call_id": "call-1000",
+      "phase": "call_setup",
+      "component": "bob",
+      "type": "INVITE_RECEIVED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-004",
+      "ts": "2026-10-31T10:20:01.500000Z",
+      "call_id": "call-1000",
+      "phase": "call_setup",
+      "component": "bob",
+      "type": "CALL_ACCEPTED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-005",
+      "ts": "2026-10-31T10:20:01.600000Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "OFFER_CREATED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-006",
+      "ts": "2026-10-31T10:20:01.650000Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "OFFER_SENT",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-007",
+      "ts": "2026-10-31T10:20:01.750000Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "bob",
+      "type": "OFFER_RECEIVED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-008",
+      "ts": "2026-10-31T10:20:01.850000Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "bob",
+      "type": "ANSWER_CREATED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-009",
+      "ts": "2026-10-31T10:20:01.900000Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "bob",
+      "type": "ANSWER_SENT",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-010",
+      "ts": "2026-10-31T10:20:02Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "ANSWER_RECEIVED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-011",
+      "ts": "2026-10-31T10:20:02.050000Z",
+      "call_id": "call-1000",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "SET_REMOTE_DESCRIPTION_OK",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-012",
+      "ts": "2026-10-31T10:20:02.100000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_GATHERING_START",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-013",
+      "ts": "2026-10-31T10:20:02.150000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_CANDIDATE_GATHERED",
+      "attrs": {
+        "candidate_type": "host",
+        "address": "10.0.0.12:50000"
+      }
+    },
+    {
+      "event_id": "ev-014",
+      "ts": "2026-10-31T10:20:02.300000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_CANDIDATE_GATHERED",
+      "attrs": {
+        "candidate_type": "srflx",
+        "address": "198.51.100.7:61000"
+      }
+    },
+    {
+      "event_id": "ev-015",
+      "ts": "2026-10-31T10:20:02.600000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_CANDIDATE_GATHERED",
+      "attrs": {
+        "candidate_type": "relay",
+        "address": "203.0.113.10:49152"
+      }
+    },
+    {
+      "event_id": "ev-016",
+      "ts": "2026-10-31T10:20:02.650000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_GATHERING_COMPLETE",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-017",
+      "ts": "2026-10-31T10:20:02.700000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_CHECKING",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-018",
+      "ts": "2026-10-31T10:20:02.900000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_PAIR_FAILED",
+      "attrs": {
+        "local_type": "host",
+        "remote_type": "host",
+        "error": "timeout"
+      }
+    },
+    {
+      "event_id": "ev-019",
+      "ts": "2026-10-31T10:20:03.100000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_PAIR_SUCCEEDED",
+      "attrs": {
+        "local_type": "srflx",
+        "remote_type": "srflx"
+      }
+    },
+    {
+      "event_id": "ev-020",
+      "ts": "2026-10-31T10:20:03.150000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_SELECTED_PAIR",
+      "attrs": {
+        "local_type": "srflx",
+        "remote_type": "srflx",
+        "via_turn": false,
+        "turn_server": null
+      }
+    },
+    {
+      "event_id": "ev-021",
+      "ts": "2026-10-31T10:20:03.200000Z",
+      "call_id": "call-1000",
+      "phase": "ice",
+      "component": "alice",
+      "type": "ICE_CONNECTED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-022",
+      "ts": "2026-10-31T10:20:03.400000Z",
+      "call_id": "call-1000",
+      "phase": "media",
+      "component": "alice",
+      "type": "DTLS_CONNECTING",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-023",
+      "ts": "2026-10-31T10:20:03.600000Z",
+      "call_id": "call-1000",
+      "phase": "media",
+      "component": "alice",
+      "type": "DTLS_CONNECTED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-024",
+      "ts": "2026-10-31T10:20:03.800000Z",
+      "call_id": "call-1000",
+      "phase": "media",
+      "component": "alice",
+      "type": "FIRST_RTP_SENT",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-025",
+      "ts": "2026-10-31T10:20:03.900000Z",
+      "call_id": "call-1000",
+      "phase": "media",
+      "component": "alice",
+      "type": "FIRST_RTP_RECEIVED",
+      "attrs": {
+        "ssrc": 1234567,
+        "kind": "video"
+      }
+    },
+    {
+      "event_id": "ev-026",
+      "ts": "2026-10-31T10:22:00Z",
+      "call_id": "call-1000",
+      "phase": "termination",
+      "component": "alice",
+      "type": "HANGUP",
+      "attrs": {
+        "by": "alice",
+        "reason": "normal"
+      }
+    },
+    {
+      "event_id": "ev-027",
+      "ts": "2026-10-31T10:22:00.200000Z",
+      "call_id": "call-1000",
+      "phase": "termination",
+      "component": "signaling",
+      "type": "CALL_ENDED",
+      "attrs": {
+        "reason": "normal"
+      }
+    }
+  ],
+  "metrics": [
+    {
+      "sample_id": "m-alice-rtt_ms-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 86.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 87.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 75.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0012",
+      "ts": "2026-10-31T10:20:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.2
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0013",
+      "ts": "2026-10-31T10:20:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0014",
+      "ts": "2026-10-31T10:20:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 86.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0015",
+      "ts": "2026-10-31T10:20:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 84.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0016",
+      "ts": "2026-10-31T10:20:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 74.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0017",
+      "ts": "2026-10-31T10:20:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0018",
+      "ts": "2026-10-31T10:20:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 74.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0019",
+      "ts": "2026-10-31T10:20:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0020",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0021",
+      "ts": "2026-10-31T10:20:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0022",
+      "ts": "2026-10-31T10:20:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0023",
+      "ts": "2026-10-31T10:20:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0024",
+      "ts": "2026-10-31T10:20:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0025",
+      "ts": "2026-10-31T10:20:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0026",
+      "ts": "2026-10-31T10:20:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0027",
+      "ts": "2026-10-31T10:20:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 81.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0028",
+      "ts": "2026-10-31T10:20:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 73.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0029",
+      "ts": "2026-10-31T10:20:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0030",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 82.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0031",
+      "ts": "2026-10-31T10:20:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0032",
+      "ts": "2026-10-31T10:20:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0033",
+      "ts": "2026-10-31T10:20:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 84.2
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0034",
+      "ts": "2026-10-31T10:20:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0035",
+      "ts": "2026-10-31T10:20:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0036",
+      "ts": "2026-10-31T10:20:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 86.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0037",
+      "ts": "2026-10-31T10:20:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0038",
+      "ts": "2026-10-31T10:20:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 81.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0039",
+      "ts": "2026-10-31T10:20:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 81.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0040",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 84.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0041",
+      "ts": "2026-10-31T10:20:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 82.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0042",
+      "ts": "2026-10-31T10:20:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 75.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0043",
+      "ts": "2026-10-31T10:20:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0044",
+      "ts": "2026-10-31T10:20:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 84.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0045",
+      "ts": "2026-10-31T10:20:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 74.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0046",
+      "ts": "2026-10-31T10:20:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0047",
+      "ts": "2026-10-31T10:20:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0048",
+      "ts": "2026-10-31T10:20:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 81.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0049",
+      "ts": "2026-10-31T10:20:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0050",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 84.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0051",
+      "ts": "2026-10-31T10:20:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 86.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0052",
+      "ts": "2026-10-31T10:20:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.2
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0053",
+      "ts": "2026-10-31T10:20:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0054",
+      "ts": "2026-10-31T10:20:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0055",
+      "ts": "2026-10-31T10:20:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 82.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0056",
+      "ts": "2026-10-31T10:20:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0057",
+      "ts": "2026-10-31T10:20:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0058",
+      "ts": "2026-10-31T10:20:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0059",
+      "ts": "2026-10-31T10:20:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0060",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 75.2
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0061",
+      "ts": "2026-10-31T10:21:01Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0062",
+      "ts": "2026-10-31T10:21:02Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0063",
+      "ts": "2026-10-31T10:21:03Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 89.2
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0064",
+      "ts": "2026-10-31T10:21:04Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0065",
+      "ts": "2026-10-31T10:21:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0066",
+      "ts": "2026-10-31T10:21:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0067",
+      "ts": "2026-10-31T10:21:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 74.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0068",
+      "ts": "2026-10-31T10:21:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0069",
+      "ts": "2026-10-31T10:21:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0070",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.5
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0071",
+      "ts": "2026-10-31T10:21:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0072",
+      "ts": "2026-10-31T10:21:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0073",
+      "ts": "2026-10-31T10:21:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0074",
+      "ts": "2026-10-31T10:21:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0075",
+      "ts": "2026-10-31T10:21:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0076",
+      "ts": "2026-10-31T10:21:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0077",
+      "ts": "2026-10-31T10:21:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0078",
+      "ts": "2026-10-31T10:21:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0079",
+      "ts": "2026-10-31T10:21:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0080",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0081",
+      "ts": "2026-10-31T10:21:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0082",
+      "ts": "2026-10-31T10:21:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 84.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0083",
+      "ts": "2026-10-31T10:21:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0084",
+      "ts": "2026-10-31T10:21:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0085",
+      "ts": "2026-10-31T10:21:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0086",
+      "ts": "2026-10-31T10:21:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0087",
+      "ts": "2026-10-31T10:21:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0088",
+      "ts": "2026-10-31T10:21:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 86.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0089",
+      "ts": "2026-10-31T10:21:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0090",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 83.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0091",
+      "ts": "2026-10-31T10:21:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 89.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0092",
+      "ts": "2026-10-31T10:21:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0093",
+      "ts": "2026-10-31T10:21:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0094",
+      "ts": "2026-10-31T10:21:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0095",
+      "ts": "2026-10-31T10:21:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.9
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0096",
+      "ts": "2026-10-31T10:21:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 71.2
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0097",
+      "ts": "2026-10-31T10:21:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0098",
+      "ts": "2026-10-31T10:21:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 73.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0099",
+      "ts": "2026-10-31T10:21:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0100",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0101",
+      "ts": "2026-10-31T10:21:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0102",
+      "ts": "2026-10-31T10:21:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 85.0
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0103",
+      "ts": "2026-10-31T10:21:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 73.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0104",
+      "ts": "2026-10-31T10:21:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 76.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0105",
+      "ts": "2026-10-31T10:21:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 73.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0106",
+      "ts": "2026-10-31T10:21:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0107",
+      "ts": "2026-10-31T10:21:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 75.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0108",
+      "ts": "2026-10-31T10:21:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.7
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0109",
+      "ts": "2026-10-31T10:21:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 86.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0110",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 78.4
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0111",
+      "ts": "2026-10-31T10:21:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0112",
+      "ts": "2026-10-31T10:21:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0113",
+      "ts": "2026-10-31T10:21:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 80.3
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0114",
+      "ts": "2026-10-31T10:21:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 81.8
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0115",
+      "ts": "2026-10-31T10:21:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 81.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0116",
+      "ts": "2026-10-31T10:21:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.1
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0117",
+      "ts": "2026-10-31T10:21:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 79.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0118",
+      "ts": "2026-10-31T10:21:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 77.6
+    },
+    {
+      "sample_id": "m-alice-rtt_ms-0119",
+      "ts": "2026-10-31T10:21:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "rtt_ms",
+      "value": 73.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 6.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0012",
+      "ts": "2026-10-31T10:20:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 7.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0013",
+      "ts": "2026-10-31T10:20:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0014",
+      "ts": "2026-10-31T10:20:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0015",
+      "ts": "2026-10-31T10:20:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0016",
+      "ts": "2026-10-31T10:20:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0017",
+      "ts": "2026-10-31T10:20:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0018",
+      "ts": "2026-10-31T10:20:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0019",
+      "ts": "2026-10-31T10:20:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0020",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0021",
+      "ts": "2026-10-31T10:20:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0022",
+      "ts": "2026-10-31T10:20:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0023",
+      "ts": "2026-10-31T10:20:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0024",
+      "ts": "2026-10-31T10:20:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0025",
+      "ts": "2026-10-31T10:20:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0026",
+      "ts": "2026-10-31T10:20:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0027",
+      "ts": "2026-10-31T10:20:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0028",
+      "ts": "2026-10-31T10:20:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0029",
+      "ts": "2026-10-31T10:20:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0030",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0031",
+      "ts": "2026-10-31T10:20:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0032",
+      "ts": "2026-10-31T10:20:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0033",
+      "ts": "2026-10-31T10:20:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0034",
+      "ts": "2026-10-31T10:20:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 7.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0035",
+      "ts": "2026-10-31T10:20:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0036",
+      "ts": "2026-10-31T10:20:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0037",
+      "ts": "2026-10-31T10:20:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0038",
+      "ts": "2026-10-31T10:20:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0039",
+      "ts": "2026-10-31T10:20:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0040",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0041",
+      "ts": "2026-10-31T10:20:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0042",
+      "ts": "2026-10-31T10:20:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 13.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0043",
+      "ts": "2026-10-31T10:20:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0044",
+      "ts": "2026-10-31T10:20:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0045",
+      "ts": "2026-10-31T10:20:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0046",
+      "ts": "2026-10-31T10:20:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0047",
+      "ts": "2026-10-31T10:20:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0048",
+      "ts": "2026-10-31T10:20:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0049",
+      "ts": "2026-10-31T10:20:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0050",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0051",
+      "ts": "2026-10-31T10:20:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0052",
+      "ts": "2026-10-31T10:20:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0053",
+      "ts": "2026-10-31T10:20:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0054",
+      "ts": "2026-10-31T10:20:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0055",
+      "ts": "2026-10-31T10:20:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0056",
+      "ts": "2026-10-31T10:20:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0057",
+      "ts": "2026-10-31T10:20:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 7.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0058",
+      "ts": "2026-10-31T10:20:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0059",
+      "ts": "2026-10-31T10:20:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0060",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0061",
+      "ts": "2026-10-31T10:21:01Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0062",
+      "ts": "2026-10-31T10:21:02Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0063",
+      "ts": "2026-10-31T10:21:03Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0064",
+      "ts": "2026-10-31T10:21:04Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0065",
+      "ts": "2026-10-31T10:21:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0066",
+      "ts": "2026-10-31T10:21:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0067",
+      "ts": "2026-10-31T10:21:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0068",
+      "ts": "2026-10-31T10:21:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0069",
+      "ts": "2026-10-31T10:21:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0070",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0071",
+      "ts": "2026-10-31T10:21:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0072",
+      "ts": "2026-10-31T10:21:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0073",
+      "ts": "2026-10-31T10:21:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0074",
+      "ts": "2026-10-31T10:21:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0075",
+      "ts": "2026-10-31T10:21:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0076",
+      "ts": "2026-10-31T10:21:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 7.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0077",
+      "ts": "2026-10-31T10:21:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0078",
+      "ts": "2026-10-31T10:21:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0079",
+      "ts": "2026-10-31T10:21:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0080",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0081",
+      "ts": "2026-10-31T10:21:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0082",
+      "ts": "2026-10-31T10:21:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0083",
+      "ts": "2026-10-31T10:21:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0084",
+      "ts": "2026-10-31T10:21:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0085",
+      "ts": "2026-10-31T10:21:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0086",
+      "ts": "2026-10-31T10:21:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0087",
+      "ts": "2026-10-31T10:21:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0088",
+      "ts": "2026-10-31T10:21:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.8
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0089",
+      "ts": "2026-10-31T10:21:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0090",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0091",
+      "ts": "2026-10-31T10:21:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0092",
+      "ts": "2026-10-31T10:21:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0093",
+      "ts": "2026-10-31T10:21:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0094",
+      "ts": "2026-10-31T10:21:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0095",
+      "ts": "2026-10-31T10:21:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0096",
+      "ts": "2026-10-31T10:21:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 13.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0097",
+      "ts": "2026-10-31T10:21:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0098",
+      "ts": "2026-10-31T10:21:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.6
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0099",
+      "ts": "2026-10-31T10:21:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0100",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0101",
+      "ts": "2026-10-31T10:21:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0102",
+      "ts": "2026-10-31T10:21:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.1
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0103",
+      "ts": "2026-10-31T10:21:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0104",
+      "ts": "2026-10-31T10:21:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0105",
+      "ts": "2026-10-31T10:21:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 7.7
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0106",
+      "ts": "2026-10-31T10:21:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0107",
+      "ts": "2026-10-31T10:21:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 12.4
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0108",
+      "ts": "2026-10-31T10:21:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0109",
+      "ts": "2026-10-31T10:21:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.5
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0110",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.0
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0111",
+      "ts": "2026-10-31T10:21:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0112",
+      "ts": "2026-10-31T10:21:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 6.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0113",
+      "ts": "2026-10-31T10:21:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 7.2
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0114",
+      "ts": "2026-10-31T10:21:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0115",
+      "ts": "2026-10-31T10:21:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 9.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0116",
+      "ts": "2026-10-31T10:21:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.9
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0117",
+      "ts": "2026-10-31T10:21:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 11.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0118",
+      "ts": "2026-10-31T10:21:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 8.3
+    },
+    {
+      "sample_id": "m-alice-jitter_ms-0119",
+      "ts": "2026-10-31T10:21:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "jitter_ms",
+      "value": 10.8
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0012",
+      "ts": "2026-10-31T10:20:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0013",
+      "ts": "2026-10-31T10:20:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0014",
+      "ts": "2026-10-31T10:20:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0015",
+      "ts": "2026-10-31T10:20:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0016",
+      "ts": "2026-10-31T10:20:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0017",
+      "ts": "2026-10-31T10:20:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0018",
+      "ts": "2026-10-31T10:20:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0019",
+      "ts": "2026-10-31T10:20:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0020",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0021",
+      "ts": "2026-10-31T10:20:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0022",
+      "ts": "2026-10-31T10:20:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0023",
+      "ts": "2026-10-31T10:20:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0024",
+      "ts": "2026-10-31T10:20:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0025",
+      "ts": "2026-10-31T10:20:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0026",
+      "ts": "2026-10-31T10:20:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0027",
+      "ts": "2026-10-31T10:20:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0028",
+      "ts": "2026-10-31T10:20:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.0
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0029",
+      "ts": "2026-10-31T10:20:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0030",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0031",
+      "ts": "2026-10-31T10:20:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0032",
+      "ts": "2026-10-31T10:20:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0033",
+      "ts": "2026-10-31T10:20:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0034",
+      "ts": "2026-10-31T10:20:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0035",
+      "ts": "2026-10-31T10:20:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0036",
+      "ts": "2026-10-31T10:20:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0037",
+      "ts": "2026-10-31T10:20:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0038",
+      "ts": "2026-10-31T10:20:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0039",
+      "ts": "2026-10-31T10:20:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0040",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0041",
+      "ts": "2026-10-31T10:20:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0042",
+      "ts": "2026-10-31T10:20:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0043",
+      "ts": "2026-10-31T10:20:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0044",
+      "ts": "2026-10-31T10:20:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.1
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0045",
+      "ts": "2026-10-31T10:20:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0046",
+      "ts": "2026-10-31T10:20:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0047",
+      "ts": "2026-10-31T10:20:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0048",
+      "ts": "2026-10-31T10:20:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0049",
+      "ts": "2026-10-31T10:20:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0050",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0051",
+      "ts": "2026-10-31T10:20:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0052",
+      "ts": "2026-10-31T10:20:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0053",
+      "ts": "2026-10-31T10:20:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0054",
+      "ts": "2026-10-31T10:20:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0055",
+      "ts": "2026-10-31T10:20:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0056",
+      "ts": "2026-10-31T10:20:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0057",
+      "ts": "2026-10-31T10:20:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0058",
+      "ts": "2026-10-31T10:20:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0059",
+      "ts": "2026-10-31T10:20:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0060",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0061",
+      "ts": "2026-10-31T10:21:01Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0062",
+      "ts": "2026-10-31T10:21:02Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0063",
+      "ts": "2026-10-31T10:21:03Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0064",
+      "ts": "2026-10-31T10:21:04Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0065",
+      "ts": "2026-10-31T10:21:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0066",
+      "ts": "2026-10-31T10:21:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0067",
+      "ts": "2026-10-31T10:21:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0068",
+      "ts": "2026-10-31T10:21:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0069",
+      "ts": "2026-10-31T10:21:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0070",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0071",
+      "ts": "2026-10-31T10:21:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.1
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0072",
+      "ts": "2026-10-31T10:21:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0073",
+      "ts": "2026-10-31T10:21:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0074",
+      "ts": "2026-10-31T10:21:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0075",
+      "ts": "2026-10-31T10:21:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0076",
+      "ts": "2026-10-31T10:21:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0077",
+      "ts": "2026-10-31T10:21:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0078",
+      "ts": "2026-10-31T10:21:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0079",
+      "ts": "2026-10-31T10:21:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0080",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0081",
+      "ts": "2026-10-31T10:21:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0082",
+      "ts": "2026-10-31T10:21:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0083",
+      "ts": "2026-10-31T10:21:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0084",
+      "ts": "2026-10-31T10:21:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0085",
+      "ts": "2026-10-31T10:21:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0086",
+      "ts": "2026-10-31T10:21:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0087",
+      "ts": "2026-10-31T10:21:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0088",
+      "ts": "2026-10-31T10:21:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0089",
+      "ts": "2026-10-31T10:21:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0090",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0091",
+      "ts": "2026-10-31T10:21:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0092",
+      "ts": "2026-10-31T10:21:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0093",
+      "ts": "2026-10-31T10:21:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0094",
+      "ts": "2026-10-31T10:21:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0095",
+      "ts": "2026-10-31T10:21:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0096",
+      "ts": "2026-10-31T10:21:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0097",
+      "ts": "2026-10-31T10:21:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0098",
+      "ts": "2026-10-31T10:21:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0099",
+      "ts": "2026-10-31T10:21:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0100",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0101",
+      "ts": "2026-10-31T10:21:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0102",
+      "ts": "2026-10-31T10:21:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0103",
+      "ts": "2026-10-31T10:21:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0104",
+      "ts": "2026-10-31T10:21:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.2
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0105",
+      "ts": "2026-10-31T10:21:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0106",
+      "ts": "2026-10-31T10:21:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0107",
+      "ts": "2026-10-31T10:21:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0108",
+      "ts": "2026-10-31T10:21:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0109",
+      "ts": "2026-10-31T10:21:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0110",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0111",
+      "ts": "2026-10-31T10:21:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0112",
+      "ts": "2026-10-31T10:21:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.3
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0113",
+      "ts": "2026-10-31T10:21:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0114",
+      "ts": "2026-10-31T10:21:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0115",
+      "ts": "2026-10-31T10:21:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.6
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0116",
+      "ts": "2026-10-31T10:21:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0117",
+      "ts": "2026-10-31T10:21:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.7
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0118",
+      "ts": "2026-10-31T10:21:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.4
+    },
+    {
+      "sample_id": "m-alice-packet_loss_pct-0119",
+      "ts": "2026-10-31T10:21:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "packet_loss_pct",
+      "value": 0.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1554.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1518.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1501.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1566.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1573.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1522.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1488.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0012",
+      "ts": "2026-10-31T10:20:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1514.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0013",
+      "ts": "2026-10-31T10:20:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1541.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0014",
+      "ts": "2026-10-31T10:20:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1636.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0015",
+      "ts": "2026-10-31T10:20:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1524.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0016",
+      "ts": "2026-10-31T10:20:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1399.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0017",
+      "ts": "2026-10-31T10:20:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1456.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0018",
+      "ts": "2026-10-31T10:20:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1484.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0019",
+      "ts": "2026-10-31T10:20:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1529.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0020",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1498.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0021",
+      "ts": "2026-10-31T10:20:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1464.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0022",
+      "ts": "2026-10-31T10:20:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1586.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0023",
+      "ts": "2026-10-31T10:20:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1456.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0024",
+      "ts": "2026-10-31T10:20:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1501.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0025",
+      "ts": "2026-10-31T10:20:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1447.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0026",
+      "ts": "2026-10-31T10:20:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1480.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0027",
+      "ts": "2026-10-31T10:20:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1547.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0028",
+      "ts": "2026-10-31T10:20:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1444.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0029",
+      "ts": "2026-10-31T10:20:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1499.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0030",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1543.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0031",
+      "ts": "2026-10-31T10:20:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1464.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0032",
+      "ts": "2026-10-31T10:20:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1490.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0033",
+      "ts": "2026-10-31T10:20:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1474.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0034",
+      "ts": "2026-10-31T10:20:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1497.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0035",
+      "ts": "2026-10-31T10:20:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1503.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0036",
+      "ts": "2026-10-31T10:20:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1432.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0037",
+      "ts": "2026-10-31T10:20:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1503.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0038",
+      "ts": "2026-10-31T10:20:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1428.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0039",
+      "ts": "2026-10-31T10:20:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1452.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0040",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1482.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0041",
+      "ts": "2026-10-31T10:20:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1424.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0042",
+      "ts": "2026-10-31T10:20:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1561.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0043",
+      "ts": "2026-10-31T10:20:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1476.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0044",
+      "ts": "2026-10-31T10:20:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1464.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0045",
+      "ts": "2026-10-31T10:20:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1531.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0046",
+      "ts": "2026-10-31T10:20:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1487.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0047",
+      "ts": "2026-10-31T10:20:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1440.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0048",
+      "ts": "2026-10-31T10:20:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1502.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0049",
+      "ts": "2026-10-31T10:20:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1518.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0050",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1538.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0051",
+      "ts": "2026-10-31T10:20:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1370.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0052",
+      "ts": "2026-10-31T10:20:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1366.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0053",
+      "ts": "2026-10-31T10:20:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1594.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0054",
+      "ts": "2026-10-31T10:20:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1408.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0055",
+      "ts": "2026-10-31T10:20:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1523.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0056",
+      "ts": "2026-10-31T10:20:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1405.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0057",
+      "ts": "2026-10-31T10:20:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1550.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0058",
+      "ts": "2026-10-31T10:20:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1548.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0059",
+      "ts": "2026-10-31T10:20:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1521.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0060",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1524.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0061",
+      "ts": "2026-10-31T10:21:01Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1502.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0062",
+      "ts": "2026-10-31T10:21:02Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1608.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0063",
+      "ts": "2026-10-31T10:21:03Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1528.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0064",
+      "ts": "2026-10-31T10:21:04Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1456.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0065",
+      "ts": "2026-10-31T10:21:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1493.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0066",
+      "ts": "2026-10-31T10:21:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1538.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0067",
+      "ts": "2026-10-31T10:21:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1490.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0068",
+      "ts": "2026-10-31T10:21:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1406.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0069",
+      "ts": "2026-10-31T10:21:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1501.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0070",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1504.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0071",
+      "ts": "2026-10-31T10:21:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1547.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0072",
+      "ts": "2026-10-31T10:21:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1496.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0073",
+      "ts": "2026-10-31T10:21:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1501.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0074",
+      "ts": "2026-10-31T10:21:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1419.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0075",
+      "ts": "2026-10-31T10:21:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1442.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0076",
+      "ts": "2026-10-31T10:21:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1479.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0077",
+      "ts": "2026-10-31T10:21:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1390.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0078",
+      "ts": "2026-10-31T10:21:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1441.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0079",
+      "ts": "2026-10-31T10:21:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1478.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0080",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1475.8
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0081",
+      "ts": "2026-10-31T10:21:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1449.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0082",
+      "ts": "2026-10-31T10:21:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1561.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0083",
+      "ts": "2026-10-31T10:21:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1558.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0084",
+      "ts": "2026-10-31T10:21:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1545.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0085",
+      "ts": "2026-10-31T10:21:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1446.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0086",
+      "ts": "2026-10-31T10:21:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1429.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0087",
+      "ts": "2026-10-31T10:21:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1513.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0088",
+      "ts": "2026-10-31T10:21:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1531.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0089",
+      "ts": "2026-10-31T10:21:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1462.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0090",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1406.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0091",
+      "ts": "2026-10-31T10:21:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1458.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0092",
+      "ts": "2026-10-31T10:21:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1512.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0093",
+      "ts": "2026-10-31T10:21:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1576.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0094",
+      "ts": "2026-10-31T10:21:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1500.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0095",
+      "ts": "2026-10-31T10:21:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1605.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0096",
+      "ts": "2026-10-31T10:21:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1506.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0097",
+      "ts": "2026-10-31T10:21:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1524.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0098",
+      "ts": "2026-10-31T10:21:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1533.0
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0099",
+      "ts": "2026-10-31T10:21:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1496.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0100",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1500.6
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0101",
+      "ts": "2026-10-31T10:21:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1415.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0102",
+      "ts": "2026-10-31T10:21:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1509.5
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0103",
+      "ts": "2026-10-31T10:21:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1495.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0104",
+      "ts": "2026-10-31T10:21:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1486.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0105",
+      "ts": "2026-10-31T10:21:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1537.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0106",
+      "ts": "2026-10-31T10:21:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1601.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0107",
+      "ts": "2026-10-31T10:21:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1544.1
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0108",
+      "ts": "2026-10-31T10:21:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1517.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0109",
+      "ts": "2026-10-31T10:21:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1564.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0110",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1503.4
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0111",
+      "ts": "2026-10-31T10:21:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1529.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0112",
+      "ts": "2026-10-31T10:21:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1506.9
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0113",
+      "ts": "2026-10-31T10:21:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1483.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0114",
+      "ts": "2026-10-31T10:21:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1381.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0115",
+      "ts": "2026-10-31T10:21:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1468.7
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0116",
+      "ts": "2026-10-31T10:21:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1400.2
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0117",
+      "ts": "2026-10-31T10:21:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1626.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0118",
+      "ts": "2026-10-31T10:21:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1550.3
+    },
+    {
+      "sample_id": "m-alice-bitrate_kbps-0119",
+      "ts": "2026-10-31T10:21:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "inbound",
+      "metric": "bitrate_kbps",
+      "value": 1491.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0000",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0001",
+      "ts": "2026-10-31T10:20:01Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0002",
+      "ts": "2026-10-31T10:20:02Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0003",
+      "ts": "2026-10-31T10:20:03Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 42.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0004",
+      "ts": "2026-10-31T10:20:04Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 31.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0012",
+      "ts": "2026-10-31T10:20:12Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0013",
+      "ts": "2026-10-31T10:20:13Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0014",
+      "ts": "2026-10-31T10:20:14Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0015",
+      "ts": "2026-10-31T10:20:15Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0016",
+      "ts": "2026-10-31T10:20:16Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0017",
+      "ts": "2026-10-31T10:20:17Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0018",
+      "ts": "2026-10-31T10:20:18Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0019",
+      "ts": "2026-10-31T10:20:19Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0020",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0021",
+      "ts": "2026-10-31T10:20:21Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0022",
+      "ts": "2026-10-31T10:20:22Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 32.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0023",
+      "ts": "2026-10-31T10:20:23Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0024",
+      "ts": "2026-10-31T10:20:24Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0025",
+      "ts": "2026-10-31T10:20:25Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0026",
+      "ts": "2026-10-31T10:20:26Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0027",
+      "ts": "2026-10-31T10:20:27Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0028",
+      "ts": "2026-10-31T10:20:28Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0029",
+      "ts": "2026-10-31T10:20:29Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0030",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0031",
+      "ts": "2026-10-31T10:20:31Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 32.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0032",
+      "ts": "2026-10-31T10:20:32Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0033",
+      "ts": "2026-10-31T10:20:33Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0034",
+      "ts": "2026-10-31T10:20:34Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0035",
+      "ts": "2026-10-31T10:20:35Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 33.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0036",
+      "ts": "2026-10-31T10:20:36Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0037",
+      "ts": "2026-10-31T10:20:37Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 41.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0038",
+      "ts": "2026-10-31T10:20:38Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0039",
+      "ts": "2026-10-31T10:20:39Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0040",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0041",
+      "ts": "2026-10-31T10:20:41Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0042",
+      "ts": "2026-10-31T10:20:42Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0043",
+      "ts": "2026-10-31T10:20:43Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0044",
+      "ts": "2026-10-31T10:20:44Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0045",
+      "ts": "2026-10-31T10:20:45Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0046",
+      "ts": "2026-10-31T10:20:46Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 33.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0047",
+      "ts": "2026-10-31T10:20:47Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0048",
+      "ts": "2026-10-31T10:20:48Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 33.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0049",
+      "ts": "2026-10-31T10:20:49Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 33.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0050",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0051",
+      "ts": "2026-10-31T10:20:51Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0052",
+      "ts": "2026-10-31T10:20:52Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0053",
+      "ts": "2026-10-31T10:20:53Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 41.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0054",
+      "ts": "2026-10-31T10:20:54Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0055",
+      "ts": "2026-10-31T10:20:55Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 43.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0056",
+      "ts": "2026-10-31T10:20:56Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0057",
+      "ts": "2026-10-31T10:20:57Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0058",
+      "ts": "2026-10-31T10:20:58Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0059",
+      "ts": "2026-10-31T10:20:59Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 41.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0060",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0061",
+      "ts": "2026-10-31T10:21:01Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 33.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0062",
+      "ts": "2026-10-31T10:21:02Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0063",
+      "ts": "2026-10-31T10:21:03Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.2
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0064",
+      "ts": "2026-10-31T10:21:04Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0065",
+      "ts": "2026-10-31T10:21:05Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0066",
+      "ts": "2026-10-31T10:21:06Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0067",
+      "ts": "2026-10-31T10:21:07Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.2
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0068",
+      "ts": "2026-10-31T10:21:08Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0069",
+      "ts": "2026-10-31T10:21:09Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0070",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0071",
+      "ts": "2026-10-31T10:21:11Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0072",
+      "ts": "2026-10-31T10:21:12Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0073",
+      "ts": "2026-10-31T10:21:13Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0074",
+      "ts": "2026-10-31T10:21:14Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0075",
+      "ts": "2026-10-31T10:21:15Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0076",
+      "ts": "2026-10-31T10:21:16Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0077",
+      "ts": "2026-10-31T10:21:17Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0078",
+      "ts": "2026-10-31T10:21:18Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0079",
+      "ts": "2026-10-31T10:21:19Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0080",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0081",
+      "ts": "2026-10-31T10:21:21Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0082",
+      "ts": "2026-10-31T10:21:22Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0083",
+      "ts": "2026-10-31T10:21:23Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0084",
+      "ts": "2026-10-31T10:21:24Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 31.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0085",
+      "ts": "2026-10-31T10:21:25Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0086",
+      "ts": "2026-10-31T10:21:26Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 30.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0087",
+      "ts": "2026-10-31T10:21:27Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0088",
+      "ts": "2026-10-31T10:21:28Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0089",
+      "ts": "2026-10-31T10:21:29Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0090",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 43.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0091",
+      "ts": "2026-10-31T10:21:31Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0092",
+      "ts": "2026-10-31T10:21:32Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 41.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0093",
+      "ts": "2026-10-31T10:21:33Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0094",
+      "ts": "2026-10-31T10:21:34Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.7
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0095",
+      "ts": "2026-10-31T10:21:35Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 43.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0096",
+      "ts": "2026-10-31T10:21:36Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0097",
+      "ts": "2026-10-31T10:21:37Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0098",
+      "ts": "2026-10-31T10:21:38Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0099",
+      "ts": "2026-10-31T10:21:39Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0100",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0101",
+      "ts": "2026-10-31T10:21:41Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0102",
+      "ts": "2026-10-31T10:21:42Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 42.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0103",
+      "ts": "2026-10-31T10:21:43Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0104",
+      "ts": "2026-10-31T10:21:44Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 42.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0105",
+      "ts": "2026-10-31T10:21:45Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 42.2
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0106",
+      "ts": "2026-10-31T10:21:46Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 33.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0107",
+      "ts": "2026-10-31T10:21:47Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.2
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0108",
+      "ts": "2026-10-31T10:21:48Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0109",
+      "ts": "2026-10-31T10:21:49Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0110",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 35.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0111",
+      "ts": "2026-10-31T10:21:51Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.8
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0112",
+      "ts": "2026-10-31T10:21:52Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 32.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0113",
+      "ts": "2026-10-31T10:21:53Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0114",
+      "ts": "2026-10-31T10:21:54Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0115",
+      "ts": "2026-10-31T10:21:55Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0116",
+      "ts": "2026-10-31T10:21:56Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 40.2
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0117",
+      "ts": "2026-10-31T10:21:57Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 44.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0118",
+      "ts": "2026-10-31T10:21:58Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.6
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0119",
+      "ts": "2026-10-31T10:21:59Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 36.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0120",
+      "ts": "2026-10-31T10:22:00Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 42.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0000",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0001",
+      "ts": "2026-10-31T10:20:01Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0002",
+      "ts": "2026-10-31T10:20:02Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 24.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0003",
+      "ts": "2026-10-31T10:20:03Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 34.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0004",
+      "ts": "2026-10-31T10:20:04Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 38.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 26.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0012",
+      "ts": "2026-10-31T10:20:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0013",
+      "ts": "2026-10-31T10:20:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0014",
+      "ts": "2026-10-31T10:20:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 24.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0015",
+      "ts": "2026-10-31T10:20:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0016",
+      "ts": "2026-10-31T10:20:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 20.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0017",
+      "ts": "2026-10-31T10:20:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0018",
+      "ts": "2026-10-31T10:20:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0019",
+      "ts": "2026-10-31T10:20:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0020",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0021",
+      "ts": "2026-10-31T10:20:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0022",
+      "ts": "2026-10-31T10:20:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0023",
+      "ts": "2026-10-31T10:20:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0024",
+      "ts": "2026-10-31T10:20:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0025",
+      "ts": "2026-10-31T10:20:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0026",
+      "ts": "2026-10-31T10:20:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0027",
+      "ts": "2026-10-31T10:20:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0028",
+      "ts": "2026-10-31T10:20:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0029",
+      "ts": "2026-10-31T10:20:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0030",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0031",
+      "ts": "2026-10-31T10:20:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0032",
+      "ts": "2026-10-31T10:20:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0033",
+      "ts": "2026-10-31T10:20:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0034",
+      "ts": "2026-10-31T10:20:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0035",
+      "ts": "2026-10-31T10:20:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0036",
+      "ts": "2026-10-31T10:20:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0037",
+      "ts": "2026-10-31T10:20:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 37.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0038",
+      "ts": "2026-10-31T10:20:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0039",
+      "ts": "2026-10-31T10:20:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0040",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 26.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0041",
+      "ts": "2026-10-31T10:20:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0042",
+      "ts": "2026-10-31T10:20:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0043",
+      "ts": "2026-10-31T10:20:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 38.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0044",
+      "ts": "2026-10-31T10:20:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0045",
+      "ts": "2026-10-31T10:20:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0046",
+      "ts": "2026-10-31T10:20:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0047",
+      "ts": "2026-10-31T10:20:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0048",
+      "ts": "2026-10-31T10:20:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0049",
+      "ts": "2026-10-31T10:20:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0050",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 26.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0051",
+      "ts": "2026-10-31T10:20:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0052",
+      "ts": "2026-10-31T10:20:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0053",
+      "ts": "2026-10-31T10:20:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0054",
+      "ts": "2026-10-31T10:20:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0055",
+      "ts": "2026-10-31T10:20:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0056",
+      "ts": "2026-10-31T10:20:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0057",
+      "ts": "2026-10-31T10:20:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0058",
+      "ts": "2026-10-31T10:20:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0059",
+      "ts": "2026-10-31T10:20:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0060",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0061",
+      "ts": "2026-10-31T10:21:01Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0062",
+      "ts": "2026-10-31T10:21:02Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0063",
+      "ts": "2026-10-31T10:21:03Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0064",
+      "ts": "2026-10-31T10:21:04Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0065",
+      "ts": "2026-10-31T10:21:05Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0066",
+      "ts": "2026-10-31T10:21:06Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0067",
+      "ts": "2026-10-31T10:21:07Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0068",
+      "ts": "2026-10-31T10:21:08Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0069",
+      "ts": "2026-10-31T10:21:09Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0070",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0071",
+      "ts": "2026-10-31T10:21:11Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0072",
+      "ts": "2026-10-31T10:21:12Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0073",
+      "ts": "2026-10-31T10:21:13Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0074",
+      "ts": "2026-10-31T10:21:14Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0075",
+      "ts": "2026-10-31T10:21:15Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 24.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0076",
+      "ts": "2026-10-31T10:21:16Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0077",
+      "ts": "2026-10-31T10:21:17Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0078",
+      "ts": "2026-10-31T10:21:18Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 26.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0079",
+      "ts": "2026-10-31T10:21:19Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0080",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0081",
+      "ts": "2026-10-31T10:21:21Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0082",
+      "ts": "2026-10-31T10:21:22Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0083",
+      "ts": "2026-10-31T10:21:23Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0084",
+      "ts": "2026-10-31T10:21:24Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0085",
+      "ts": "2026-10-31T10:21:25Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0086",
+      "ts": "2026-10-31T10:21:26Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 34.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0087",
+      "ts": "2026-10-31T10:21:27Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0088",
+      "ts": "2026-10-31T10:21:28Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0089",
+      "ts": "2026-10-31T10:21:29Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 26.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0090",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0091",
+      "ts": "2026-10-31T10:21:31Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0092",
+      "ts": "2026-10-31T10:21:32Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 38.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0093",
+      "ts": "2026-10-31T10:21:33Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0094",
+      "ts": "2026-10-31T10:21:34Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0095",
+      "ts": "2026-10-31T10:21:35Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0096",
+      "ts": "2026-10-31T10:21:36Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0097",
+      "ts": "2026-10-31T10:21:37Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0098",
+      "ts": "2026-10-31T10:21:38Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0099",
+      "ts": "2026-10-31T10:21:39Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0100",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0101",
+      "ts": "2026-10-31T10:21:41Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0102",
+      "ts": "2026-10-31T10:21:42Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0103",
+      "ts": "2026-10-31T10:21:43Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0104",
+      "ts": "2026-10-31T10:21:44Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0105",
+      "ts": "2026-10-31T10:21:45Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0106",
+      "ts": "2026-10-31T10:21:46Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0107",
+      "ts": "2026-10-31T10:21:47Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0108",
+      "ts": "2026-10-31T10:21:48Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0109",
+      "ts": "2026-10-31T10:21:49Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0110",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 34.6
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0111",
+      "ts": "2026-10-31T10:21:51Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0112",
+      "ts": "2026-10-31T10:21:52Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.2
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0113",
+      "ts": "2026-10-31T10:21:53Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0114",
+      "ts": "2026-10-31T10:21:54Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 32.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0115",
+      "ts": "2026-10-31T10:21:55Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0116",
+      "ts": "2026-10-31T10:21:56Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0117",
+      "ts": "2026-10-31T10:21:57Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0118",
+      "ts": "2026-10-31T10:21:58Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.1
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0119",
+      "ts": "2026-10-31T10:21:59Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0120",
+      "ts": "2026-10-31T10:22:00Z",
+      "call_id": "call-1000",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.1
+    }
+  ],
+  "logs": [
+    {
+      "log_id": "log-001",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": "call-1000",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "call created caller=alice callee=bob",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-002",
+      "ts": "2026-10-31T10:20:01.500000Z",
+      "call_id": "call-1000",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "bob accepted call",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-003",
+      "ts": "2026-10-31T10:20:01.750000Z",
+      "call_id": "call-1000",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "OFFER relayed alice→bob (SDP 2.9 KB, 2 m= sections)",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-004",
+      "ts": "2026-10-31T10:20:02Z",
+      "call_id": "call-1000",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "ANSWER relayed bob→alice",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-005",
+      "ts": "2026-10-31T10:20:02.600000Z",
+      "call_id": "call-1000",
+      "component": "turn-01",
+      "level": "INFO",
+      "category": "turn",
+      "message": "allocation created relay=203.0.113.10:49152",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-006",
+      "ts": "2026-10-31T10:20:02.900000Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "WARN",
+      "category": "ice",
+      "message": "candidate pair host↔host failed: timeout",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-007",
+      "ts": "2026-10-31T10:20:03.150000Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "INFO",
+      "category": "ice",
+      "message": "selected candidate pair srflx↔srflx",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-008",
+      "ts": "2026-10-31T10:20:03.600000Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "INFO",
+      "category": "dtls",
+      "message": "DTLS handshake complete (role client)",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-009",
+      "ts": "2026-10-31T10:20:03.900000Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "INFO",
+      "category": "media",
+      "message": "first inbound RTP ssrc=1234567 (video)",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-011",
+      "ts": "2026-10-31T10:20:20Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-012",
+      "ts": "2026-10-31T10:20:30Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-013",
+      "ts": "2026-10-31T10:20:30.500000Z",
+      "call_id": "call-0999",
+      "component": "turn-01",
+      "level": "INFO",
+      "category": "turn",
+      "message": "allocation created for another call",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-014",
+      "ts": "2026-10-31T10:20:40Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-015",
+      "ts": "2026-10-31T10:20:50Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-016",
+      "ts": "2026-10-31T10:21:00Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-017",
+      "ts": "2026-10-31T10:21:10Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-018",
+      "ts": "2026-10-31T10:21:20Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-019",
+      "ts": "2026-10-31T10:21:30Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-020",
+      "ts": "2026-10-31T10:21:40Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-021",
+      "ts": "2026-10-31T10:21:50Z",
+      "call_id": "call-1000",
+      "component": "alice",
+      "level": "DEBUG",
+      "category": "media",
+      "message": "getStats snapshot ok",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-022",
+      "ts": "2026-10-31T10:22:00Z",
+      "call_id": "call-1000",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "HANGUP from alice",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-023",
+      "ts": "2026-10-31T10:22:00.200000Z",
+      "call_id": "call-1000",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "call ended reason=normal",
+      "attrs": {}
+    }
+  ]
+}

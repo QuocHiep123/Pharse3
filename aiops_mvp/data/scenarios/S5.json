@@ -1,0 +1,382 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "call_id": "call-1005",
+    "scenario_id": "S5",
+    "title": "Signaling timeout",
+    "start_ts": "2026-10-31T10:20:00Z",
+    "end_ts": "2026-10-31T10:20:11.800000Z",
+    "caller": "alice",
+    "callee": "bob",
+    "measured_endpoint": "alice",
+    "turn_server": "turn-01",
+    "clock_model": "single_synthetic_clock",
+    "expected_metrics": [
+      "alice/client_cpu_pct",
+      "turn-01/turn_cpu_pct"
+    ],
+    "missing_sources": [
+      "bob/getStats: không thu thập trong MVP"
+    ]
+  },
+  "events": [
+    {
+      "event_id": "ev-001",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": "call-1005",
+      "phase": "call_setup",
+      "component": "signaling",
+      "type": "CALL_CREATED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-002",
+      "ts": "2026-10-31T10:20:00.050000Z",
+      "call_id": "call-1005",
+      "phase": "call_setup",
+      "component": "signaling",
+      "type": "INVITE_SENT",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-003",
+      "ts": "2026-10-31T10:20:00.120000Z",
+      "call_id": "call-1005",
+      "phase": "call_setup",
+      "component": "bob",
+      "type": "INVITE_RECEIVED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-004",
+      "ts": "2026-10-31T10:20:01.500000Z",
+      "call_id": "call-1005",
+      "phase": "call_setup",
+      "component": "bob",
+      "type": "CALL_ACCEPTED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-005",
+      "ts": "2026-10-31T10:20:01.600000Z",
+      "call_id": "call-1005",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "OFFER_CREATED",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-006",
+      "ts": "2026-10-31T10:20:01.650000Z",
+      "call_id": "call-1005",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "OFFER_SENT",
+      "attrs": {}
+    },
+    {
+      "event_id": "ev-007",
+      "ts": "2026-10-31T10:20:11.650000Z",
+      "call_id": "call-1005",
+      "phase": "offer_answer",
+      "component": "alice",
+      "type": "SIGNALING_TIMEOUT",
+      "attrs": {
+        "waited_ms": 10000
+      }
+    },
+    {
+      "event_id": "ev-008",
+      "ts": "2026-10-31T10:20:11.700000Z",
+      "call_id": "call-1005",
+      "phase": "termination",
+      "component": "alice",
+      "type": "HANGUP",
+      "attrs": {
+        "by": "alice",
+        "reason": "signaling_timeout"
+      }
+    },
+    {
+      "event_id": "ev-009",
+      "ts": "2026-10-31T10:20:11.800000Z",
+      "call_id": "call-1005",
+      "phase": "termination",
+      "component": "signaling",
+      "type": "CALL_ENDED",
+      "attrs": {
+        "reason": "signaling_timeout"
+      }
+    }
+  ],
+  "metrics": [
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0000",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 37.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0001",
+      "ts": "2026-10-31T10:20:01Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0002",
+      "ts": "2026-10-31T10:20:02Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.3
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0003",
+      "ts": "2026-10-31T10:20:03Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 39.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0004",
+      "ts": "2026-10-31T10:20:04Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 43.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.4
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 45.9
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 34.0
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.1
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 42.5
+    },
+    {
+      "sample_id": "m-turn-01-turn_cpu_pct-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": null,
+      "source": "turn-01",
+      "direction": "none",
+      "metric": "turn_cpu_pct",
+      "value": 38.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0000",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 28.5
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0001",
+      "ts": "2026-10-31T10:20:01Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 24.7
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0002",
+      "ts": "2026-10-31T10:20:02Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 24.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0003",
+      "ts": "2026-10-31T10:20:03Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 33.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0004",
+      "ts": "2026-10-31T10:20:04Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 35.0
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0005",
+      "ts": "2026-10-31T10:20:05Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.9
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0006",
+      "ts": "2026-10-31T10:20:06Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 27.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0007",
+      "ts": "2026-10-31T10:20:07Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 25.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0008",
+      "ts": "2026-10-31T10:20:08Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 29.4
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0009",
+      "ts": "2026-10-31T10:20:09Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 30.8
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0010",
+      "ts": "2026-10-31T10:20:10Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 24.3
+    },
+    {
+      "sample_id": "m-alice-client_cpu_pct-0011",
+      "ts": "2026-10-31T10:20:11Z",
+      "call_id": "call-1005",
+      "source": "alice",
+      "direction": "none",
+      "metric": "client_cpu_pct",
+      "value": 31.4
+    }
+  ],
+  "logs": [
+    {
+      "log_id": "log-001",
+      "ts": "2026-10-31T10:20:00Z",
+      "call_id": "call-1005",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "call created caller=alice callee=bob",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-002",
+      "ts": "2026-10-31T10:20:01.500000Z",
+      "call_id": "call-1005",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "bob accepted call",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-003",
+      "ts": "2026-10-31T10:20:01.700000Z",
+      "call_id": "call-1005",
+      "component": "signaling",
+      "level": "WARN",
+      "category": "signaling",
+      "message": "websocket for bob closed (code 1006); OFFER queued",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-004",
+      "ts": "2026-10-31T10:20:11.650000Z",
+      "call_id": "call-1005",
+      "component": "alice",
+      "level": "ERROR",
+      "category": "signaling",
+      "message": "no ANSWER received within 10000 ms",
+      "attrs": {}
+    },
+    {
+      "log_id": "log-005",
+      "ts": "2026-10-31T10:20:11.800000Z",
+      "call_id": "call-1005",
+      "component": "signaling",
+      "level": "INFO",
+      "category": "signaling",
+      "message": "call ended reason=signaling_timeout",
+      "attrs": {}
+    }
+  ]
+}
