@@ -31,6 +31,30 @@ docker compose up -d --wait        # Redis + OpenSearch (tùy chọn; không có
 - Redis `HGETALL call:<call_id>`: trạng thái live của cuộc gọi.
 - OpenSearch index `callops-events`, `callops-qos`: `curl "localhost:9200/callops-events/_search?q=error_code:ICE_FAILED&pretty"`.
 
+## Demo UI (Gradio)
+
+```powershell
+.venv\Scripts\pip install -e ".[dev,ui]"
+.venv\Scripts\callops ui --port 7860     # mở http://127.0.0.1:7860, không cần Docker/LLM
+```
+
+6 tab: Run / Playground (chọn/sửa kịch bản), Call Flow (sơ đồ từng bước có animation), QoS Timeline (chart + ngưỡng + vùng sự cố),
+Diagnosis (FACT ↔ INFERENCE, rule khớp/không khớp), Logs / Export, Upload / Re-analyze. Thanh thời gian + Play đặt trên các tab;
+bật sẵn chế độ "Giải thích cho người mới".
+
+## WebRTC Lab
+
+Trang web dùng `RTCPeerConnection` thật của trình duyệt (chỉ stdlib, không cần extra) để xem từng bước hai bên gọi nhau và xuất log/metric.
+
+```powershell
+.venv\Scripts\callops lab            # http://127.0.0.1:8765  (hai tab: ?role=alice và ?role=bob)
+```
+
+- Chế độ "Một trang" (Alice + Bob trong cùng trang) hoặc "Hai tab"; bật "Từng bước" để dừng sau mỗi giai đoạn (INVITE, SDP, ICE, DTLS...).
+- Media thật (camera + mic, cần `localhost`/`127.0.0.1`) hoặc giả lập; bị từ chối/không có thiết bị thì tự rơi về giả lập. Âm thanh bên kia mặc định tắt để tránh hú; hình/tiếng không rời trình duyệt, file xuất chỉ chứa metric/log.
+- Tạo sự cố thật: Chrome DevTools > Network throttling (chỉ ảnh hưởng một số luồng), **clumsy** trên Windows (lag/drop/throttle), hoặc `sudo tc qdisc add dev lo root netem delay 200ms loss 5%` trên Linux.
+- Bấm "Tải events.jsonl" + "Tải qos.csv", rồi `callops ui` > tab **Upload / Re-analyze** > chọn 2 file > "Phân tích lại".
+
 ## Luồng hoạt động
 
 ```

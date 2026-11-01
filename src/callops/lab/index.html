@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>callops WebRTC Lab</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--fg:#1c2330;--mut:#667085;--bd:#d6dbe3;--acc:#2563eb;--ok:#15803d;--warn:#b45309;--crit:#b91c1c;--code:#f1f3f7;--hl:#fff3bf}
+@media (prefers-color-scheme:dark){:root{--bg:#10141b;--panel:#171c26;--fg:#e5e9f0;--mut:#9aa4b5;--bd:#2c3445;--acc:#6ea0ff;--ok:#4ade80;--warn:#fbbf24;--crit:#f87171;--code:#1e2531;--hl:#4a3f10}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:10px 16px;border-bottom:1px solid var(--bd);background:var(--panel)}
+h1{font-size:18px;margin:0 0 4px}
+h2{font-size:14px;margin:0 0 6px}
+.mut{color:var(--mut);font-size:12px}
+main{padding:10px 16px;max-width:1500px;margin:auto}
+.bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:6px 0}
+.panel{background:var(--panel);border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:10px}
+button{font:inherit;padding:5px 11px;border:1px solid var(--bd);border-radius:6px;background:var(--panel);color:var(--fg);cursor:pointer}
+button.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:disabled{opacity:.45;cursor:not-allowed}
+input[type=text],input[type=password],select{font:inherit;padding:4px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--panel);color:var(--fg)}
+input.w{width:220px}input.m{width:120px}
+label{display:inline-flex;gap:4px;align-items:center}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) minmax(0,1fr);gap:10px}
+.peer h2{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--bd);background:var(--code)}
+.badge.real{border-color:var(--ok);color:var(--ok)}.badge.syn{border-color:var(--warn);color:var(--warn)}
+[hidden]{display:none!important}
+.vids{display:flex;gap:6px}
+.vids figure{margin:0;flex:1;min-width:0}
+.vids video{width:100%;aspect-ratio:4/3;background:#000;border-radius:6px;display:block}
+.vids figcaption{font-size:11px;color:var(--mut)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin:6px 0;font-size:12px}
+.kv b{color:var(--mut);font-weight:500}
+.list{max-height:150px;overflow:auto;font:12px/1.4 ui-monospace,Consolas,monospace;background:var(--code);border-radius:6px;padding:4px 6px}
+.list div{white-space:pre-wrap;word-break:break-all}
+.sig{height:100%;display:flex;flex-direction:column}
+.sig .list{flex:1;min-height:300px;max-height:460px}
+.sig details{margin:0}
+.sig summary{cursor:pointer}
+.sig pre{margin:2px 0 4px 14px;white-space:pre-wrap;word-break:break-all}
+.arrow-r{color:var(--acc)}.arrow-l{color:var(--ok)}
+.steps{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px}
+.chip{font-size:11px;padding:1px 8px;border-radius:10px;border:1px solid var(--bd);color:var(--mut)}
+.chip.done{border-color:var(--ok);color:var(--ok)}.chip.cur{background:var(--acc);border-color:var(--acc);color:#fff}
+.term{border-bottom:1px dotted var(--acc);cursor:help}
+.sdp div{font:12px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+.sdp .l-m{background:#bfdbfe;color:#0b2a5b}.sdp .l-rtpmap{background:#bbf7d0;color:#0b3d1c}.sdp .l-ice-ufrag{background:var(--hl);color:inherit}
+.sdp .l-fingerprint{background:#fbcfe8;color:#5b0b33}.sdp .l-candidate{background:#fed7aa;color:#4a2300}
+.sdp-box{max-height:230px;overflow:auto;background:var(--code);border-radius:6px;padding:4px 6px;margin-top:4px}
+.bottom{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:10px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{border:1px solid var(--bd);padding:3px 6px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+td.warn{color:var(--warn);font-weight:600}td.crit{color:var(--crit);font-weight:700}td.ok{color:var(--ok)}
+.lv-WARNING{color:var(--warn)}.lv-ERROR{color:var(--crit)}
+.note{border-left:3px solid var(--warn);padding:2px 8px;margin:4px 0;font-size:12px;color:var(--mut)}
+#toast{min-height:18px;color:var(--mut);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>callops WebRTC Lab <span class="mut">- gọi WebRTC thật trong trình duyệt, xuất log/metric để chẩn đoán</span></h1>
+  <div class="mut">Xem từng bước hai bên tìm thấy nhau: <span class="term" data-term="signaling">signaling</span> &rarr; <span class="term" data-term="SDP">SDP</span> offer/answer &rarr; <span class="term" data-term="ICE">ICE</span> &rarr; <span class="term" data-term="DTLS-SRTP">DTLS-SRTP</span> &rarr; đo QoS mỗi giây.</div>
+</header>
+<main>
+<div class="note" id="roleBanner" hidden style="border-left-width:6px;font-size:14px;color:var(--fg)"></div>
+<div class="panel">
+  <div class="bar" id="modeBar">
+    <b>Chế độ:</b>
+    <label><input type="radio" name="mode" value="single" checked> Một trang</label>
+    <label><input type="radio" name="mode" value="two"> Hai tab (mở <code>?role=alice</code> và <code>?role=bob</code>)</label>
+    <span id="roleLabel" class="badge" hidden></span>
+    <label title="Dừng sau mỗi giai đoạn để xem payload thật"><input type="checkbox" id="chkStep" checked> Từng bước</label>
+    <label><input type="checkbox" id="chkListen"> Nghe âm thanh bên kia (nên dùng tai nghe)</label>
+  </div>
+  <div class="note" id="listenWarn">Khi Alice và Bob cùng một máy, loa phát tiếng bên kia sẽ lọt vào mic gây hú. Mặc định âm thanh remote đang TẮT; hình vẫn hiển thị. Chỉ bật nghe khi đeo tai nghe.</div>
+  <div class="bar">
+    <b>Nguồn media:</b>
+    <label>Alice <select id="selMediaAlice"><option value="real">Media thật (camera + mic)</option><option value="synthetic">Giả lập (canvas + oscillator)</option></select></label>
+    <label>Bob <select id="selMediaBob"><option value="real">Media thật (camera + mic)</option><option value="synthetic">Giả lập (canvas + oscillator)</option></select></label>
+    <button id="btnCam">Bật camera/mic</button>
+    <button id="btnCamOff">Tắt camera/mic</button>
+    <span class="mut">origin hiện tại: <b id="origin">?</b></span>
+  </div>
+  <div class="bar">
+    <span class="badge" id="permCam">Quyền camera: ?</span>
+    <span class="badge" id="permMic">Quyền micrô: ?</span>
+  </div>
+  <div class="note" id="originNote">Quyền camera/mic được cấp THEO ORIGIN: http://127.0.0.1:8765 và http://localhost:8765 là hai origin khác nhau, cấp ở origin này không áp dụng cho origin kia.</div>
+  <div class="note lv-ERROR" id="permHint" hidden>Quyền bị chặn: bấm biểu tượng ổ khóa cạnh địa chỉ &rarr; Cài đặt trang web &rarr; Camera/Micrô &rarr; Cho phép, rồi tải lại trang.</div>
+  <div class="note" id="permWait" hidden style="border-left-width:6px;font-size:14px;color:var(--fg)">
+    <span id="permWaitText"></span> <button id="btnCancelWait">Huỷ</button>
+  </div>
+  <div class="note lv-ERROR" id="camBusy" hidden style="border-left-width:6px;font-size:14px;color:var(--fg)">
+    <b>Không mở được camera (NotReadableError): thiết bị đang bị giữ.</b> Đã tự chuyển sang media giả lập. Ba nguyên nhân thường gặp:
+    <ol style="margin:4px 0 0 18px;padding:0">
+      <li>Camera đang bị tab Lab khác hoặc ứng dụng khác (OBS, Zoom, Teams, Camera app) giữ.</li>
+      <li>Chỉ nên chạy MỘT tab Lab dùng camera thật; tab còn lại chọn "Giả lập".</li>
+      <li>Đóng ứng dụng đang giữ camera rồi bấm "Làm lại".</li>
+    </ol>
+  </div>
+  <div id="mediaMsg" class="mut"></div>
+  <div class="bar">
+    <b><span class="term" data-term="ICE">ICE</span>:</b>
+    <label>STUN <input type="text" class="w" id="stun" placeholder="(trống = offline, chỉ host)"></label>
+    <button id="btnStun">Điền stun:stun.l.google.com:19302</button>
+    <label>TURN <input type="text" class="w" id="turn" placeholder="turn:host:3478"></label>
+    <label>user <input type="text" class="m" id="turnUser"></label>
+    <label>pass <input type="password" class="m" id="turnCred"></label>
+    <label><input type="checkbox" id="chkRelay" disabled> Ép <span class="term" data-term="relay">relay</span></label>
+    <span class="mut">Timeout ICE: <b id="iceTo">20000</b> ms</span>
+  </div>
+  <div class="note lv-ERROR" id="cfgErr" hidden></div>
+  <div class="note">Với media thật, Chrome không còn che IP host bằng mDNS (<code>xxx.local</code>) nên host candidate có thể lộ IP LAN thật: hãy che thông tin này trước khi chia sẻ ảnh chụp/log. Với media giả lập (chưa cấp quyền), Chrome che IP bằng mDNS, đó là bình thường. Gọi loopback cùng máy cho metric gần hoàn hảo; muốn thấy suy giảm hãy dùng Chrome DevTools &gt; Network throttling, clumsy (Windows) hoặc <code>tc netem</code> (Linux).</div>
+  <div class="note">Quyền riêng tư: hình/tiếng chỉ đi giữa hai peer trong trình duyệt của bạn, KHÔNG gửi lên server nào (server <code>callops lab</code> chỉ phục vụ file tĩnh). File xuất chỉ chứa metric/log, KHÔNG chứa hình/tiếng.</div>
+  <div class="bar">
+    <button class="primary" id="btnStart">Gọi (Alice &rarr; Bob)</button>
+    <button id="btnNext" disabled>Bước tiếp theo</button>
+    <button id="btnAuto">Chạy tự động</button>
+    <button id="btnHang" disabled>Hangup (BYE)</button>
+    <button id="btnReset">Làm lại</button>
+    <span style="flex:1"></span>
+    <button id="btnEv">Tải events.jsonl</button>
+    <button id="btnQos">Tải qos.csv</button>
+    <button id="btnBoth">Tải cả hai</button>
+    <button id="btnCopy">Sao chép cách upload</button>
+  </div>
+  <div id="toast"></div>
+</div>
+
+<div class="panel" id="explain">
+  <h2>Chuyện gì đang xảy ra? <span id="exTitle" class="badge">chưa bắt đầu</span></h2>
+  <div class="steps" id="steps"></div>
+  <div><b>Làm gì: </b><span id="exWhat">Bấm "Gọi" để bắt đầu.</span></div>
+  <div><b>Vì sao: </b><span id="exWhy"></span></div>
+  <div class="mut" id="exState"></div>
+  <div class="note lv-ERROR" id="errBox" hidden></div>
+  <div class="mut" id="gloss">Rê chuột hoặc nhấp vào thuật ngữ gạch chân để xem giải thích.</div>
+  <div class="sdp-box sdp" id="payload" hidden></div>
+</div>
+
+<div class="cols">
+  <section class="panel peer" id="col-alice"></section>
+  <section class="panel sig">
+    <h2>Kênh signaling <span class="mut">(server trung gian, không mang media)</span></h2>
+    <div class="list" id="sigLog"></div>
+  </section>
+  <section class="panel peer" id="col-bob"></section>
+</div>
+
+<div class="bottom">
+  <section class="panel"><h2>Timeline sự kiện (= events.jsonl)</h2><div class="list" id="timeline" style="max-height:260px"></div></section>
+  <section class="panel"><h2>QoS mỗi giây (= qos.csv)</h2><div id="qosWrap"></div><div class="mut" id="pathLine">Đường media: chưa có</div><div class="mut" id="sampleCount"></div></section>
+</div>
+</main>
+
+<script>
+'use strict';
+// ====================================================================== tiện ích DOM (mọi dữ liệu động chỉ đi qua textContent)
+const $ = (id) => document.getElementById(id);
+function h(tag, cls, text, kids) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = String(text);
+  if (kids) kids.forEach((k) => e.appendChild(k));
+  return e;
+}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(cond, ms) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < ms) { if (cond()) return true; await sleep(100); }
+  return !!cond();
+}
+
+const GLOSSARY = {
+  ICE: 'Interactive Connectivity Establishment: quy trình thu thập các địa chỉ (candidate) có thể dùng rồi thử từng cặp để tìm đường đi tốt nhất giữa hai bên.',
+  STUN: 'Server nhỏ cho biết "IP:port public của bạn nhìn từ Internet là gì" (sinh ra candidate srflx). Không chuyển media.',
+  TURN: 'Server trung chuyển: khi không đi trực tiếp được (NAT đối xứng, chặn UDP) media đi vòng qua TURN (candidate relay). Tốn băng thông, thêm độ trễ.',
+  SDP: 'Session Description Protocol: văn bản mô tả codec, ICE ufrag/pwd, fingerprint DTLS... Hai bên trao đổi offer/answer để thống nhất cách gọi.',
+  signaling: 'Kênh tự chọn (WebSocket, HTTP...) để hai bên gửi SDP và candidate cho nhau. WebRTC không quy định kênh này.',
+  candidate: 'Một địa chỉ (ip:port, giao thức, loại) mà máy có thể nhận media. Mỗi bên có nhiều candidate: host, srflx, relay.',
+  host: 'Candidate là IP của chính máy (LAN). Nhanh nhất nhưng chỉ dùng được khi hai bên cùng mạng.',
+  srflx: 'Server-reflexive: IP:port public do STUN báo lại. Dùng để hole-punching qua NAT (đường P2P_STUN).',
+  prflx: 'Peer-reflexive: địa chỉ học được trong lúc connectivity check, không có trong SDP.',
+  relay: 'Địa chỉ cấp trên TURN server. Media đi qua server (đường TURN_RELAY).',
+  'DTLS-SRTP': 'Sau khi ICE chọn được cặp, hai bên bắt tay DTLS (kiểm fingerprint trong SDP) để sinh khóa, rồi gửi media mã hóa SRTP.',
+  jitter: 'Độ dao động thời gian đến giữa các gói RTP (ms). Cao thì jitter buffer phải giãn, gây trễ/méo tiếng. >30ms là cảnh báo.',
+  MOS: 'Mean Opinion Score 1-5 ước lượng chất lượng nghe, tính từ RTT, jitter, mất gói (E-model). >=4.0 tốt, <3.6 kém.',
+  RTT: 'Round-trip time: thời gian khứ hồi của gói (ms), lấy từ candidate-pair đã chọn.',
+  loss: 'Phần trăm gói RTP bị mất trong 1 giây vừa qua.',
+  concealment: 'Phần trăm mẫu âm thanh mà bộ giải mã phải "bịa" (PLC) vì gói mất/đến trễ.',
+  freeze: 'Số lần video bị đứng hình trong 1 giây.',
+  trickle: 'Trickle ICE: gửi candidate ngay khi tìm thấy, không chờ thu thập xong.',
+  BUNDLE: 'Gộp audio+video vào cùng một cổng/transport để chỉ cần một lần ICE.',
+};
+const STATE_HELP = {
+  new: 'vừa tạo, chưa làm gì', checking: 'đang thử (connectivity check) các cặp candidate', connected: 'đã có ít nhất một cặp chạy được',
+  completed: 'đã kiểm xong mọi cặp', failed: 'mọi cặp đều thất bại: không có đường media', disconnected: 'mất kết nối tạm thời, đang thử lại',
+  closed: 'đã đóng', gathering: 'đang thu thập candidate', complete: 'thu thập xong', stable: 'ổn định, không có offer/answer dở dang',
+  'have-local-offer': 'đã đặt offer cục bộ, chờ answer', 'have-remote-offer': 'đã nhận offer, chờ tạo answer', connecting: 'đang kết nối (ICE + DTLS)',
+};
+function rich(el, str) {
+  // {{TERM}} -> span thuật ngữ có tooltip; còn lại là text thường
+  el.textContent = '';
+  String(str).split(/(\{\{[^}]+\}\})/).forEach((part) => {
+    const m = /^\{\{([^}]+)\}\}$/.exec(part);
+    if (m) el.appendChild(termSpan(m[1])); else if (part) el.appendChild(document.createTextNode(part));
+  });
+}
+function termSpan(t) {
+  const s = h('span', 'term', t);
+  s.dataset.term = t; wireTerm(s); return s;
+}
+function wireTerm(s) {
+  const t = s.dataset.term;
+  s.title = GLOSSARY[t] || '';
+  s.tabIndex = 0;
+  const show = () => { $('gloss').textContent = t + ': ' + (GLOSSARY[t] || ''); };
+  s.addEventListener('click', show);
+  s.addEventListener('focus', show);
+}
+
+// ====================================================================== công thức MOS
+// MOS-BEGIN
+// Port nguyên văn từ callops/qos.py::compute_mos (ITU-T G.107 E-model rút gọn, Cole & Rosenbluth).
+function computeMos(rtt, jitter, loss) {
+  const d = rtt / 2 + 2 * jitter + 10.0;
+  const iD = 0.024 * d + (d > 177.3 ? 0.11 * (d - 177.3) : 0.0);
+  const ie = 0.0, bpl = 25.1;
+  const ieEff = ie + (95 - ie) * loss / (loss + bpl);
+  const r = 93.2 - iD - ieEff;
+  if (r <= 0) return 1.0;
+  if (r >= 100) return 4.5;
+  const mos = 1 + 0.035 * r + 7e-6 * r * (r - 60) * (100 - r);
+  return Math.round(Math.max(1.0, Math.min(4.5, mos)) * 100) / 100;
+}
+// MOS-END
+
+// ngưỡng giống callops/qos.py::THRESHOLDS
+const TH = {
+  rtt_ms: { w: 300, c: 500, hi: true }, jitter_ms: { w: 30, c: 50, hi: true }, packet_loss_pct: { w: 1, c: 5, hi: true },
+  mos: { w: 3.6, c: 3.1, hi: false }, concealment_pct: { w: 5, c: 10, hi: true },
+};
+function sev(metric, v) {
+  const t = TH[metric]; if (!t) return '';
+  if (t.hi) return v >= t.c ? 'crit' : v >= t.w ? 'warn' : 'ok';
+  return v <= t.c ? 'crit' : v <= t.w ? 'warn' : 'ok';
+}
+
+// ====================================================================== trạng thái toàn cục
+const ICE_TIMEOUT_MS = 20000; // quá thời gian này sau khi trao đổi SDP mà ICE chưa connected -> ICE_FAILED (ice_timeout)
+let iceTimeoutMs = ICE_TIMEOUT_MS;
+const GUM_TIMEOUT_MS = 20000; // chờ người dùng cấp quyền camera/mic tối đa chừng này, hết giờ tự chuyển sang giả lập
+let gumTimeoutMs = GUM_TIMEOUT_MS;
+function setGumTimeout(ms) { gumTimeoutMs = Math.max(200, Number(ms) || GUM_TIMEOUT_MS); }
+function setIceTimeout(ms) { iceTimeoutMs = Math.max(500, Number(ms) || ICE_TIMEOUT_MS); $('iceTo').textContent = String(iceTimeoutMs); }
+const QOS_COLS = 'ts,call_id,participant_id,t_s,rtt_ms,jitter_ms,packet_loss_pct,mos,video_freeze_count,concealment_pct'.split(',');
+function newState() {
+  return {
+    mode: 'single', role: null, callId: null, callState: 'IDLE', events: [], samples: [], extras: {},
+    mediaStart: null, mediaPath: null, pair: null, pendingGate: null, running: false, ended: false, aborted: false,
+    timer: null, iceTimer: null, mediaWait: null, iceUp: false, failed: false, failReason: null, lastError: null, tIdx: 0, ticking: false, exchanged: false, pairBusy: false, pairDone: false, curStep: null, doneSteps: [],
+  };
+}
+let S = newState();
+const media = { alice: null, bob: null };
+const mediaSel = { alice: 'real', bob: 'real' };
+let peers = {};
+let views = {};
+let sigChan = null, teleChan = null;
+const SEND_LABEL = { invite: 'INVITE', accept: '200 OK (RINGING_ACCEPTED)', offer: 'SDP offer', answer: 'SDP answer', candidate: 'ice-candidate', bye: 'BYE' };
+
+function rand8() {
+  const a = new Uint8Array(4); crypto.getRandomValues(a);
+  return Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+function isoTs(ms) { return new Date(ms).toISOString().replace('Z', '+00:00'); }
+const localNames = () => (S.mode === 'two' ? [S.role] : ['alice', 'bob']);
+const isLocal = (n) => localNames().indexOf(n) >= 0;
+
+const tele = { post(msg) { if (teleChan) { try { teleChan.postMessage(msg); } catch (e) { /* bỏ qua */ } } } };
+
+// ====================================================================== sự kiện (events.jsonl)
+function emit(event, message, o) {
+  o = o || {};
+  if (o.state) S.callState = o.state;
+  const ev = {
+    ts: isoTs(o.ts || Date.now()), call_id: S.callId, level: o.level || 'INFO', event: event, state: S.callState,
+    error_code: o.code || null, message: message, detail: o.detail || {},
+  };
+  addEvent(ev);
+  tele.post({ k: 'event', ev: ev });
+  return ev;
+}
+function addEvent(ev) {
+  S.events.push(ev);
+  const t0 = Date.parse(S.events[0].ts);
+  const dt = ((Date.parse(ev.ts) - t0) / 1000).toFixed(2);
+  const row = h('div', 'lv-' + ev.level, '+' + dt + 's  ' + ev.event + '  [' + ev.state + ']  ' + ev.message);
+  $('timeline').appendChild(row); $('timeline').scrollTop = 1e9;
+}
+function exportEvents() {
+  const evs = S.events.slice().sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
+  return evs.map((e) => JSON.stringify(e)).join('\n') + (evs.length ? '\n' : '');
+}
+function exportQos() {
+  const rows = S.samples.slice().sort((a, b) => (Date.parse(a.ts) - Date.parse(b.ts)) || (a.participant_id < b.participant_id ? -1 : 1));
+  return [QOS_COLS.join(',')].concat(rows.map((r) => QOS_COLS.map((c) => String(r[c])).join(','))).join('\n') + '\n';
+}
+function download(name, text, type) {
+  const url = URL.createObjectURL(new Blob([text], { type: type }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 500);
+}
+function toast(msg) { $('toast').textContent = msg; }
+
+// ====================================================================== giải thích từng bước
+const STEPS = {
+  invite: { t: '1. INVITE', next: 'gửi INVITE', what: 'Alice báo cho Bob qua kênh {{signaling}} rằng muốn gọi (INVITE). Lúc này chưa có media, chưa có kết nối trực tiếp nào.', why: 'Hai trình duyệt chưa biết nhau; phải có một kênh trung gian (signaling) để làm quen. WebRTC không quy định kênh này.' },
+  ringing: { t: '2. RINGING / accept', next: 'Bob chấp nhận', what: 'Bob đổ chuông rồi chấp nhận cuộc gọi, gửi lại trả lời qua signaling.', why: 'Chỉ khi callee đồng ý, caller mới tốn công tạo offer và thu thập {{candidate}}.' },
+  createOffer: { t: '3. createOffer + setLocalDescription', next: 'tạo offer', what: 'Alice gọi createOffer(): trình duyệt sinh bản mô tả {{SDP}} (codec, {{BUNDLE}}, ice-ufrag, fingerprint). setLocalDescription() chốt nó và bắt đầu thu thập {{ICE}} candidate.', why: 'Offer cho Bob biết Alice gửi/nhận được codec nào và cách xác thực khóa DTLS (fingerprint). Màu trong SDP: m= (xanh dương), rtpmap (xanh lá), ice-ufrag (vàng), fingerprint (hồng), candidate (cam).' },
+  sendOffer: { t: '4. Gửi offer', next: 'gửi offer qua signaling', what: 'Offer được gửi cho Bob qua signaling. Đây chỉ là văn bản, chưa có media.', why: 'Trình duyệt không tự gửi SDP; ứng dụng phải chuyển nó cho đối phương.' },
+  setRemote: { t: '5. setRemoteDescription(offer)', next: 'Bob đặt remote offer', what: 'Bob đặt offer của Alice làm remote description.', why: 'Từ đây Bob biết codec của Alice, ufrag và fingerprint để kiểm tra kết nối sau này.' },
+  createAnswer: { t: '6. createAnswer + setLocalDescription', next: 'tạo answer', what: 'Bob tạo answer (chọn codec chung) và setLocalDescription; Bob bắt đầu thu thập candidate của mình.', why: 'Answer chốt những gì hai bên cùng hỗ trợ (ví dụ opus + VP8).' },
+  sendAnswer: { t: '7. Gửi answer', next: 'gửi answer qua signaling', what: 'Bob gửi answer về cho Alice; sau đó Bob bắt đầu gửi các candidate (trickle).', why: 'Alice cần answer để hoàn tất đàm phán SDP.' },
+  setAnswer: { t: '8. setRemoteDescription(answer)', next: 'Alice đặt remote answer', what: 'Alice đặt answer làm remote description. Ghi event SDP_ANSWER, state ANSWER_RECEIVED.', why: 'Đàm phán xong: hai bên đã thống nhất codec, khóa, ufrag/pwd.' },
+  ice: { t: '9. ICE: trao đổi candidate', next: 'Alice gửi candidate', what: 'Từng {{candidate}} (host / srflx / relay) được gửi qua signaling ({{trickle}}). Mỗi bên ghép candidate của mình với candidate của bên kia thành các cặp và thử (connectivity check).', why: 'Mạng thật có NAT/firewall nên không thể biết trước đường nào thông. Thử mọi cặp theo độ ưu tiên: host rẻ nhất, srflx qua {{STUN}}, relay qua {{TURN}} là phương án cuối.' },
+  pair: { t: '10. Chọn cặp candidate (getStats)', next: 'đọc selected pair', what: 'Đọc getStats() để biết cặp candidate-pair được chọn (loại local/remote, RTT) và suy ra đường media: P2P_HOST, P2P_STUN hoặc TURN_RELAY.', why: 'Đường media quyết định độ trễ và chi phí: relay thêm một chặng qua server.' },
+  media: { t: '11. MEDIA_ESTABLISHED (DTLS-SRTP)', next: 'xác nhận media', what: 'Bắt tay {{DTLS-SRTP}} xong: audio/video chảy dưới dạng SRTP. Bắt đầu đo QoS mỗi giây.', why: 'Kết nối ICE chỉ là đường ống; DTLS mới mã hóa và xác thực đối phương bằng fingerprint trong SDP.' },
+  measure: { t: '12. Đo QoS mỗi giây', next: '', what: 'Mỗi giây getStats() cho RTT, {{jitter}}, mất gói, {{concealment}}, {{freeze}}; từ đó tính {{MOS}}. Bấm Hangup để kết thúc (BYE).', why: 'Đây chính là dữ liệu mà AIOps dùng để tách FACT khỏi INFERENCE.' },
+  bye: { t: '13. BYE', next: '', what: 'Một bên gửi BYE, hai bên đóng PeerConnection, tắt camera/mic.', why: 'Giải phóng tài nguyên (cổng, TURN allocation) và chốt duration_s.' },
+  failed: { t: 'Thất bại', next: '', what: 'ICE failed: không cặp candidate nào chạy được.', why: 'Thường do NAT đối xứng hoặc chặn UDP mà không có TURN; thử điền TURN hoặc bỏ throttling quá nặng.' },
+};
+const STEP_ORDER = ['invite', 'ringing', 'createOffer', 'sendOffer', 'setRemote', 'createAnswer', 'sendAnswer', 'setAnswer', 'ice', 'pair', 'media', 'measure', 'bye'];
+function buildChips() {
+  const box = $('steps'); box.textContent = '';
+  STEP_ORDER.forEach((id) => { const c = h('span', 'chip', STEPS[id].t); c.id = 'chip-' + id; box.appendChild(c); });
+}
+function setStep(id) {
+  const s = STEPS[id]; if (!s) return;
+  if (S.curStep && S.doneSteps.indexOf(S.curStep) < 0) S.doneSteps.push(S.curStep);
+  S.curStep = id;
+  STEP_ORDER.forEach((k) => {
+    const c = $('chip-' + k); if (!c) return;
+    c.className = 'chip' + (k === id ? ' cur' : S.doneSteps.indexOf(k) >= 0 ? ' done' : '');
+    c.dataset.active = k === id ? '1' : '0';
+  });
+  $('exTitle').textContent = s.t; rich($('exWhat'), s.what); rich($('exWhy'), s.why);
+}
+function gate(id) {
+  setStep(id);
+  if (S.aborted || S.ended) return Promise.resolve(false);
+  if (!$('chkStep').checked) return Promise.resolve(true);
+  return new Promise((res) => {
+    S.pendingGate = { id: id, res: res };
+    $('btnNext').disabled = false; $('btnNext').textContent = 'Bước tiếp theo: ' + STEPS[id].next;
+  });
+}
+function next() {
+  const g = S.pendingGate; if (!g) return false;
+  S.pendingGate = null; $('btnNext').disabled = true; $('btnNext').textContent = 'Bước tiếp theo'; g.res(true); return true;
+}
+function payload(title, text, isSdp) {
+  const box = $('payload'); box.hidden = false; box.textContent = '';
+  box.appendChild(h('div', '', '--- ' + title + ' ---'));
+  renderSdp(box, text, isSdp);
+}
+function sdpClass(l) {
+  if (l.startsWith('m=')) return 'l-m';
+  if (l.startsWith('a=rtpmap')) return 'l-rtpmap';
+  if (l.startsWith('a=ice-ufrag')) return 'l-ice-ufrag';
+  if (l.startsWith('a=fingerprint')) return 'l-fingerprint';
+  if (l.startsWith('a=candidate')) return 'l-candidate';
+  return '';
+}
+function renderSdp(box, text, isSdp) {
+  String(text).split(/\r?\n/).forEach((l) => { if (l !== '') box.appendChild(h('div', isSdp ? sdpClass(l) : '', l)); });
+}
+
+// ====================================================================== view của mỗi bên
+class PeerView {
+  constructor(name) {
+    this.name = name; this.forward = false;
+    const root = $('col-' + name); root.textContent = '';
+    this.badge = h('span', 'badge', 'chưa bật media');
+    root.appendChild(h('h2', '', null, [h('span', '', name.toUpperCase() + (name === 'alice' ? ' (caller)' : ' (callee)')), this.badge]));
+    this.localVideo = document.createElement('video'); this.localVideo.muted = true; this.localVideo.autoplay = true; this.localVideo.playsInline = true;
+    this.remoteVideo = document.createElement('video'); this.remoteVideo.autoplay = true; this.remoteVideo.playsInline = true; this.remoteVideo.muted = true;
+    this.vids = h('div', 'vids', null, [
+      h('figure', '', null, [this.localVideo, h('figcaption', '', 'Preview local (muted)')]),
+      h('figure', '', null, [this.remoteVideo, h('figcaption', '', 'Nhận từ bên kia (qua WebRTC)')]),
+    ]);
+    this.ph = h('div', 'note'); this.ph.hidden = true;
+    root.appendChild(this.vids); root.appendChild(this.ph);
+    this.st = {};
+    const kv = h('div', 'kv');
+    [['signaling', 'signalingState'], ['gathering', 'iceGatheringState'], ['ice', 'iceConnectionState'], ['connection', 'connectionState']].forEach(([k, label]) => {
+      kv.appendChild(h('b', '', label)); this.st[k] = h('span', '', '-'); kv.appendChild(this.st[k]);
+    });
+    this.pathEl = h('span', '', '-'); kv.appendChild(h('b', '', 'cặp được chọn')); kv.appendChild(this.pathEl);
+    root.appendChild(kv);
+    root.appendChild(h('div', 'mut', 'Candidate thu thập được (host / srflx / relay):'));
+    this.candBox = h('div', 'list'); root.appendChild(this.candBox);
+    const det = document.createElement('details');
+    det.appendChild(h('summary', 'mut', 'SDP local (đã tô sáng)'));
+    this.sdpBox = h('div', 'sdp-box sdp'); det.appendChild(this.sdpBox); root.appendChild(det);
+  }
+  do(m, ...a) { this.apply(m, a); if (this.forward) tele.post({ k: 'view', peer: this.name, m: m, a: a }); }
+  apply(m, a) { const f = this['_' + m]; if (f) f.apply(this, a); }
+  setRemoteTab(flag) {
+    // bên này nằm ở tab khác: không có video ở tab hiện tại -> thay ô đen bằng giải thích
+    const me = this.name === 'alice' ? 'Alice' : 'Bob'; const other = this.name === 'alice' ? 'BOB' : 'ALICE';
+    this.vids.hidden = !!flag; this.ph.hidden = !flag;
+    this.ph.textContent = 'Video của ' + this.name.toUpperCase() + ' nằm ở tab ' + me + '. Hình ' + me + ' bạn đang thấy ở ô "Nhận từ bên kia" của ' + other + '.';
+  }
+  setLocalStream(s) { this.localVideo.srcObject = s; }
+  setRemoteStream(s) { this.remoteVideo.srcObject = s; this.remoteVideo.muted = !$('chkListen').checked; const p = this.remoteVideo.play(); if (p && p.catch) p.catch(() => {}); }
+  _setState(kind, val) { if (this.st[kind]) { this.st[kind].textContent = val; this.st[kind].title = STATE_HELP[val] || ''; } }
+  _addCandidate(c) { this.candBox.appendChild(h('div', '', c.type + '  ' + c.ip + ':' + c.port + '  ' + c.protocol + '  prio=' + c.priority)); this.candBox.scrollTop = 1e9; }
+  _setSdp(type, text) { this.sdpBox.textContent = ''; this.sdpBox.appendChild(h('div', '', '# ' + type)); renderSdp(this.sdpBox, text, true); }
+  _setPair(txt) { this.pathEl.textContent = txt; }
+  _setMedia(kind, reason) {
+    this.badge.textContent = 'đang dùng: ' + (kind === 'real' ? 'media thật' : kind === 'synthetic' ? (reason ? 'giả lập (do lỗi camera: ' + reason + ')' : 'giả lập') : 'chưa bật');
+    this.badge.className = 'badge ' + (kind === 'real' ? 'real' : kind === 'synthetic' ? 'syn' : '');
+  }
+  _reset() { Object.keys(this.st).forEach((k) => { this.st[k].textContent = '-'; }); this.candBox.textContent = ''; this.sdpBox.textContent = ''; this.pathEl.textContent = '-'; }
+}
+
+// ====================================================================== bảng QoS
+const QCOLS = [['rtt_ms', 'RTT ms'], ['jitter_ms', 'jitter ms'], ['packet_loss_pct', 'loss %'], ['mos', 'MOS'], ['concealment_pct', 'conceal %'], ['video_freeze_count', 'freeze']];
+const qcell = {};
+function buildQosTable() {
+  const wrap = $('qosWrap'); wrap.textContent = '';
+  const t = document.createElement('table');
+  const hr = document.createElement('tr'); hr.appendChild(h('th', '', 'bên'));
+  QCOLS.forEach((c) => hr.appendChild(h('th', '', c[1]))); hr.appendChild(h('th', '', 'video')); t.appendChild(hr);
+  ['alice', 'bob'].forEach((n) => {
+    const tr = document.createElement('tr'); tr.appendChild(h('td', '', n)); qcell[n] = {};
+    QCOLS.forEach((c) => { const td = h('td', '', '-'); qcell[n][c[0]] = td; tr.appendChild(td); });
+    qcell[n].video = h('td', '', '-'); tr.appendChild(qcell[n].video); t.appendChild(tr);
+  });
+  wrap.appendChild(t);
+}
+function showSample(row, extra) {
+  const c = qcell[row.participant_id]; if (!c) return;
+  QCOLS.forEach((q) => { c[q[0]].textContent = String(row[q[0]]); c[q[0]].className = sev(q[0], row[q[0]]); });
+  c.video.textContent = extra && extra.w ? extra.w + 'x' + extra.h + ' @' + Math.round(extra.fps) + 'fps ' + Math.round(extra.kbps) + 'kbps' : '-';
+  $('sampleCount').textContent = 'Tổng ' + S.samples.length + ' mẫu (t_s=' + row.t_s + ').';
+}
+function addSample(row, extra) {
+  if (S.callState === 'CONNECTED' && S.curStep === 'media') setStep('measure');
+  S.samples.push(row); S.extras[row.participant_id] = extra; showSample(row, extra); }
+
+// ====================================================================== media (thật / giả lập)
+function describeMediaError(e) {
+  const n = (e && e.name) || 'Error';
+  const map = {
+    NotAllowedError: 'Bạn đã từ chối quyền camera/mic (hoặc trình duyệt chặn).',
+    NotFoundError: 'Không tìm thấy camera/mic trên máy.',
+    NotReadableError: 'Thiết bị đang bị ứng dụng/tab khác khóa. Hãy chuyển một bên sang "Giả lập" hoặc đóng ứng dụng đang dùng camera.',
+    OverconstrainedError: 'Thiết bị không đáp ứng ràng buộc yêu cầu.',
+    SecurityError: 'Bị chặn vì lý do bảo mật.',
+    GumTimeout: 'Chưa nhận được quyền camera/mic trong thời gian chờ.',
+    GumCancelled: 'Bạn đã huỷ chờ quyền camera/mic.',
+    InsecureContext: 'Trang không ở secure context: hãy mở bằng http://localhost hoặc http://127.0.0.1 (không dùng IP LAN).',
+  };
+  return n + ': ' + (map[n] || (e && e.message) || 'lỗi không rõ');
+}
+function makeSynthetic(name) {
+  const cv = document.createElement('canvas'); cv.width = 320; cv.height = 240;
+  const g = cv.getContext('2d'); let f = 0;
+  const draw = () => {
+    f++;
+    g.fillStyle = name === 'alice' ? '#12356b' : '#5b1d3a'; g.fillRect(0, 0, 320, 240);
+    g.fillStyle = '#fff'; g.font = '28px sans-serif'; g.fillText(name.toUpperCase() + ' (giả lập)', 16, 44);
+    g.font = '40px monospace'; g.fillText(new Date().toLocaleTimeString(), 16, 110);
+    g.fillStyle = '#fbbf24'; g.beginPath(); g.arc(160 + 110 * Math.cos(f / 8), 180 + 40 * Math.sin(f / 8), 18, 0, 6.283); g.fill();
+  };
+  draw();
+  const timer = setInterval(draw, 66);
+  const stream = cv.captureStream(15);
+  let ac = null;
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    const dst = ac.createMediaStreamDestination(); const osc = ac.createOscillator(); const gain = ac.createGain();
+    gain.gain.value = 0.08; osc.frequency.value = name === 'alice' ? 440 : 554; osc.connect(gain); gain.connect(dst); osc.start();
+    ac.resume().catch(() => {});
+    dst.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
+  } catch (e) { /* không có AudioContext: chỉ video */ }
+  return { kind: 'synthetic', stream: stream, stop() { clearInterval(timer); stream.getTracks().forEach((t) => t.stop()); if (ac) ac.close().catch(() => {}); } };
+}
+const gumWaits = {}; // name -> { since, cancel }
+let gumTick = null;
+function refreshWait() {
+  const names = Object.keys(gumWaits);
+  const box = $('permWait');
+  if (!names.length) {
+    S.mediaWait = null; box.hidden = true;
+    if (gumTick) { clearInterval(gumTick); gumTick = null; }
+    return;
+  }
+  const since = Math.min.apply(null, names.map((n) => gumWaits[n].since));
+  S.mediaWait = { since: since, timeoutMs: gumTimeoutMs, who: names.slice() };
+  box.hidden = false;
+  const left = Math.max(0, Math.ceil((since + gumTimeoutMs - Date.now()) / 1000));
+  $('permWaitText').textContent = '⏳ Đang chờ bạn cho phép camera/mic. Hãy nhìn biểu tượng camera ở thanh địa chỉ (hoặc hộp thoại của Chrome) và bấm Cho phép. Còn ' + left + ' giây.';
+  if (!gumTick) gumTick = setInterval(refreshWait, 250);
+}
+function cancelWait() { Object.keys(gumWaits).forEach((n) => gumWaits[n].cancel('GumCancelled')); }
+function makeReal(name) {
+  // gọi getUserMedia ĐỒNG BỘ trong handler của click (giữ user gesture); có timeout + huỷ
+  return new Promise((resolve, reject) => {
+    if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { const e = new Error('insecure'); e.name = 'InsecureContext'; reject(e); return; }
+    let settled = false; let to = null;
+    const settle = (fn, v) => { if (settled) return; settled = true; clearTimeout(to); delete gumWaits[name]; refreshWait(); fn(v); };
+    const cancel = (kind) => { const e = new Error(kind); e.name = kind; settle(reject, e); };
+    gumWaits[name] = { since: Date.now(), cancel: cancel };
+    to = setTimeout(() => cancel('GumTimeout'), gumTimeoutMs);
+    refreshWait();
+    let p;
+    try { p = navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true } }); } catch (e) { settle(reject, e); return; }
+    p.then((stream) => {
+      if (settled) { stream.getTracks().forEach((t) => t.stop()); return; } // đến muộn sau timeout/huỷ: bỏ, tắt đèn camera
+      settle(resolve, { kind: 'real', stream: stream, stop() { stream.getTracks().forEach((t) => t.stop()); } });
+    }, (e) => settle(reject, e));
+  });
+}
+const isLive = (m) => !!(m && m.stream.getTracks().some((t) => t.readyState === 'live'));
+function installMedia(name, m) {
+  media[name] = m;
+  views[name].do('setMedia', m.kind, m.reason); views[name].setLocalStream(m.stream);
+  return m;
+}
+function useSynthetic(name, e) {
+  // rơi về giả lập do lỗi: ghi rõ lý do lên badge + thông báo, không im lặng
+  const code = (e && e.name) || 'Error';
+  $('mediaMsg').textContent = name + ': ' + (code === 'GumTimeout' ? 'Chưa nhận được quyền camera/mic, chuyển sang media giả lập.' : describeMediaError(e) + ' -> tự chuyển sang giả lập.');
+  if (code === 'NotReadableError') $('camBusy').hidden = false;
+  mediaSel[name] = 'synthetic'; $('selMedia' + (name === 'alice' ? 'Alice' : 'Bob')).value = 'synthetic';
+  const m = makeSynthetic(name); m.reason = code;
+  return installMedia(name, m);
+}
+async function acquireSharedStream() {
+  // Chế độ một trang: mở thiết bị ĐÚNG MỘT LẦN; Bob dùng clone() của stream gốc (clone track không mở lại camera)
+  const base = await makeReal('alice');
+  const clone = base.stream.clone();
+  return { alice: base, bob: { kind: 'real', stream: clone, stop() { clone.getTracks().forEach((t) => t.stop()); } } };
+}
+async function prepareMedia(name) {
+  if (isLive(media[name])) return media[name];
+  if (mediaSel[name] === 'real') {
+    try { const m = await makeReal(name); $('mediaMsg').textContent = name + ': đã bật camera/mic thật.'; return installMedia(name, m); } catch (e) { return useSynthetic(name, e); }
+  }
+  return installMedia(name, makeSynthetic(name));
+}
+async function prepareAll(names) {
+  const todo = names.filter((n) => !isLive(media[n]));
+  if (todo.length === 2 && mediaSel.alice === 'real' && mediaSel.bob === 'real') {
+    try {
+      const sh = await acquireSharedStream();
+      installMedia('alice', sh.alice); installMedia('bob', sh.bob);
+      $('mediaMsg').textContent = 'Đã bật camera/mic thật (mở thiết bị một lần; Bob dùng bản clone của stream).';
+    } catch (e) { todo.forEach((n) => useSynthetic(n, e)); }
+    return;
+  }
+  await Promise.all(todo.map(prepareMedia));
+}
+function stopMedia() {
+  ['alice', 'bob'].forEach((n) => { if (media[n]) { try { media[n].stop(); } catch (e) { /* bỏ qua */ } media[n] = null; if (views[n]) { views[n].setLocalStream(null); views[n].do('setMedia', 'none'); } } });
+}
+function setMedia(kind, who) {
+  const k = kind === 'synthetic' ? 'synthetic' : 'real';
+  (who ? [who] : ['alice', 'bob']).forEach((n) => { mediaSel[n] = k; $('selMedia' + (n === 'alice' ? 'Alice' : 'Bob')).value = k; });
+}
+
+// ====================================================================== signaling
+function logSig(from, to, msg, dir) {
+  const arrow = from === 'alice' ? 'ALICE ---> BOB ' : 'ALICE <--- BOB ';
+  const label = SEND_LABEL[msg.t] || msg.t;
+  let body = '';
+  if (msg.sdp) body = msg.sdp; else if (msg.info) body = msg.info.type + ' ' + msg.info.ip + ':' + msg.info.port + ' ' + msg.info.protocol + ' prio=' + msg.info.priority; else body = JSON.stringify(msg);
+  const d = document.createElement('details');
+  const sm = h('summary', from === 'alice' ? 'arrow-r' : 'arrow-l', new Date().toLocaleTimeString() + '  ' + arrow + label + (dir === 'recv' ? ' (nhận)' : ''));
+  d.appendChild(sm); d.appendChild(h('pre', '', body));
+  $('sigLog').appendChild(d); $('sigLog').scrollTop = 1e9;
+}
+const sig = {
+  send(from, msg) {
+    const to = from === 'alice' ? 'bob' : 'alice';
+    logSig(from, to, msg, 'send');
+    if (S.mode === 'two') { if (sigChan) sigChan.postMessage({ from: from, msg: msg }); } else {
+      setTimeout(() => { if (peers[to]) peers[to].onMessage(msg); }, 30);
+    }
+  },
+};
+
+// ====================================================================== stats
+function pickPair(rep) {
+  const m = {}; rep.forEach((r) => { m[r.id] = r; });
+  let pair = null;
+  rep.forEach((r) => { if (r.type === 'transport' && r.selectedCandidatePairId && m[r.selectedCandidatePairId]) pair = m[r.selectedCandidatePairId]; });
+  if (!pair) rep.forEach((r) => { if (!pair && r.type === 'candidate-pair' && (r.selected || (r.nominated && r.state === 'succeeded'))) pair = r; });
+  if (!pair) return null;
+  return { pair: pair, local: m[pair.localCandidateId] || null, remote: m[pair.remoteCandidateId] || null };
+}
+function candInfo(c) {
+  return c ? { type: c.candidateType || '?', ip: c.address || c.ip || '', port: c.port, protocol: c.protocol || '', priority: c.priority } : null;
+}
+function parseCand(c) {
+  const p = (c.candidate || '').split(' '); const i = p.indexOf('typ');
+  return {
+    type: c.type || (i > 0 ? p[i + 1] : '?'), ip: c.address || p[4] || '', port: c.port != null ? c.port : Number(p[5]),
+    protocol: c.protocol || p[2] || '', priority: c.priority != null ? c.priority : Number(p[3]),
+  };
+}
+function mediaPathOf(lt, rt) {
+  if (lt === 'relay' || rt === 'relay') return 'TURN_RELAY';
+  if (lt === 'host' && rt === 'host') return 'P2P_HOST';
+  return 'P2P_STUN';
+}
+
+// ====================================================================== Peer
+class Peer {
+  constructor(name) {
+    this.name = name; this.view = views[name]; this.pc = null; this.cands = []; this.remoteCount = 0; this.pendingRemote = [];
+    this.outQueue = []; this.trickle = false; this.remoteSet = false; this.gatherDone = false; this.prev = null;
+  }
+  get other() { return this.name === 'alice' ? 'bob' : 'alice'; }
+  get driver() { return this.name === 'alice'; }
+  ensurePc() {
+    if (this.pc) return this.pc;
+    const bad = validateIce();
+    if (bad) { const e = new Error(bad); e.name = 'InvalidConfig'; throw e; }
+    const servers = []; const stun = $('stun').value.trim(); const turn = $('turn').value.trim();
+    if (stun) servers.push({ urls: stun });
+    if (turn) servers.push({ urls: turn, username: $('turnUser').value, credential: $('turnCred').value });
+    const cfg = { iceServers: servers };
+    if (turn && $('chkRelay').checked) cfg.iceTransportPolicy = 'relay';
+    const pc = new RTCPeerConnection(cfg); this.pc = pc;
+    const m = media[this.name];
+    if (m) m.stream.getTracks().forEach((t) => pc.addTrack(t, m.stream));
+    pc.onicecandidate = (e) => { if (e.candidate) this.onLocalCand(e.candidate); else this.finishGather(); };
+    pc.onicegatheringstatechange = () => { this.view.do('setState', 'gathering', pc.iceGatheringState); if (pc.iceGatheringState === 'complete') this.finishGather(); };
+    pc.onsignalingstatechange = () => this.view.do('setState', 'signaling', pc.signalingState);
+    pc.oniceconnectionstatechange = () => this.onIceConn(pc.iceConnectionState);
+    pc.onconnectionstatechange = () => this.onConn(pc.connectionState);
+    pc.onicecandidateerror = (e) => { $('exState').textContent = '[' + this.name.toUpperCase() + '] icecandidateerror ' + (e.errorCode || '') + ' ' + (e.url || '') + ' ' + (e.errorText || ''); };
+    pc.ontrack = (e) => { if (e.streams && e.streams[0]) this.view.setRemoteStream(e.streams[0]); };
+    return pc;
+  }
+  note(kind, val) { $('exState').textContent = '[' + this.name.toUpperCase() + '] ' + kind + ' = ' + val + ': ' + (STATE_HELP[val] || ''); }
+  onLocalCand(c) {
+    const info = parseCand(c); this.cands.push(info); this.view.do('addCandidate', info);
+    const msg = { t: 'candidate', c: c.toJSON(), info: info };
+    if (this.trickle) sig.send(this.name, msg); else this.outQueue.push(msg);
+  }
+  enableTrickle() { this.trickle = true; this.outQueue.splice(0).forEach((m) => sig.send(this.name, m)); }
+  finishGather() {
+    if (this.gatherDone) return; this.gatherDone = true;
+    const order = ['host', 'srflx', 'prflx', 'relay'];
+    const types = order.filter((t) => this.cands.some((c) => c.type === t));
+    const detail = { participant: this.name };
+    if (types.length) detail.candidate_types = types.join(',');
+    emit('ICE_GATHERING_COMPLETE', '[' + this.name + '] thu thập ' + this.cands.length + ' candidate: ' + (types.join(', ') || 'không có'), { detail: detail });
+    const relayOnly = !!$('turn').value.trim() && $('chkRelay').checked;
+    if (!this.cands.length || (relayOnly && types.indexOf('relay') < 0)) {
+      failCall('no_candidates', { participant: this.name }, '[' + this.name + '] không thu thập được candidate nào' + (relayOnly ? ' (relay-only, không có relay)' : ''));
+    }
+  }
+  async onMessage(m) {
+    try {
+      if (m.t === 'invite') await this.onInvite(m);
+      else if (m.t === 'accept') await this.onAccept();
+      else if (m.t === 'offer') await this.onOffer(m);
+      else if (m.t === 'answer') await this.onAnswer(m);
+      else if (m.t === 'candidate') await this.onRemoteCand(m);
+      else if (m.t === 'bye') endCall(false);
+    } catch (e) {
+      fatal('signaling:' + m.t + ' (' + this.name + ')', e);
+    }
+  }
+  async onInvite(m, fresh) {
+    if (!fresh && S.mode === 'two' && (S.running || S.ended)) { newSession(); return peers[this.name].onInvite(m, true); }
+    S.callId = m.callId; S.running = true; S.callState = 'SETUP';
+    if (!(await gate('ringing'))) return;
+    await prepareMedia(this.name);
+    emit('RINGING_ACCEPTED', 'bob chấp nhận cuộc gọi', { state: 'SETUP', detail: { callee: this.name } });
+    this.ensurePc();
+    sig.send(this.name, { t: 'accept' });
+  }
+  async onAccept() {
+    if (!(await gate('createOffer'))) return;
+    const pc = this.ensurePc();
+    const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+    const text = pc.localDescription.sdp;
+    this.view.do('setSdp', 'offer', text); payload('SDP offer (Alice)', text, true);
+    emit('SDP_OFFER', 'alice createOffer() + setLocalDescription(); gửi offer', { state: 'OFFER_SENT', detail: { sdp_lines: text.split(/\r?\n/).filter(Boolean).length } });
+    if (!(await gate('sendOffer'))) return;
+    sig.send(this.name, { t: 'offer', sdp: text });
+  }
+  async onOffer(m) {
+    if (S.mode === 'two') S.callState = 'OFFER_SENT';
+    if (!(await gate('setRemote'))) return;
+    const pc = this.ensurePc();
+    await pc.setRemoteDescription({ type: 'offer', sdp: m.sdp }); this.remoteSet = true; await this.drainRemote();
+    if (!(await gate('createAnswer'))) return;
+    const ans = await pc.createAnswer(); await pc.setLocalDescription(ans);
+    const text = pc.localDescription.sdp;
+    this.view.do('setSdp', 'answer', text); payload('SDP answer (Bob)', text, true);
+    if (S.mode === 'two') S.callState = 'ANSWER_RECEIVED';
+    if (!(await gate('sendAnswer'))) return;
+    sig.send(this.name, { t: 'answer', sdp: text });
+    this.enableTrickle();
+  }
+  async onAnswer(m) {
+    if (!(await gate('setAnswer'))) return;
+    await this.pc.setRemoteDescription({ type: 'answer', sdp: m.sdp }); this.remoteSet = true;
+    emit('SDP_ANSWER', 'Nhận answer -> setRemoteDescription()', { state: 'ANSWER_RECEIVED', detail: { sdp_lines: m.sdp.split(/\r?\n/).filter(Boolean).length } });
+    await this.drainRemote();
+    if (!(await gate('ice'))) return;
+    this.enableTrickle();
+    if (S.iceTimer) clearTimeout(S.iceTimer);
+    // watchdog tính từ sau khi người dùng qua bước ICE (thời gian đứng ở chế độ từng bước không bị tính)
+    S.iceTimer = setTimeout(() => { if (!S.iceUp) failCall('ice_timeout', { timeout_ms: iceTimeoutMs }); }, iceTimeoutMs);
+  }
+  async onRemoteCand(m) {
+    this.remoteCount++;
+    if (this.remoteSet) { try { await this.pc.addIceCandidate(m.c); } catch (e) { /* candidate muộn/không hợp lệ */ } } else this.pendingRemote.push(m.c);
+  }
+  async drainRemote() { for (const c of this.pendingRemote.splice(0)) { try { await this.pc.addIceCandidate(c); } catch (e) { /* bỏ qua */ } } }
+  onIceConn(st) {
+    this.view.do('setState', 'ice', st); this.note('iceConnectionState', st);
+    if (!this.driver) return;
+    if (st === 'checking') ensureExchanged();
+    if (st === 'connected' || st === 'completed') { S.iceUp = true; afterIceConnected(this).catch((e) => fatal('ICE', e)); }
+    if (st === 'failed') failCall('ice_failed', {});
+  }
+  onConn(st) {
+    this.view.do('setState', 'connection', st); this.note('connectionState', st);
+    if (st === 'failed' && this.driver) failCall('connection_failed', {});
+    if (st === 'connected' && S.mode === 'two' && !this.driver && !S.ended) {
+      if (!S.timer) startSampling();
+      this.showOwnPair().catch(() => {});
+    }
+  }
+  async showOwnPair() {
+    // chỉ hiển thị cặp được chọn của chính peer này (không phát ICE_SELECTED_PAIR để khỏi trùng)
+    for (let i = 0; i < 10 && this.pc && !S.ended; i++) {
+      const sp = pickPair(await this.pc.getStats());
+      if (sp) {
+        const l = candInfo(sp.local); const r = candInfo(sp.remote);
+        this.view.do('setPair', (l ? l.type : '?') + ' ' + (l ? l.ip + ':' + l.port : '?') + '  <->  ' + (r ? r.type : '?') + ' ' + (r ? r.ip + ':' + r.port : '?'));
+        return;
+      }
+      await sleep(300);
+    }
+  }
+  async collect() {
+    const rep = await this.pc.getStats(); const sp = pickPair(rep);
+    const o = { rtt: null, jA: null, jV: null, recv: 0, lost: 0, conc: 0, tot: 0, freeze: 0, vBytes: 0, w: 0, h: 0, fps: 0 };
+    if (sp && typeof sp.pair.currentRoundTripTime === 'number') o.rtt = sp.pair.currentRoundTripTime * 1000;
+    rep.forEach((r) => {
+      if (r.type === 'inbound-rtp') {
+        const k = r.kind || r.mediaType;
+        o.recv += r.packetsReceived || 0; o.lost += r.packetsLost || 0;
+        if (k === 'audio') { if (typeof r.jitter === 'number') o.jA = r.jitter * 1000; o.conc += r.concealedSamples || 0; o.tot += r.totalSamplesReceived || 0; }
+        else if (k === 'video') {
+          if (typeof r.jitter === 'number') o.jV = r.jitter * 1000;
+          o.freeze += r.freezeCount || 0; o.vBytes += r.bytesReceived || 0; o.w = r.frameWidth || o.w; o.h = r.frameHeight || o.h; o.fps = r.framesPerSecond || o.fps;
+        }
+      } else if (r.type === 'remote-inbound-rtp' && o.rtt === null && typeof r.roundTripTime === 'number') o.rtt = r.roundTripTime * 1000;
+    });
+    return o;
+  }
+  async sample(t) {
+    const cur = await this.collect(); const p = this.prev; this.prev = cur;
+    if (!p) return null;
+    const dRecv = Math.max(0, cur.recv - p.recv); const dLost = Math.max(0, cur.lost - p.lost);
+    const loss = dRecv + dLost > 0 ? (dLost / (dRecv + dLost)) * 100 : 0;
+    const dTot = cur.tot - p.tot; const conc = dTot > 0 ? Math.min(100, Math.max(0, ((cur.conc - p.conc) / dTot) * 100)) : 0;
+    const rtt = Math.round(Math.max(1, cur.rtt != null ? cur.rtt : (p.rtt != null ? p.rtt : 1)) * 10) / 10; cur.rtt = rtt;
+    const jit = Math.round((cur.jA != null ? cur.jA : (cur.jV != null ? cur.jV : 0)) * 10) / 10;
+    const lossR = Math.round(loss * 100) / 100; const concR = Math.round(conc * 100) / 100;
+    const row = {
+      ts: isoTs(S.mediaStart + t * 1000), call_id: S.callId, participant_id: this.name, t_s: t, rtt_ms: rtt, jitter_ms: jit,
+      packet_loss_pct: lossR, mos: computeMos(rtt, jit, lossR), video_freeze_count: Math.max(0, cur.freeze - p.freeze), concealment_pct: concR,
+    };
+    const extra = { w: cur.w, h: cur.h, fps: cur.fps, kbps: Math.max(0, cur.vBytes - p.vBytes) * 8 / 1000 };
+    return { row: row, extra: extra };
+  }
+}
+
+// ====================================================================== luồng điều khiển cuộc gọi
+function ensureExchanged() {
+  const a = peers.alice;
+  if (S.exchanged || !a) return; S.exchanged = true;
+  emit('ICE_CANDIDATES_EXCHANGED', 'Trao đổi candidate qua signaling (trickle ICE)', { state: 'ICE_CHECKING', detail: { local: a.cands.length, remote: a.remoteCount } });
+}
+async function afterIceConnected(alice) {
+  ensureExchanged();
+  if (S.pairDone || S.pairBusy || S.ended) return;
+  S.pairBusy = true;
+  if (!(await gate('pair'))) return;
+  let sp = null;
+  for (let i = 0; i < 10 && !sp; i++) { sp = pickPair(await alice.pc.getStats()); if (!sp) await sleep(300); }
+  const l = sp ? candInfo(sp.local) : null; const r = sp ? candInfo(sp.remote) : null;
+  const lt = l ? l.type : 'host'; const rt = r ? r.type : 'host';
+  const path = mediaPathOf(lt, rt);
+  if (path === 'TURN_RELAY') emit('TURN_FALLBACK', 'Chọn đường TURN relay (không có cặp P2P nào được chọn)', { level: 'WARNING', detail: { reason: 'relay_selected' } });
+  emit('ICE_SELECTED_PAIR', 'Nominated pair ' + lt + '<->' + rt, { state: 'ICE_CHECKING', detail: { media_path: path, local_type: lt, remote_type: rt } });
+  S.mediaPath = path; S.pair = { local: l, remote: r };
+  const txt = lt + ' ' + (l ? l.ip + ':' + l.port : '?') + '  <->  ' + rt + ' ' + (r ? r.ip + ':' + r.port : '?') + '  [' + path + ']';
+  localNames().forEach((n) => views[n].do('setPair', txt)); if (S.mode === 'single') views.bob.do('setPair', txt);
+  payload('selected candidate-pair', txt + (sp && typeof sp.pair.currentRoundTripTime === 'number' ? '\nRTT hiện tại: ' + (sp.pair.currentRoundTripTime * 1000).toFixed(1) + ' ms' : ''), false);
+  $('pathLine').textContent = 'Đường media: ' + path + '  (' + txt + ')';
+  S.pairDone = true;
+  if (!(await gate('media'))) return;
+  await waitFor(() => alice.pc && (alice.pc.connectionState === 'connected' || alice.pc.connectionState === 'failed' || S.ended), 10000);
+  if (S.ended || S.failed) return;
+  emit('MEDIA_ESTABLISHED', 'DTLS handshake xong, SRTP audio/video bắt đầu chảy', { state: 'CONNECTED', detail: { media_path: path } });
+  startSampling();
+  setStep('measure');
+}
+const FAIL_TEXT = {
+  no_candidates: 'Không thu thập được candidate nào: có thể UDP bị chặn/TURN không tới được (kiểm tra URL/user/pass của TURN, hoặc bỏ "Ép relay").',
+  ice_timeout: 'Quá thời gian chờ ICE (ICE_TIMEOUT_MS) mà chưa có cặp candidate nào chạy được: có thể NAT đối xứng / chặn UDP / mạng bị nghẽn nặng.',
+  ice_failed: 'ICE failed: không cặp candidate nào chạy được (NAT đối xứng hoặc chặn UDP mà không có TURN).',
+  connection_failed: 'connectionState = failed: ICE hoặc bắt tay DTLS không thành công.',
+};
+function showErr(msg) { const b = $('errBox'); b.hidden = false; b.textContent = msg; }
+function clearTimers() { stopSampling(); if (S.iceTimer) { clearTimeout(S.iceTimer); S.iceTimer = null; } }
+function abortCall() {
+  // dọn sạch: dừng timer, đóng pc, tắt camera/mic; idempotent
+  clearTimers(); S.failed = true; S.ended = true; S.aborted = true; S.running = false;
+  if (S.pendingGate) { S.pendingGate.res(false); S.pendingGate = null; }
+  teardownPcs(); stopMedia();
+  $('btnHang').disabled = true; $('btnStart').disabled = (S.mode === 'two' && S.role !== 'alice'); $('btnNext').disabled = true;
+}
+function failCall(reason, extra, msg) {
+  if (S.failed || S.ended) return;
+  S.failed = true; S.failReason = reason;
+  if (reason !== 'no_candidates') ensureExchanged();
+  const pa = peers.alice && peers.alice.pc;
+  const detail = Object.assign({ reason: reason, turn_configured: !!$('turn').value.trim(), relay_only: !!$('turn').value.trim() && $('chkRelay').checked }, extra || {});
+  if (pa) detail.ice_state = pa.iceConnectionState;
+  const text = msg || FAIL_TEXT[reason] || reason;
+  emit('ICE_FAILED', 'ICE thất bại (' + reason + '): ' + text, { level: 'ERROR', code: 'ICE_FAILED', detail: detail });
+  emit('CALL_FAILED', 'Cuộc gọi thất bại: không thiết lập được media', { state: 'FAILED', level: 'ERROR', code: 'ICE_FAILED', detail: { reason: reason } });
+  S.lastError = reason + ': ' + (FAIL_TEXT[reason] || text);
+  setStep('ice'); $('exTitle').textContent = STEPS.ice.t + ' - THẤT BẠI'; $('exWhat').textContent = FAIL_TEXT[reason] || text; $('exWhy').textContent = STEPS.failed.why;
+  showErr(S.lastError);
+  abortCall();
+}
+function fatal(where, e) {
+  if (S.failed || S.ended) return;
+  const name = (e && e.name) || 'Error';
+  const message = String(e && e.message ? e.message : e).slice(0, 200);
+  S.failed = true; S.failReason = 'exception'; S.lastError = where + ': ' + name + ': ' + message;
+  showErr('Lỗi trong ' + where + ' - ' + name + ': ' + message);
+  if (S.callId) {
+    emit('CALL_FAILED', 'Lỗi trong ' + where + ': ' + name + ': ' + message, { state: 'FAILED', level: 'ERROR', code: 'LAB_' + name.toUpperCase(), detail: { reason: 'exception', where: where, name: name, message: message } });
+  } else S.callState = 'FAILED';
+  abortCall();
+}
+function validateIce() {
+  const stun = $('stun').value.trim(); const turn = $('turn').value.trim();
+  if (stun && !/^stuns?:\S+/i.test(stun)) return 'STUN URL phải bắt đầu bằng stun: hoặc stuns: (ví dụ stun:stun.l.google.com:19302).';
+  if (turn && !/^turns?:\S+/i.test(turn)) return 'TURN URL phải bắt đầu bằng turn: hoặc turns: (ví dụ turn:host:3478).';
+  if (turn && (!$('turnUser').value || !$('turnCred').value)) return 'TURN cần đủ username và credential.';
+  if ($('chkRelay').checked && !turn) return '"Ép relay" cần có TURN URL.';
+  return null;
+}
+function startSampling() {
+  if (S.timer) return;
+  if (S.mode === 'two' && S.role !== 'alice') S.callState = 'CONNECTED';
+  S.mediaStart = Date.now(); S.tIdx = 0;
+  $('btnHang').disabled = false;
+  const ps = localNames().map((n) => peers[n]).filter((p) => p && p.pc);
+  ps.forEach((p) => { p.prev = null; p.collect().then((c) => { if (!p.prev) p.prev = c; }).catch(() => {}); });
+  S.timer = setInterval(async () => {
+    if (S.ticking) return; S.ticking = true;
+    try {
+      const t = S.tIdx;
+      for (const p of ps) {
+        const r = await p.sample(t);
+        if (r) { addSample(r.row, r.extra); tele.post({ k: 'sample', row: r.row, extra: r.extra }); }
+      }
+      S.tIdx++;
+    } catch (e) { S.lastError = String(e); } finally { S.ticking = false; }
+  }, 1000);
+}
+function stopSampling() { if (S.timer) { clearInterval(S.timer); S.timer = null; } }
+function teardownPcs() {
+  Object.keys(peers).forEach((n) => { const p = peers[n]; if (p && p.pc) { try { p.pc.close(); } catch (e) { /* bỏ qua */ } } });
+}
+function endCall(local) {
+  if (S.ended) return;
+  const wasConnected = S.mediaStart != null;
+  clearTimers();
+  if (local && !S.failed) {
+    const dur = wasConnected ? Math.round((Date.now() - S.mediaStart) / 1000) : 0;
+    emit('BYE', localNames()[0] + ' gửi BYE, giải phóng PeerConnection', { state: 'TERMINATED', detail: { duration_s: dur } });
+  } else if (!S.failed) S.callState = 'TERMINATED';
+  S.ended = true; S.running = false; S.aborted = true;
+  if (S.pendingGate) { S.pendingGate.res(false); S.pendingGate = null; }
+  setStep('bye'); teardownPcs(); stopMedia();
+  $('btnHang').disabled = true; $('btnStart').disabled = false; $('btnNext').disabled = true;
+}
+function hangup() {
+  if (!S.running) return false;
+  const from = S.mode === 'two' ? S.role : 'alice';
+  sig.send(from, { t: 'bye' });
+  endCall(true); return true;
+}
+
+function resetViews() {
+  ['alice', 'bob'].forEach((n) => { if (!views[n]) views[n] = new PeerView(n); views[n].apply('reset', []); });
+  $('timeline').textContent = ''; $('sigLog').textContent = ''; $('payload').hidden = true; $('payload').textContent = '';
+  $('exState').textContent = ''; $('pathLine').textContent = 'Đường media: chưa có'; $('sampleCount').textContent = '';
+  Object.keys(qcell).forEach((n) => Object.keys(qcell[n]).forEach((k) => { qcell[n][k].textContent = '-'; qcell[n][k].className = ''; }));
+}
+function newSession() {
+  clearTimers(); teardownPcs();
+  const mode = S.mode, role = S.role;
+  if (S.pendingGate) { S.pendingGate.res(false); }
+  S = newState(); S.mode = mode; S.role = role;
+  resetViews(); S.doneSteps = [];
+  setStep('invite'); $('exTitle').textContent = 'sẵn sàng';
+  ['alice', 'bob'].forEach((n) => { views[n].forward = S.mode === 'two' && n === S.role; views[n].setRemoteTab(S.mode === 'two' && n !== S.role); });
+  peers = {};
+  localNames().forEach((n) => { peers[n] = new Peer(n); });
+  ['alice', 'bob'].forEach((n) => { const m = media[n]; if (m) views[n].do('setMedia', m.kind, m.reason); });
+  $('errBox').hidden = true; $('errBox').textContent = ''; $('camBusy').hidden = !['alice', 'bob'].some((n) => media[n] && media[n].reason === 'NotReadableError');
+  $('btnStart').disabled = S.mode === 'two' && S.role !== 'alice'; $('btnHang').disabled = true; $('btnNext').disabled = true;
+}
+function openChannels() {
+  closeChannels();
+  if (typeof BroadcastChannel === 'undefined') return;
+  sigChan = new BroadcastChannel('callops-lab-sig');
+  sigChan.onmessage = (e) => {
+    const d = e.data; if (!d || d.from === S.role) return;
+    logSig(d.from, S.role, d.msg, 'recv');
+    if (peers[S.role]) peers[S.role].onMessage(d.msg);
+  };
+  teleChan = new BroadcastChannel('callops-lab-telemetry');
+  teleChan.onmessage = (e) => {
+    const d = e.data; if (!d) return;
+    if (d.k === 'event') { addEvent(d.ev); followEvent(d.ev); if (d.ev.event === 'CALL_FAILED' && !S.failed && !S.ended) { S.callState = 'FAILED'; S.failReason = 'remote'; S.lastError = 'bên kia báo CALL_FAILED: ' + d.ev.message; showErr(S.lastError); abortCall(); } }
+    else if (d.k === 'sample') addSample(d.row, d.extra);
+    else if (d.k === 'view' && views[d.peer]) views[d.peer].apply(d.m, d.a);
+  };
+}
+function followEvent(ev) {
+  // tab này không chạy các bước của tab kia -> đi theo tiến trình qua event forward
+  if (S.ended || S.failed) { if (ev.event === 'BYE') endCall(false); return; }
+  const dt = ev.detail || {};
+  if (ev.event === 'SDP_ANSWER') setStep('setAnswer');
+  else if (ev.event === 'ICE_CANDIDATES_EXCHANGED') setStep('ice');
+  else if (ev.event === 'ICE_SELECTED_PAIR') {
+    setStep('pair'); S.mediaPath = dt.media_path || null;
+    S.pair = { local: dt.local_type, remote: dt.remote_type };
+    $('pathLine').textContent = 'Đường media: ' + S.mediaPath + '  (' + dt.local_type + ' <-> ' + dt.remote_type + ')';
+  } else if (ev.event === 'MEDIA_ESTABLISHED') { S.callState = 'CONNECTED'; S.mediaPath = dt.media_path || S.mediaPath; setStep('media'); }
+  else if (ev.event === 'BYE') endCall(false);
+}
+function closeChannels() {
+  if (sigChan) { sigChan.close(); sigChan = null; }
+  if (teleChan) { teleChan.close(); teleChan = null; }
+}
+function setMode(mode, role) {
+  S.mode = mode === 'two' ? 'two' : 'single';
+  S.role = S.mode === 'two' ? (role || S.role || 'alice') : null;
+  document.querySelectorAll('input[name=mode]').forEach((r) => { r.checked = r.value === S.mode; });
+  if (S.mode === 'two') openChannels(); else closeChannels();
+  newSession();
+  if (S.mode === 'two') {
+    $('roleLabel').hidden = false; $('roleLabel').textContent = 'tab: ' + S.role.toUpperCase();
+    $('roleBanner').hidden = false;
+    $('roleBanner').textContent = S.role === 'bob' ? 'Tab này là BOB — chỉ tab này mở camera của Bob; tab Alice điều khiển các bước.' : 'Tab này là ALICE — chỉ tab này mở camera của Alice và điều khiển các bước; tab Bob chỉ làm theo.';
+    $('selMediaAlice').disabled = S.role !== 'alice'; $('selMediaBob').disabled = S.role !== 'bob';
+    if (S.role !== 'alice') { $('btnStart').disabled = true; $('btnStart').textContent = 'Bob: chờ Alice gọi'; $('chkStep').checked = false; $('chkStep').disabled = true;
+      ['btnNext', 'btnAuto'].forEach((id) => { $(id).disabled = true; $(id).title = 'Alice điều khiển các bước'; }); }
+    $('btnHang').textContent = 'Hangup (BYE)';
+  } else {
+    $('roleLabel').hidden = true; $('roleBanner').hidden = true; $('selMediaAlice').disabled = false; $('selMediaBob').disabled = false;
+    $('btnStart').textContent = 'Gọi (Alice → Bob)';
+  }
+}
+
+async function startCall() {
+  if (S.running) return false;
+  if (S.mode === 'two' && S.role !== 'alice') { toast('Chỉ tab Alice mới bắt đầu cuộc gọi.'); return false; }
+  const bad = validateIce();
+  $('cfgErr').hidden = !bad; $('cfgErr').textContent = bad ? 'Cấu hình ICE sai: ' + bad : '';
+  if (bad) { S.lastError = 'cấu hình ICE sai: ' + bad; return false; }
+  if (S.ended || S.events.length) newSession();
+  S.callId = 'lab-' + rand8(); S.running = true; $('btnStart').disabled = true;
+  try {
+    // xin media NGAY trong handler click, trước gate đầu tiên; hai bên song song để không mất user gesture
+    await prepareAll(S.mode === 'single' ? ['alice', 'bob'] : ['alice']);
+    if (!(await gate('invite'))) return false;
+    emit('INVITE', 'alice -> signaling server: INVITE tới bob', { state: 'SETUP', detail: { caller: 'alice' } });
+    payload('INVITE (JSON qua signaling)', JSON.stringify({ t: 'invite', callId: S.callId, from: 'alice', to: 'bob' }), false);
+    sig.send('alice', { t: 'invite', callId: S.callId });
+  } catch (e) { fatal('startCall', e); return false; }
+  return !S.failed;
+}
+async function run(o) {
+  o = o || {};
+  if (o.auto) { $('chkStep').checked = false; next(); }
+  if (o.mode && o.mode !== S.mode) setMode(o.mode, o.role);
+  if (o.media) setMedia(o.media);
+  if (o.iceTimeoutMs !== undefined) setIceTimeout(o.iceTimeoutMs);
+  if (o.gumTimeoutMs !== undefined) setGumTimeout(o.gumTimeoutMs);
+  if (o.stun !== undefined) $('stun').value = o.stun;
+  if (o.turn !== undefined) { $('turn').value = o.turn; $('chkRelay').disabled = !o.turn; }
+  if (o.turnUser !== undefined) $('turnUser').value = o.turnUser;
+  if (o.turnCred !== undefined) $('turnCred').value = o.turnCred;
+  if (o.relay !== undefined) $('chkRelay').checked = !!o.relay;
+  S.lastError = null;
+  let startOk = null;
+  startCall().then((v) => { startOk = v; });
+  const terminal = () => S.callState === 'CONNECTED' || S.callState === 'FAILED' || S.callState === 'TERMINATED' || S.failed || startOk === false;
+  const tmo = o.timeoutMs || 30000;
+  const done = await waitFor(terminal, tmo);
+  if (!done) {
+    const st = S.callState;
+    if (S.callId && !S.failed) {
+      emit('CALL_FAILED', 'Hết thời gian chờ (' + tmo + ' ms) khi đang ở ' + st, { state: 'FAILED', level: 'ERROR', code: 'RUN_TIMEOUT', detail: { reason: 'run_timeout', last_state: st, timeout_ms: tmo } });
+    }
+    S.lastError = 'timeout sau ' + tmo + ' ms ở state ' + st; S.failReason = 'run_timeout';
+    showErr(S.lastError); abortCall(); S.callState = 'FAILED';
+  } else if (startOk === false && !S.failed && !S.running && S.callState === 'IDLE') {
+    return { callState: 'IDLE', mediaPath: null, events: S.events.length, samples: S.samples.length, error: S.lastError, reason: 'invalid_config' };
+  }
+  if (!S.failed && o.seconds && S.callState === 'CONNECTED') { await sleep(o.seconds * 1000); hangup(); }
+  return { callState: S.callState, mediaPath: S.mediaPath, events: S.events.length, samples: S.samples.length, error: S.lastError || null, reason: S.failReason };
+}
+
+const PERM_LABEL = { prompt: 'chờ cấp', granted: 'đã cho phép', denied: 'bị chặn' };
+async function permissions() {
+  const out = { camera: 'unsupported', microphone: 'unsupported', origin: location.origin };
+  for (const n of ['camera', 'microphone']) {
+    try { out[n] = (await navigator.permissions.query({ name: n })).state; } catch (e) { /* Firefox/Safari không hỗ trợ */ }
+  }
+  return out;
+}
+function initPermissions() {
+  $('origin').textContent = location.origin;
+  const chips = { camera: $('permCam'), microphone: $('permMic') }; const names = { camera: 'camera', microphone: 'micrô' };
+  const states = {};
+  const paint = () => {
+    Object.keys(chips).forEach((n) => {
+      const st = states[n];
+      chips[n].textContent = 'Quyền ' + names[n] + ': ' + (st ? (PERM_LABEL[st] || st) : 'không rõ');
+      chips[n].className = 'badge ' + (st === 'granted' ? 'real' : st === 'denied' ? 'syn' : '');
+    });
+    $('permHint').hidden = !(states.camera === 'denied' || states.microphone === 'denied');
+  };
+  paint();
+  ['camera', 'microphone'].forEach((n) => {
+    try {
+      navigator.permissions.query({ name: n }).then((st) => { states[n] = st.state; paint(); st.onchange = () => { states[n] = st.state; paint(); }; }, () => { /* không hỗ trợ */ });
+    } catch (e) { /* không hỗ trợ */ }
+  });
+}
+
+const UPLOAD_HELP = 'Cách upload: chạy `callops ui` (cần extra ui), mở tab "Upload / Re-analyze", chọn events.jsonl và qos.csv vừa tải từ WebRTC Lab, bấm "Phân tích lại" để xem FACT -> INFERENCE.';
+
+// ====================================================================== khởi tạo
+function init() {
+  document.querySelectorAll('.term[data-term]').forEach(wireTerm);
+  buildChips(); buildQosTable(); initPermissions(); setIceTimeout(ICE_TIMEOUT_MS);
+  window.addEventListener('unhandledrejection', (e) => fatal('unhandledrejection', e.reason));
+  resetViews();
+  const role = new URLSearchParams(location.search).get('role');
+  if (role === 'alice' || role === 'bob') { setMode('two', role); document.querySelectorAll('input[name=mode]').forEach((r) => { r.disabled = true; }); } else setMode('single');
+  document.querySelectorAll('input[name=mode]').forEach((r) => r.addEventListener('change', (e) => { if (!S.running) setMode(e.target.value, 'alice'); }));
+  $('selMediaAlice').addEventListener('change', (e) => setMedia(e.target.value, 'alice'));
+  $('selMediaBob').addEventListener('change', (e) => setMedia(e.target.value, 'bob'));
+  $('btnCam').addEventListener('click', () => { prepareAll(localNames()).catch((e) => fatal('media', e)); });
+  $('btnCancelWait').addEventListener('click', cancelWait);
+  $('btnCamOff').addEventListener('click', () => { stopMedia(); $('mediaMsg').textContent = 'Đã tắt camera/mic (stop mọi track).'; });
+  $('btnStun').addEventListener('click', () => { $('stun').value = 'stun:stun.l.google.com:19302'; });
+  $('turn').addEventListener('input', () => { const has = !!$('turn').value.trim(); $('chkRelay').disabled = !has; if (!has) $('chkRelay').checked = false; });
+  $('chkListen').addEventListener('change', () => { ['alice', 'bob'].forEach((n) => { views[n].remoteVideo.muted = !$('chkListen').checked; }); });
+  $('chkStep').addEventListener('change', () => { if (!$('chkStep').checked) next(); });
+  $('btnStart').addEventListener('click', () => { startCall(); });
+  $('btnNext').addEventListener('click', () => { next(); });
+  $('btnAuto').addEventListener('click', () => { $('chkStep').checked = false; next(); if (!S.running) startCall(); });
+  $('btnHang').addEventListener('click', () => { hangup(); });
+  $('btnReset').addEventListener('click', () => { if (S.running) hangup(); stopMedia(); newSession(); toast('Đã làm lại.'); });
+  $('btnEv').addEventListener('click', () => { download('events.jsonl', exportEvents(), 'application/x-ndjson'); toast('Đã tạo events.jsonl (' + S.events.length + ' dòng).'); });
+  $('btnQos').addEventListener('click', () => { download('qos.csv', exportQos(), 'text/csv'); toast('Đã tạo qos.csv (' + S.samples.length + ' mẫu).'); });
+  $('btnBoth').addEventListener('click', () => { download('events.jsonl', exportEvents(), 'application/x-ndjson'); setTimeout(() => download('qos.csv', exportQos(), 'text/csv'), 300); toast('Đã tạo cả hai file.'); });
+  $('btnCopy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(UPLOAD_HELP); toast('Đã sao chép hướng dẫn upload.'); } catch (e) { toast(UPLOAD_HELP); }
+  });
+  const stopAll = () => { try { stopMedia(); } catch (e) { /* bỏ qua */ } };
+  window.addEventListener('pagehide', stopAll); window.addEventListener('beforeunload', stopAll);
+}
+
+window.__lab = {
+  get state() { return S; }, peers: () => peers, views: () => views,
+  run: run, next: next, hangup: hangup, startCall: startCall, setMode: setMode, setMedia: setMedia, stopMedia: stopMedia,
+  stepChip: () => { const c = document.querySelector('.chip[data-active="1"]'); return c ? c.id.replace('chip-', '') : null; }, permissions: permissions, setGumTimeout: setGumTimeout, GUM_TIMEOUT_MS: GUM_TIMEOUT_MS, cancelWait: cancelWait, setIceTimeout: setIceTimeout, ICE_TIMEOUT_MS: ICE_TIMEOUT_MS, validateIce: validateIce, exportEvents: exportEvents, exportQos: exportQos, computeMos: computeMos, reset: () => { stopMedia(); newSession(); },
+  events: () => S.events, samples: () => S.samples, glossary: GLOSSARY,
+};
+init();
+</script>
+</body>
+</html>

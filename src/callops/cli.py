@@ -1,4 +1,4 @@
-"""CLI:  callops list | callops check-env | callops run <scenario> | callops run-all"""
+"""CLI:  callops list | callops check-env | callops run <scenario> | callops run-all | callops ui [--port N] | callops lab [--port N]"""
 
 from __future__ import annotations
 
@@ -70,6 +70,13 @@ def main(argv: list[str] | None = None) -> int:
     p_run = sub.add_parser("run", help="chạy 1 kịch bản")
     p_run.add_argument("scenario", choices=sorted(SCENARIOS))
     sub.add_parser("run-all", help="chạy tất cả kịch bản")
+    p_ui = sub.add_parser("ui", help="mở demo Gradio (cần extra ui)")
+    p_ui.add_argument("--host", default="127.0.0.1")
+    p_ui.add_argument("--port", type=int, default=7860)
+    p_ui.add_argument("--share", action="store_true")
+    p_lab = sub.add_parser("lab", help="mở WebRTC Lab (trang gọi WebRTC thật trong trình duyệt)")
+    p_lab.add_argument("--host", default="127.0.0.1")
+    p_lab.add_argument("--port", type=int, default=8765)
     args = ap.parse_args(argv)
 
     settings = Settings()
@@ -82,6 +89,22 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.reconfigure(encoding="utf-8")
         for s in SCENARIOS.values():
             print(f"{s.name:<20} {s.description}\n{'':<20} kỳ vọng: {s.expected}")
+        return 0
+
+    if args.cmd == "ui":
+        # UI luôn dùng in-memory; import lười để không bắt buộc cài gradio
+        try:
+            from callops.ui.app import launch
+        except ImportError:
+            print('Thiếu thư viện UI. Cài: pip install -e ".[ui]"', file=sys.stderr)
+            return 2
+        launch(host=args.host, port=args.port, share=args.share)
+        return 0
+
+    if args.cmd == "lab":
+        from callops.lab import serve  # import lười, chỉ dùng stdlib
+
+        serve(host=args.host, port=args.port)
         return 0
 
     run_id = datetime.now().strftime("run-%Y%m%d-%H%M%S")
