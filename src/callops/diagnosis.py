@@ -84,6 +84,12 @@ class FactExtractor:
                 tags.append(f"nat:{d['nat']}")
             if "media_path" in d:
                 tags.append(f"path:{d['media_path']}")
+            if "turn_configured" in d:
+                tags.append("turn:configured" if d["turn_configured"] else "turn:none")
+            if d.get("relay_only"):
+                tags.append("relay_only")
+            if "reason" in d:
+                tags.append(f"reason:{d['reason']}")
             f = Fact(id=self._id(), ts=ev["ts"], source="log", statement=ev["message"],
                      evidence=json.dumps({k: ev[k] for k in ("ts", "level", "event", "error_code", "detail")},
                                          ensure_ascii=False),
@@ -193,13 +199,35 @@ class InferenceEngine:
         stun_to = b.by_code("STUN_TIMEOUT")
         hard_nat = [f for f in gathering if "nat:SYMMETRIC" in f.tags or "nat:UDP_BLOCKED" in f.tags]
         cited = failed + no_relay + stun_to + hard_nat
+        turn_cfg = any("turn:configured" in f.tags for f in failed)
+        reason_of = {t.split(":", 1)[1] for f in failed for t in f.tags if t.startswith("reason:")}
         reasons = []
         if stun_to:
             reasons.append(f"{len(stun_to)} STUN timeout cho thấy UDP bị chặn")
         if hard_nat:
             reasons.append("có participant sau NAT đối xứng/firewall nên srflx không hole-punch được")
         if no_relay:
-            reasons.append(f"{len(no_relay)} participant không có relay candidate (TURN chưa cấu hình/không cấp phát)")
+            reasons.append(f"{len(no_relay)} participant không có relay candidate "
+                           + ("(TURN đã cấu hình nhưng không cấp phát được)" if turn_cfg
+                              else "(TURN chưa cấu hình/không cấp phát)"))
+        if "no_candidates" in reason_of:
+            reasons.append("không thu thập được candidate nào")
+        if "ice_timeout" in reason_of:
+            reasons.append("hết thời gian chờ ICE mà chưa có cặp candidate nào chạy được")
+        if not reasons:
+            reasons.append("không có cặp candidate nào kết nối được")
+
+        if turn_cfg:
+            # Có TURN mà vẫn hỏng: nguyên nhân là TURN không dùng được, KHÔNG phải thiếu TURN.
+            return [self._inf(
+                hypothesis="ICE thất bại dù đã cấu hình TURN: TURN server không tới được hoặc credential/URL sai",
+                reasoning="; ".join(reasons) + ". TURN đã được cấu hình nhưng vẫn không có relay/cặp chạy được "
+                          "-> nghi TURN không reachable (UDP 3478/TLS 443 bị chặn), sai credential hoặc sai URL.",
+                derived_from=_ids(cited),
+                confidence=0.7 if (reason_of or any("relay_only" in f.tags for f in failed)) else 0.6,
+                recommendation="Kiểm tra TURN reachable (UDP 3478, TCP/TLS 443) từ mạng người dùng; "
+                               "kiểm tra credential/TTL và URL trong iceServers; thử bằng công cụ Trickle ICE.",
+            )]
         return [self._inf(
             hypothesis="ICE thất bại do không có đường TURN relay trong khi P2P không khả thi",
             reasoning="; ".join(reasons) + ". Khi mọi cặp host/srflx fail, chỉ TURN mới cứu được -> thiếu TURN là nguyên nhân gốc.",
