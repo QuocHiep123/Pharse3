@@ -13,3 +13,6 @@ reports/
 data/
 WebRTC-QoE Dataset/
 *.zip
+
+# local-only explainer
+docs/contracts/data-contract-explained.md
