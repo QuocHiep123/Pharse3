@@ -185,7 +185,7 @@ erDiagram
 
 <section id="call">
   <h2>2. Luồng một cuộc gọi (hai mặt phẳng: signaling qua BE, media qua TURN)</h2>
-  <p class="muted">Ghi chú trong ngoặc là bảng được ghi ở bước đó. Selector chạy song song trong lúc đổ chuông, không chặn lời mời (I14).</p>
+  <p class="muted">Ghi chú trong ngoặc là bảng được ghi ở bước đó. Selector không chặn lời mời tới B: BE gửi lời mời song song với việc gọi Selector (I14).</p>
   <div class="card"><pre class="mermaid">
 sequenceDiagram
   autonumber
@@ -198,18 +198,19 @@ sequenceDiagram
 
   A->>BE: bấm gọi
   Note over BE: ghi call_session
-  BE->>S: POST /v1/turn/select (phase=initial, chỉ biết A)
-  S-->>BE: top-k TURN cho A
-  Note over BE: ghi selector_decision (caller)
-  BE-->>A: danh sách TURN + ice_transport_policy
-  BE->>B: invite (không chờ Selector)
+  par BE gọi Selector và gửi lời mời song song (I14)
+    BE->>S: POST /v1/turn/select (phase=initial, chỉ biết A)
+    S-->>BE: top-k TURN cho A
+    Note over BE: ghi selector_decision (caller). Lỗi/timeout: static_fallback
+    BE-->>A: danh sách TURN + ice_transport_policy
+  and
+    BE->>B: invite (không chờ Selector)
+  end
   B-->>BE: ring
   Note over BE: ghi ring_ts
-  par Selector chạy song song khi đổ chuông
-    BE->>S: POST /v1/turn/select (phase=refined, biết cả A và B)
-    S-->>BE: top-k cho A và B
-    Note over BE: ghi selector_decision (mỗi thiết bị B một decision_id)
-  end
+  BE->>S: POST /v1/turn/select (phase=refined, mỗi thiết bị B đổ chuông một request)
+  S-->>BE: top-k cho A và B
+  Note over BE: ghi selector_decision (mỗi thiết bị B một decision_id)
   BE-->>B: danh sách TURN cho B
   B->>BE: bấm nghe
   Note over BE: ghi answer_ts
