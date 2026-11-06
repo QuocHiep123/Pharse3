@@ -1,0 +1,442 @@
+# Định nghĩa metric cho dashboard và đánh giá, Data Contract v0.5.0.
+# Mỗi phần tử là một dòng metric_config (xem $defs/metric_config trong dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml).
+# Cùng một metric_definition_version phải được dùng ở simulator, pipeline và dashboard.
+# Bốn nhóm: Call Quality (theo KPI_MVP_v0.5.0.md), TURN Performance, Service Health, Algorithm Quality.
+#
+# Quy ước chung:
+#   - Không thay unknown/null bằng 0, false hay "tốt". Mẫu số loại trừ phần unknown, và phần unknown được báo riêng.
+#   - Tỷ lệ luôn đi kèm n (mẫu số) và coverage. Mẫu số bằng 0 thì metric không xác định (null).
+#   - Percentile (P50/P95/P99) tính trên mẫu thô hoặc histogram gộp được; không trung bình các percentile.
+#   - Mọi metric có data_source; synthetic và production không gộp.
+#   - min_coverage_ref là tham số có version, chưa chọn giá trị.
+metric_definition_version: "0.5.0"
+metrics:
+  # ============ Call Quality (outcome_all_calls, telemetry_observed) ============
+  - metric_name: connection_success_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: outcome_all_calls
+    unit: ratio
+    denominator: toàn cohort N
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: count(media_connected = true) / N; ICE connected và DTLS connected là hai metric riêng cùng cách tính
+    denominator_rule: N = T + F + U
+    missingness_rule: unknown vào U, không đổi thành false hay 0
+    coverage_rule: Số call có outcome_status khác missing / N
+    source_tables: [fact_call, outcome_log]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: So hai nhóm chỉ khi báo T, F, U, N của cả hai; khoảng bảo thủ là [T/N, (T+U)/N]
+  - metric_name: setup_failure_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: outcome_all_calls
+    unit: ratio
+    denominator: toàn cohort N
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: count(setup_failure_observed = true) theo x-metrics.setup_fail
+    denominator_rule: N
+    missingness_rule: unknown vào U, không đổi thành false hay 0
+    coverage_rule: Số call có bằng chứng đủ để kết luận / N
+    source_tables: [fact_call, outcome_log]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: So hai nhóm chỉ khi báo T, F, U, N của cả hai; khoảng bảo thủ là [T/N, (T+U)/N]
+  - metric_name: drop_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: outcome_all_calls
+    unit: ratio
+    denominator: call đã xác nhận media connected
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: count(dropped = true) / count(media_connected = true và dropped đã biết); báo thêm số call chưa rõ kết nối
+    denominator_rule: media_connected = true và dropped in {true, false}
+    missingness_rule: Call chưa rõ kết nối hoặc dropped vào U, không mặc định không rớt
+    coverage_rule: Số call dropped đã biết / số call media connected
+    source_tables: [fact_call, outcome_log]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: So hai nhóm chỉ khi báo T, F, U, N của cả hai; khoảng bảo thủ là [T/N, (T+U)/N]
+  - metric_name: cst_technical_ms
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: telemetry_observed
+    unit: ms
+    denominator: call có CST đo được ở cả hai endpoint
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: max của checking_to_connected_ms hai endpoint (cùng đồng hồ từng bên); P50 và P95 trên các call đo được
+    denominator_rule: call có cst_assessment = measured
+    missingness_rule: Thiếu một bên thì call-level null; proxy từ state checking phải ghi phương pháp
+    coverage_rule: Số call measured / số call relay hoặc failed
+    source_tables: [fact_call, fact_call_endpoint, ice_event]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: So hai nhóm chỉ khi báo T, F, U, N của cả hai; khoảng bảo thủ là [T/N, (T+U)/N]
+  - metric_name: ttfm_post_answer_ms
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: telemetry_observed
+    unit: ms
+    denominator: call có TTFM đo được ở cả hai endpoint
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: Callee - first_media_received_ts trừ answer_clicked_at_client; Caller - first_media_received_ts trừ answer_observed_at_peer; cấp call lấy max; không trừ chéo với answer_received_at_be
+    denominator_rule: call có ttfm_assessment = measured
+    missingness_rule: Thiếu một bên thì call-level null
+    coverage_rule: Số call measured / số call đã bắt máy
+    source_tables: [fact_call, fact_call_endpoint, client_call_report]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: So hai nhóm chỉ khi báo T, F, U, N của cả hai; khoảng bảo thủ là [T/N, (T+U)/N]
+  - metric_name: rtt_ms
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: telemetry_observed
+    unit: ms
+    denominator: mẫu RTT hợp lệ của endpoint
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: P50 và P95 trên mẫu RTT hợp lệ; tách media_rtcp_rtt và ice_stun_rtt theo metric_name
+    denominator_rule: sample_count, kèm eligible_count
+    missingness_rule: Không trung bình các P95 của epoch; chỉ có percentile gộp sẵn thì không công bố P95 toàn call
+    coverage_rule: sample_count / eligible_count; thêm coverage theo call
+    source_tables: [fact_call_endpoint, call_stats_epoch, call_stats_5s]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: call_stats_* giữ relay_or_failed, nên so country có và không có TURN phải báo coverage và cảnh báo giới hạn đại diện
+  - metric_name: packet_loss_pct
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: telemetry_observed
+    unit: pct
+    denominator: tổng gói received + lost trên delta cùng stream và epoch
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: 100 * lost / (received + lost) khi mẫu số dương
+    denominator_rule: received + lost > 0
+    missingness_rule: Reset counter, đổi stream hoặc attribution không rõ thì không tự điền 0
+    coverage_rule: sample_count / eligible_count
+    source_tables: [fact_call_endpoint, call_stats_epoch]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: Như rtt_ms
+  - metric_name: jitter_ms
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: telemetry_observed
+    unit: ms
+    denominator: mẫu jitter hợp lệ
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: Tổng jitter mẫu hợp lệ / số mẫu; P95 chỉ khi có mẫu hoặc histogram gộp hợp lệ
+    denominator_rule: số mẫu jitter hợp lệ
+    missingness_rule: Không nhận gói thì không coi jitter bằng 0
+    coverage_rule: sample_count / eligible_count
+    source_tables: [fact_call_endpoint, call_stats_epoch]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: Như rtt_ms
+  - metric_name: pcr_itt
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: outcome_all_calls
+    unit: ratio
+    denominator: toàn cohort N
+    cohort_rule: fact_call, cohort one_to_one, initiated_ts trong kỳ, left join outcome_log hiện hành; cutoff và phiên bản pipeline đi cùng kết quả
+    numerator_rule: pcr_itt_low = |K| / N; pcr_itt_high = (|K| + |U_quality| + |U_outcome|) / N; unclassifiable_rate = |U_quality| / N; outcome_unknown_rate = |U_outcome| / N
+    denominator_rule: N = |K| + |G| + |U|
+    missingness_rule: Thiếu bằng chứng vào U, không vào G
+    coverage_rule: 1 - undetermined_rate
+    source_tables: [fact_call, outcome_log, call_stats_epoch]
+    stratification_rule: Theo data_source, call_path_scope (p2p, relay, failed, unknown), pair_group, Country, Region, ISP, Network, TURN
+    compare_guardrail: N = 0 thì không xác định; ngưỡng poor phải nêu rõ (VIA 320 ms, 1,2 %, 12 ms hay nội bộ 300 ms, 3 %, 30 ms)
+
+  # ============ TURN Performance (scope: turn_infrastructure) ============
+  - metric_name: turn_alloc_success_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: turn_infrastructure
+    unit: ratio
+    denominator: allocation đã biết kết quả (success + failure)
+    cohort_rule: turn_allocation theo turn_id × cửa sổ thời gian; mọi call_type; cutoff = thời điểm ingest
+    numerator_rule: count(allocation_result = success). 401 rồi thành công là một success. 300 (redirect_300) không tính là failure
+    denominator_rule: count(allocation_result in {success, failure}). allocation_result = unknown bị loại khỏi mẫu số và báo riêng
+    missingness_rule: unknown không thành success hay failure. Nguồn log thiếu (source không phải log TURN) thì metric ở trạng thái not_measured
+    coverage_rule: (success + failure) / tổng allocation quan sát; null nếu tổng bằng 0
+    source_tables: [turn_allocation, turn_health_1m]
+    stratification_rule: Theo turn_id, vn_region, host_isp, country/area của TURN, transport, giờ. turn_health_1m.alloc_attempts/alloc_failures chỉ dùng thay khi exporter có và source ghi rõ
+    compare_guardrail: So hai TURN chỉ khi coverage cả hai không chênh quá min_coverage_ref; 486 (quota theo username) tách riêng, không coi là lỗi sức khỏe máy chủ
+    min_coverage_ref: turn_alloc_min_coverage@v1
+  - metric_name: turn_alloc_failure_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: turn_infrastructure
+    unit: ratio
+    denominator: allocation đã biết kết quả
+    cohort_rule: Như turn_alloc_success_rate
+    numerator_rule: count(allocation_result = failure). Báo hai biến thể - all_failures và server_failures, trong đó server_failures loại error_code 486 (quota theo username) và giữ 508 (thiếu capacity)
+    denominator_rule: Như turn_alloc_success_rate
+    missingness_rule: Như turn_alloc_success_rate
+    coverage_rule: Như turn_alloc_success_rate
+    source_tables: [turn_allocation, turn_health_1m]
+    stratification_rule: Như turn_alloc_success_rate, thêm tách theo error_code
+    compare_guardrail: Như turn_alloc_success_rate
+  - metric_name: turn_path_rtt_relay_same_ms
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: telemetry_observed
+    unit: ms
+    denominator: mẫu RTT hợp lệ của endpoint thuộc call có path_type = relay_same và path_attribution_status = single_path
+    cohort_rule: fact_call_endpoint join fact_call; call_path_scope = relay; turn_identity_status = identified; hai đầu dùng cùng một TURN
+    numerator_rule: P50 và P95 của mẫu RTT. Định nghĩa Latency của TURN theo mentor là RTT qua TURN. Phân biệt rtt_ms theo metric_name (media_rtcp_rtt hay ice_stun_rtt), không trộn
+    denominator_rule: Số mẫu RTT hợp lệ (sample_count), kèm eligible_count và measurement_coverage
+    missingness_rule: Thiếu mẫu không thành 0. Chỉ có percentile gộp sẵn mà không có mẫu hoặc histogram thì không công bố P95 của TURN
+    coverage_rule: sample_count / eligible_count của endpoint; thêm coverage theo call = số call có phép đo / số call relay_same của TURN
+    source_tables: [fact_call_endpoint, fact_call, call_stats_epoch]
+    stratification_rule: Theo turn_id, transport, network_type, ISP hai đầu, giờ. Không gán cho TURN khi path_attribution_status là mixed hoặc unknown
+    compare_guardrail: RTT này là RTT đầu cuối của đường chỉ có một TURN, nên là thước đo sạch nhất của TURN. Không so với metric turn_path_rtt_involved_ms
+  - metric_name: turn_path_rtt_involved_ms
+    metric_definition_version: "0.5.0"
+    mode: reporting_only
+    scope: telemetry_observed
+    unit: ms
+    denominator: mẫu RTT hợp lệ của endpoint thuộc call relay_relay có TURN X trên đường (đầu caller hoặc đầu callee)
+    cohort_rule: Như turn_path_rtt_relay_same_ms nhưng path_type = relay_relay và turn_identity_status = identified ở cả hai đầu
+    numerator_rule: P50 và P95 RTT đầu cuối của các call có TURN X trên đường. Đây không phải độ trễ riêng của X; RTT gồm cả hai chặng và chặng giữa
+    denominator_rule: Như turn_path_rtt_relay_same_ms
+    missingness_rule: Như turn_path_rtt_relay_same_ms
+    coverage_rule: Như turn_path_rtt_relay_same_ms
+    source_tables: [fact_call_endpoint, fact_call, call_stats_epoch]
+    stratification_rule: Theo turn_id, vai trò (đầu caller hoặc callee), TURN phía còn lại
+    compare_guardrail: Chỉ dùng để xếp hạng tương đối khi TURN phía còn lại được kiểm soát; không đọc là độ trễ của TURN
+  - metric_name: turn_usage
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: turn_infrastructure
+    unit: mixed
+    denominator: ghi theo từng thành phần
+    cohort_rule: turn_health_1m theo turn_id × phút; selector_decision.entries; fact_call_endpoint.first_connected_turn_id
+    numerator_rule: Báo bốn thành phần riêng. (1) active_allocations_p95 và bandwidth_mbps_p95 từ turn_health_1m. (2) utilization = active_allocations / dim_turn.capacity_alloc, null khi capacity null. (3) selection_share = số lần TURN là mục rank 1 hoặc nằm trong cặp dẫn đầu / số decision. (4) actual_use_share = số endpoint có first_connected_turn_id = X / số endpoint có TURN identified
+    denominator_rule: (1)(2) số phút có observation_state = measured; (3) số decision có pair; (4) endpoint identified
+    missingness_rule: capacity_alloc null hoặc observation_state khác measured thì thành phần tương ứng null, không điền 0
+    coverage_rule: Phút measured / phút kỳ báo cáo; endpoint identified / endpoint relay
+    source_tables: [turn_health_1m, dim_turn, selector_decision, fact_call_endpoint]
+    stratification_rule: Theo turn_id, vn_region, ISP, country/area, giờ
+    compare_guardrail: bandwidth_mbps là tín hiệu tải, không phải chi phí; không lấy turn_traffic_* của coturn làm tải tức thời
+  - metric_name: turn_stability
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: turn_infrastructure
+    unit: mixed
+    denominator: giờ có đủ mẫu / ngày có health
+    cohort_rule: Mỗi turn_id, cửa sổ trượt 24 giờ
+    numerator_rule: Hai thành phần. (1) rtt_cv_24h = độ lệch chuẩn / trung bình của P50 RTT theo giờ (từ turn_path_rtt_relay_same_ms), chỉ tính khi có tối thiểu min_hours giờ đủ mẫu. (2) health_flaps_24h = số lần health_status đổi trạng thái trong 24 giờ, không tính chuyển sang hoặc từ unknown
+    denominator_rule: Số giờ đủ mẫu (1); số quan sát health liên tiếp (2)
+    missingness_rule: Không đủ giờ thì rtt_cv_24h = null. Chuyển từ hoặc sang unknown không phải flap
+    coverage_rule: Số giờ đủ mẫu / 24
+    source_tables: [fact_call_endpoint, health_snapshot, turn_health_1m]
+    stratification_rule: Theo turn_id, transport
+    compare_guardrail: Trùng stability_cv_24h trong feat_turn_health nhưng dashboard tính lại từ nguồn raw; hai nơi phải cùng phiên bản
+    min_coverage_ref: turn_stability_min_hours@v1
+  - metric_name: turn_health_status_share
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: turn_infrastructure
+    unit: ratio
+    denominator: số phút trong kỳ báo cáo
+    cohort_rule: health_snapshot theo turn_id × phút công bố
+    numerator_rule: Tỷ lệ phút ở từng health_status (healthy, degraded, overloaded, down, maintenance, unknown). unknown được báo như một giá trị riêng
+    denominator_rule: Tất cả phút trong kỳ, kể cả unknown
+    missingness_rule: Không có snapshot thì tính vào unknown, không vào healthy
+    coverage_rule: Phút có snapshot đã publish / phút trong kỳ
+    source_tables: [health_snapshot, turn_health_1m]
+    stratification_rule: Theo turn_id, vn_region, ISP, country/area
+    compare_guardrail: degraded chỉ hiển thị khi source cho phép gán; health_status mô tả máy chủ, không mô tả chất lượng đường
+
+  # ============ Service Health (scope: service_operations) ============
+  - metric_name: api_availability
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: service_operations
+    unit: ratio
+    denominator: tổng request tới Selector
+    cohort_rule: service_health_1m (service = selector) theo cửa sổ; chỉ decision_source thuộc api, static_fallback, cache
+    numerator_rule: Σ(req_count − error_count − timeout_count) / Σ req_count, tính trên tổng chứ không trung bình các phút
+    denominator_rule: Σ req_count
+    missingness_rule: Phút không có req_count bị bỏ, không tính là available hay unavailable
+    coverage_rule: Số phút có req_count > 0 / số phút trong kỳ
+    source_tables: [service_health_1m, selector_decision]
+    stratification_rule: Theo instance, be_region, policy_version
+    compare_guardrail: static_config không đi qua Selector nên không nằm trong mẫu số và được báo riêng
+  - metric_name: api_error_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: service_operations
+    unit: ratio
+    denominator: tổng request tới Selector
+    cohort_rule: Như api_availability
+    numerator_rule: Σ(error_count) / Σ req_count; timeout_rate = Σ timeout_count / Σ req_count báo riêng
+    denominator_rule: Σ req_count
+    missingness_rule: Như api_availability
+    coverage_rule: Như api_availability
+    source_tables: [service_health_1m]
+    stratification_rule: Theo instance, error_code nếu có
+    compare_guardrail: error_rate + timeout_rate = 1 − api_availability
+  - metric_name: api_latency_ms
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: service_operations
+    unit: ms
+    denominator: decision có response_ts
+    cohort_rule: selector_decision có api_latency_ms (BE đo); mọi decision_source thuộc api, static_fallback, cache
+    numerator_rule: P50, P95, P99 của api_latency_ms trên mẫu thô. Nếu chỉ có p50_ms, p95_ms theo phút của service_health_1m thì chỉ báo từng phút, không gộp
+    denominator_rule: Số decision có api_latency_ms khác null
+    missingness_rule: Timeout (response_ts null) không vào percentile và được báo qua timeout_rate
+    coverage_rule: Số decision có api_latency_ms / số decision có request
+    source_tables: [selector_decision, service_health_1m]
+    stratification_rule: Theo instance, be_region, policy_version, info_level
+    compare_guardrail: selector_api_p95 là guardrail của Data Contract; giá trị ngưỡng nằm ở cấu hình, không ở metric
+  - metric_name: fallback_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: service_operations
+    unit: ratio
+    denominator: decision có Selector được gọi
+    cohort_rule: selector_decision với decision_source in {api, static_fallback, cache}
+    numerator_rule: count(decision_source = static_fallback hoặc fallback_type khác null) / mẫu số. Báo thêm theo fallback_type (data_backoff, health_missing, selector_error, insufficient_candidates)
+    denominator_rule: Số decision đã gọi Selector. static_config bị loại và báo riêng
+    missingness_rule: fallback_type null với decision_source = api nghĩa là không fallback
+    coverage_rule: Số decision đầy đủ decision_source / tổng decision
+    source_tables: [selector_decision, service_health_1m]
+    stratification_rule: Theo fallback_type, policy_version, country/area, info_level
+    compare_guardrail: data_backoff phản ánh thiếu dữ liệu lịch sử chứ không phải lỗi dịch vụ; tách khỏi selector_error khi đọc sức khỏe dịch vụ
+  - metric_name: data_freshness_s
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: service_operations
+    unit: s
+    denominator: decision có snapshot được dùng
+    cohort_rule: selector_decision join health_snapshot theo health_snapshot_id và feature snapshot theo feature_snapshot_id
+    numerator_rule: Hai thành phần. (1) health_age_s = request_ts − health_snapshot.last_observed_ts, P50 và P95. (2) feature_age_s = feature_snapshot_age_s của service_health_1m, P95. Báo thêm stale_share = share decision có fallback_type = health_missing hoặc filtered_out health_stale
+    denominator_rule: Decision có health_snapshot_id khác null (1); phút có feature_snapshot_age_s khác null (2)
+    missingness_rule: last_observed_ts null thì health_age_s null và tính vào stale_share, không đặt 0
+    coverage_rule: Decision có health_snapshot_id / decision dùng health
+    source_tables: [selector_decision, health_snapshot, service_health_1m, turn_health_1m]
+    stratification_rule: Theo turn_id, source, policy_version
+    compare_guardrail: Độ tươi đo bằng thời điểm quan sát, không phải thời điểm publish
+
+  # ============ Algorithm Quality (scope: algorithm_decision) ============
+  - metric_name: lead_pair_match_rate
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: algorithm_decision
+    unit: ratio
+    denominator: call relay có hai TURN thực tế identified và có cặp dẫn đầu
+    cohort_rule: fact_call join fact_pair_evaluation; policy có pair (loại static_config)
+    numerator_rule: count(lead_pair_matched = true) / count(lead_pair_matched in {true, false}). Đây là TURN được xếp hạng so với TURN ICE thực tế dùng
+    denominator_rule: lead_pair_matched in {true, false}; unknown báo riêng
+    missingness_rule: identity chưa rõ thì lead_pair_matched = unknown, không thành false
+    coverage_rule: Số call có lead_pair_matched xác định / số call có cặp dẫn đầu
+    source_tables: [fact_call, fact_pair_evaluation]
+    stratification_rule: Theo policy_version, kịch bản, pair_group, country/area, ISP
+    compare_guardrail: Trong simulator giả định candidate về kịp, nên tỷ lệ này gần 100 phần trăm khi TURN khỏe; không coi đây là thành tích của thuật toán
+  - metric_name: rank_used_distribution
+    metric_definition_version: "0.5.0"
+    mode: reporting_only
+    scope: algorithm_decision
+    unit: count
+    denominator: endpoint có TURN thực tế identified và nằm trong danh sách đã áp dụng
+    cohort_rule: fact_call.rank_used_caller, rank_used_callee
+    numerator_rule: Phân bố rank của mục thực tế được ICE dùng trong danh sách đã áp dụng, theo từng bên
+    denominator_rule: Endpoint identified
+    missingness_rule: TURN thực tế không thuộc danh sách thì rank_used = null và đếm riêng (out_of_list)
+    coverage_rule: Endpoint identified / endpoint relay
+    source_tables: [fact_call, client_applied_config]
+    stratification_rule: Theo policy_version, kịch bản, transport
+    compare_guardrail: Như lead_pair_match_rate
+  - metric_name: topk_size_distribution
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: algorithm_decision
+    unit: count
+    denominator: decision của policy có top-k
+    cohort_rule: selector_decision với topk_pair_count khác null
+    numerator_rule: Phân bố topk_pair_count và returned_list_size theo nhóm, cùng cap_rate = share(topk_capped = true)
+    denominator_rule: Số decision có topk_pair_count
+    missingness_rule: static_config không có top-k, loại khỏi mẫu số
+    coverage_rule: Decision có topk_pair_count / decision của policy
+    source_tables: [selector_decision, selector_decision_request]
+    stratification_rule: Theo kịch bản, pair_group, country/area, confidence_level
+    compare_guardrail: Top-k lớn có thể hợp lệ khi các cặp gần như bằng nhau, nên không đọc là xấu nếu không kèm regret
+  - metric_name: list_churn
+    metric_definition_version: "0.5.0"
+    mode: reporting_only
+    scope: algorithm_decision
+    unit: ratio
+    denominator: cặp decision liên tiếp cùng nhóm
+    cohort_rule: Hai decision liên tiếp cùng segment (country, vn_region, isp, network_type của hai bên) trong cùng policy_version và cách nhau không quá cửa sổ cấu hình
+    numerator_rule: 1 − Jaccard(tập normalized_config_key của danh sách trước, danh sách sau), theo từng bên
+    denominator_rule: Số cặp decision liên tiếp
+    missingness_rule: Decision đầu tiên của nhóm không có cặp so sánh
+    coverage_rule: Số cặp so sánh được / số decision
+    source_tables: [selector_decision]
+    stratification_rule: Theo segment, policy_version
+    compare_guardrail: Churn cao sau sự cố là bình thường; chỉ cảnh báo khi cao ở giai đoạn ổn định
+  - metric_name: load_concentration
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: algorithm_decision
+    unit: ratio
+    denominator: TURN trong cùng vùng hoặc area
+    cohort_rule: Số lần được chọn rank 1 và số endpoint dùng thực tế, theo TURN trong cùng vn_region hoặc country/area
+    numerator_rule: Hệ số Gini và max_share của selection_share và actual_use_share
+    denominator_rule: Số TURN khả dụng (status active, health khác down) trong vùng
+    missingness_rule: TURN không có quan sát vẫn nằm trong mẫu số với giá trị 0 lượt dùng thật, nhưng chỉ khi health_status khác unknown
+    coverage_rule: TURN có quan sát / TURN trong vùng
+    source_tables: [selector_decision, fact_call_endpoint, dim_turn, health_snapshot]
+    stratification_rule: Theo vn_region, country/area, policy_version
+    compare_guardrail: Dùng để kiểm tra tải không dồn vào một TURN khi một TURN khác lỗi (kịch bản TURN Failure)
+  - metric_name: interval_coverage
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: algorithm_decision
+    unit: ratio
+    denominator: cặp thực tế có nhãn observed và có khoảng
+    cohort_rule: fact_pair_evaluation với label_status = observed và interval_low, interval_high khác null
+    numerator_rule: count(in_interval = true) / count(in_interval in {true, false}), so với interval_level đã công bố; báo cùng khoảng tin cậy Wilson và n
+    denominator_rule: Dòng observed có khoảng
+    missingness_rule: Cặp không phải cặp thực tế không có nhãn và không vào mẫu số; không điền nhãn phản thực
+    coverage_rule: Cặp có nhãn observed / cặp thực tế
+    source_tables: [fact_pair_evaluation]
+    stratification_rule: Theo metric, interval_kind, policy_version, kịch bản, số lần đường xuất hiện khi học
+    compare_guardrail: mean_ci và prediction là hai khoảng khác nhau; không so lẫn
+  - metric_name: oracle_in_topk_rate
+    metric_definition_version: "0.5.0"
+    mode: reporting_only
+    scope: sim_oracle
+    unit: ratio
+    denominator: decision synthetic có policy top-k và có oracle
+    cohort_rule: sim_decision_oracle join selector_decision; data_source = synthetic
+    numerator_rule: count(oracle_in_topk = true) / count(oracle_in_topk in {true, false}). Báo thêm oracle_in_lists_rate
+    denominator_rule: Decision có oracle_in_topk xác định
+    missingness_rule: static_config cho oracle_in_topk = unknown, loại khỏi mẫu số
+    coverage_rule: Decision có oracle / decision của policy
+    source_tables: [sim_decision_oracle, selector_decision]
+    stratification_rule: Theo kịch bản, world seed, policy_version, mật độ dữ liệu lịch sử
+    compare_guardrail: Chỉ synthetic. Không dùng kết quả này để khẳng định cải thiện production
+  - metric_name: decision_regret
+    metric_definition_version: "0.5.0"
+    mode: reporting_only
+    scope: sim_oracle
+    unit: ms
+    denominator: decision synthetic có oracle_value
+    cohort_rule: sim_decision_oracle với metric = truth_rtt_ms (các truth khác tương tự)
+    numerator_rule: P50 và P95 của lead_regret, actual_regret và list_regret; share(regret = 0)
+    denominator_rule: Decision có oracle_value khác null và giá trị truth tương ứng khác null
+    missingness_rule: actual_regret null khi call thất bại hoặc cặp thực tế chưa xác định; báo riêng, không thành 0
+    coverage_rule: Decision có actual_value / decision có oracle
+    source_tables: [sim_decision_oracle]
+    stratification_rule: Theo kịch bản, pair_group, policy_version
+    compare_guardrail: Chỉ synthetic. Thước đo chính để so Geo Baseline với Smart Selector
+  - metric_name: policy_comparison_delta
+    metric_definition_version: "0.5.0"
+    mode: active
+    scope: algorithm_decision
+    unit: mixed
+    denominator: cặp run cùng world và seed
+    cohort_rule: Hai run_manifest cùng topology_version, network_profile_version, scenario_version, incident_schedule_version và replicate_seed; khác nhau ở policy_version
+    numerator_rule: Hiệu pcr_itt_low, pcr_itt_high, Connection Success, CST, decision_regret và fallback_rate giữa Smart Selector và Geo Baseline, báo cùng khoảng dao động giữa các replicate
+    denominator_rule: Số cặp run ghép
+    missingness_rule: Run thiếu metric thì cặp đó loại và báo số cặp bị loại
+    coverage_rule: Cặp run ghép được / cặp run kế hoạch
+    source_tables: [fact_call, sim_decision_oracle, run_manifest]
+    stratification_rule: Theo Country, Region, ISP, Network và kịch bản
+    compare_guardrail: Mọi nhóm đều được báo, vì trung bình tốt có thể che nhóm bị giảm chất lượng; kết quả synthetic không khẳng định cải thiện production

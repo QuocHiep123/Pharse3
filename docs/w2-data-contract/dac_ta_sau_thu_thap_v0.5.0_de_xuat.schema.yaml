@@ -253,6 +253,11 @@ x-invariants:
   status: active
   enforced_by: pipeline
   rule: 'fact_pair_evaluation: label_status = observed chỉ khi actual_pair_matches = true và observed_metric_name = metric. Cặp không phải cặp thực tế không có observed_value. Tổng số dòng is_lead = true mỗi (decision_id, metric) bằng 1 khi policy có pair.'
+- id: I34
+  level: FAIL
+  status: active
+  enforced_by: pipeline
+  rule: 'sim_decision_oracle chỉ có khi data_source = synthetic và không bao giờ nằm trong đầu vào của policy, feature hay health. Với mỗi (decision_id, metric): list_regret, lead_regret và actual_regret đều ≥ 0 theo hướng lower_is_better; oracle_in_lists = true thì list_regret = 0.'
 x-deferred-rules:
   rtp_windows:
     A: Delta bộ đếm lớn hơn 0 trên hai snapshot hợp lệ của cùng đối tượng. Chỉ chứng minh có ít nhất một gói.
@@ -320,6 +325,7 @@ $defs:
   e_gate_status: {type: string, enum: [passed, failed, not_evaluated, not_applicable], x-change: new}
   e_validation_status: {type: string, enum: [not_validated, validated, rejected], x-change: new}
   e_estimand: {type: string, enum: [network_rtt, transaction_time, candidate_total_time], x-change: new}
+  e_failure_phase: {type: string, enum: [none, pre_allocation, post_allocation, mid_call, unknown], description: 'Thời điểm hỏng của TURN trong cuộc gọi (kịch bản TURN Failure). pre_allocation: Allocate lỗi; post_allocation: cấp phát được nhưng ICE/media không đạt; mid_call: hỏng khi đã có media, cần ICE restart. unknown khi thiếu bằng chứng, không suy ra none.', x-change: new}
   e_call_path_scope: {type: string, enum: [p2p, relay, failed, unknown], description: 'Issue #7. Phạm vi đường của cuộc gọi suy từ bằng chứng ICE (không suy từ ice_transport_policy). failed = đã bắt máy nhưng ICE hoặc media không đạt; unknown = chưa đủ bằng chứng.', x-change: new}
   e_label_status: {type: string, enum: [observed, not_observable, setup_failed, identity_unresolved, not_actual_pair], description: 'Trạng thái nhãn của một cặp dự đoán. observed: cặp này là cặp thực tế và metric đo được cùng đại lượng. not_actual_pair: cặp được cân nhắc nhưng không được dùng, không có nhãn phản thực. setup_failed: cuộc gọi thất bại, nhãn chỉ cho metric thành công. identity_unresolved: chưa xác định TURN thực tế. not_observable: thiếu telemetry hoặc khác đại lượng.', x-change: new}
   e_turn_availability_status: {type: string, enum: [local_turn_available, no_healthy_turn, no_turn_observed, unknown], description: 'Issue #5. Trạng thái TURN khả dụng theo country của endpoint tại lúc quyết định. no_turn_observed không đồng nghĩa not_deployed; chỉ kết luận not_deployed khi inventory_scope đã xác nhận đầy đủ.', x-change: new}
@@ -341,7 +347,7 @@ $defs:
   e_dq_status: {type: string, enum: [pass, fail, warn, not_evaluable], x-contract-ref: §8.5, description: 'not_evaluable: chưa đủ bằng chứng', x-change: changed}
   e_observation_state: {type: string, enum: [measured, not_measured, stale, lost, ambiguous, not_applicable], description: Trạng thái của một quan sát, x-change: new}
   e_metric_mode: {type: string, enum: [active, reporting_only], description: Cấu hình bộ KPI, x-change: new}
-  e_metric_scope: {type: string, enum: [outcome_all_calls, telemetry_observed], description: Outcome dùng toàn cohort; quality chỉ dùng phần có phép đo}
+  e_metric_scope: {type: string, enum: [outcome_all_calls, telemetry_observed, turn_infrastructure, service_operations, algorithm_decision, sim_oracle], description: 'Outcome dùng toàn cohort; quality chỉ dùng phần có phép đo; turn_infrastructure: từ log/exporter TURN; service_operations: từ API Selector; algorithm_decision: so quyết định với kết quả; sim_oracle: chỉ synthetic, đọc truth'}
   e_metric_assessment: {type: string, enum: [measured, not_measured, lost, stale, ambiguous, not_applicable], description: Trạng thái của một lần tính metric}
 
   # ---------- Object dùng chung ----------
@@ -1181,6 +1187,8 @@ $defs:
       policy_version_callee: {type: [string, 'null']}
       fallback_type_caller: {anyOf: [{$ref: '#/$defs/e_fallback_type'}, {type: 'null'}]}
       fallback_type_callee: {anyOf: [{$ref: '#/$defs/e_fallback_type'}, {type: 'null'}]}
+      confidence_level_caller: {anyOf: [{$ref: '#/$defs/e_confidence_level'}, {type: 'null'}], description: Lọc kịch bản Historical Cold-start}
+      confidence_level_callee: {anyOf: [{$ref: '#/$defs/e_confidence_level'}, {type: 'null'}]}
       returned_list_size_caller: {type: [integer, 'null'], minimum: 0, maximum: 8}
       returned_list_size_callee: {type: [integer, 'null'], minimum: 0, maximum: 8}
       lead_turn_caller: {type: [string, 'null'], description: 'turn_id của cặp dẫn đầu phía caller; null khi static_config'}
@@ -1198,7 +1206,13 @@ $defs:
       used_fallback_turn_caller: {$ref: '#/$defs/e_tristate'}
       used_fallback_turn_callee: {$ref: '#/$defs/e_tristate'}
       quality_assessed_endpoint_count: {type: integer, minimum: 0, description: 'Số endpoint có quality_assessment_status = assessed; cùng mẫu số stats_expected_endpoint_count'}
-    required: [call_id, cohort_name, as_of_ts, fact_version, call_path_scope, quality_assessed_endpoint_count, initiated_ts, answered, ice_connected, dtls_connected, media_connected, end_reason, outcome_status, cst_assessment, ttfm_assessment, quality_poor, stats_observed_endpoint_count, turn_identity_status_caller, turn_identity_status_callee, identity_check_caller, identity_check_callee]
+      n_ice_restarts: {type: [integer, 'null'], minimum: 0, description: 'Số lần restart_requested; null khi nền tảng không báo'}
+      n_selected_pair_changes: {type: [integer, 'null'], minimum: 0, description: 'Tổng lần tăng selected_pair_changes; không phải lần nào cũng là đổi đường'}
+      failure_phase: {$ref: '#/$defs/e_failure_phase'}
+      detected_to_ice_recovery_ms: {type: [number, 'null'], minimum: 0, description: 'Từ lúc client phát hiện disconnected/failed đến khi ICE nối lại; từ ice_event, cùng clock_session_id. Max khi nhiều lần phục hồi'}
+      recovery_assessment: {$ref: '#/$defs/e_metric_assessment'}
+      fault_to_recovery_ms: {type: [number, 'null'], minimum: 0, description: 'Chỉ synthetic hoặc thí nghiệm có kiểm soát (biết mốc fault từ incident_truth); production luôn null'}
+    required: [call_id, cohort_name, as_of_ts, fact_version, call_path_scope, quality_assessed_endpoint_count, failure_phase, recovery_assessment, initiated_ts, answered, ice_connected, dtls_connected, media_connected, end_reason, outcome_status, cst_assessment, ttfm_assessment, quality_poor, stats_observed_endpoint_count, turn_identity_status_caller, turn_identity_status_callee, identity_check_caller, identity_check_callee]
     unevaluatedProperties: false
   fact_call_endpoint:
     title: Một dòng cho một endpoint tham gia cuộc gọi, gồm metric tổng hợp và tham chiếu lịch sử
@@ -1291,6 +1305,46 @@ $defs:
       label_rule_version: {type: string}
       as_of_ts: {type: string, format: date-time}
     required: [call_id, decision_id, metric, turn_caller, transport_caller, turn_callee, transport_callee, is_lead, in_topk, actual_pair_matches, label_status, in_interval, label_rule_version, as_of_ts]
+    unevaluatedProperties: false
+  sim_decision_oracle:
+    title: Đáp án tối ưu của simulator cho một quyết định, chỉ dùng để đánh giá
+    x-kind: hidden
+    x-status: active
+    x-grain: Một decision_id × metric
+    x-primary-key: [decision_id, metric]
+    x-foreign-keys: [{columns: [call_id], references: call_session}, {columns: [decision_id], references: selector_decision_request}]
+    x-source-level: D
+    x-producer: simulator
+    x-change: new
+    x-notes: ['Tính từ truth_leg_5m tại thời điểm quyết định. Chỉ synthetic: production không có truth nên không có bảng này.', 'Chỉ package đánh giá và báo cáo đọc. Policy và feature không bao giờ đọc (I12, I13, I34). Trang dashboard live không đọc; nếu hiển thị kết quả oracle thì ở trang riêng ghi rõ synthetic-only và chỉ số tổng hợp.', 'Trả lời các chỉ số của đề: top-k có chứa lựa chọn tốt nhất không, khoảng cách so với cặp tốt nhất (regret), độ phủ đường chưa dùng.']
+    type: object
+    allOf:
+      - {$ref: '#/$defs/derived_meta'}
+      - {properties: {data_source: {const: synthetic}}}
+    properties:
+      call_id: {type: string, format: uuid}
+      decision_id: {type: string, format: uuid}
+      metric: {type: string, description: 'Đại lượng truth, ví dụ truth_rtt_ms, truth_loss_pct, truth_jitter_ms hoặc truth_success'}
+      unit: {type: string}
+      lower_is_better: {type: boolean}
+      truth_version: {type: string}
+      truth_cutoff_ts: {type: string, format: date-time}
+      eligible_pair_count: {type: integer, minimum: 0, description: 'Số cặp (TURN, transport) hai phía còn available theo truth tại thời điểm quyết định'}
+      oracle_turn_caller: {type: [string, 'null']}
+      oracle_transport_caller: {anyOf: [{$ref: '#/$defs/e_transport'}, {type: 'null'}]}
+      oracle_turn_callee: {type: [string, 'null']}
+      oracle_transport_callee: {anyOf: [{$ref: '#/$defs/e_transport'}, {type: 'null'}]}
+      oracle_value: {type: [number, 'null'], description: Null khi không có cặp nào available}
+      oracle_in_lists: {$ref: '#/$defs/e_tristate', description: 'Cặp tối ưu có thể tạo được từ hai danh sách đã trả (cả hai mục có mặt)'}
+      oracle_in_topk: {$ref: '#/$defs/e_tristate', description: 'Cặp tối ưu thuộc top-k của policy; unknown khi static_config'}
+      best_in_lists_value: {type: [number, 'null'], description: 'Giá trị truth tốt nhất trong các cặp tạo được từ hai danh sách'}
+      list_regret: {type: [number, 'null'], description: 'best_in_lists_value trừ oracle_value theo hướng tốt hơn; ≥ 0'}
+      lead_value: {type: [number, 'null'], description: Giá trị truth của cặp dẫn đầu}
+      lead_regret: {type: [number, 'null']}
+      actual_value: {type: [number, 'null'], description: 'Giá trị truth của cặp ICE thực tế; null khi chưa xác định hoặc call thất bại'}
+      actual_regret: {type: [number, 'null']}
+      actual_pair_matches_oracle: {$ref: '#/$defs/e_tristate'}
+    required: [call_id, decision_id, metric, unit, lower_is_better, truth_version, truth_cutoff_ts, eligible_pair_count, oracle_in_lists, oracle_in_topk, actual_pair_matches_oracle]
     unevaluatedProperties: false
   metric_config:
     title: Metadata của một metric
