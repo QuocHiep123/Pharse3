@@ -93,16 +93,7 @@ flowchart LR
   I -. "có thể ≠ cặp dẫn đầu" .-> D
 ```
 
-## 4. Tám mục `iceServers` mỗi bên
-
-Giả định simulator (chưa được mentor xác nhận): **"8 TURN" = tối đa 8 mục URL/transport**. UDP/TCP/TLS của cùng một máy là ba mục, chia chung 8 chỗ.
-
-| Phiên bản | Số mục trả về |
-|---|---|
-| Geo Baseline, Baseline lịch sử | đúng 8 (nếu đủ mục hợp lệ) |
-| Thuật toán cải tiến (top-k theo khoảng tin cậy) | 1–8; thiếu thì `insufficient_candidates`, không nhân bản server |
-
-## 5. KPI không biến "thiếu dữ liệu" thành "tốt"
+## 4. KPI không biến "thiếu dữ liệu" thành "tốt"
 
 Mọi call thuộc cohort, kể cả khi thiếu outcome hay stats. Tỷ lệ báo cả hai cận: `pcr_itt_low = K/N` và `pcr_itt_high = (K+U)/N`.
 
@@ -131,7 +122,7 @@ flowchart TD
 
 RTT, packet loss, jitter luôn đi kèm `sample_count`, `eligible_count`, `measurement_coverage`. `call_stats_*` chỉ giữ cuộc gọi relay hoặc thất bại, nên không suy rộng chất lượng sang cuộc gọi P2P.
 
-## 6. User không có TURN tại quốc gia của mình
+## 5. User không có TURN tại quốc gia của mình
 
 ```mermaid
 flowchart LR
@@ -146,31 +137,7 @@ flowchart LR
 
 `no_turn_observed` **không** có nghĩa là `not_deployed`.
 
-## 7. Tiến độ và việc còn mở
-
-```mermaid
-flowchart LR
-  W1["W1 · simulator + trace 1 call<br/>(trước 10/11)"] --> DM["Data model<br/>fact_call · fact_call_endpoint"]
-  DM --> SIM["Simulator đầy đủ<br/>+ profile obs_base / obs_active"]
-  SIM --> REP["Báo cáo mentor"]
-  classDef now fill:#e8f1ff,stroke:#3b6fd4,stroke-width:2px;
-  class W1,DM now
-```
-
-| Issue | Nội dung | Trạng thái |
-|---|---|---|
-| [#1](https://github.com/QuocHiep123/Pharse3/issues/1) | Data Contract v0.5.0 | Đã chốt cho simulator |
-| [#2](https://github.com/QuocHiep123/Pharse3/issues/2) | Simulator W1 | Đang làm |
-| [#3](https://github.com/QuocHiep123/Pharse3/issues/3) | Telemetry tối thiểu cho KPI | **Mở** — cần mẫu getStats thật |
-| [#4](https://github.com/QuocHiep123/Pharse3/issues/4) | Interface Selector–simulator, nghĩa của 8 TURN | Chốt cho simulator; chờ mentor/BE |
-| [#5](https://github.com/QuocHiep123/Pharse3/issues/5) | Quốc gia không có TURN | Đã vào schema |
-| [#6](https://github.com/QuocHiep123/Pharse3/issues/6) | Network context theo epoch | Đã vào schema |
-| [#7](https://github.com/QuocHiep123/Pharse3/issues/7) | KPI telemetry-aware | Định nghĩa đã có |
-| [#8](https://github.com/QuocHiep123/Pharse3/issues/8) | `fact_call`, `fact_call_endpoint` | Schema đủ cột (+ `fact_pair_evaluation`); còn dashboard và test |
-
-Việc đóng issue **không** có nghĩa mentor hay Đoàn đã duyệt toàn bộ contract.
-
-## 8. Bản đồ thư mục
+## 6. Bản đồ thư mục
 
 | Đường dẫn | Nội dung |
 |---|---|

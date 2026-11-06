@@ -46,7 +46,7 @@
   <text class="body" x="464" y="336">Hai client báo chất lượng → BE báo kết thúc</text>
   <line x1="464" x2="971" y1="360" y2="360" stroke="#e2e8f0" stroke-width="1.5"/>
   <text class="small" x="464" y="386">Signaling đi qua BE; media đi A → TURN(A) → TURN(B) → B.</text>
-  <text class="small" x="464" y="411">Đoàn cung cấp policy/ranking; interface còn chờ contract chốt.</text>
+  <text class="small" x="464" y="411">Đoàn cung cấp policy/ranking theo interface của contract v0.5.0.</text>
 
   <path class="line" d="M1003 278 H1029"/>
 
@@ -84,9 +84,9 @@
   <text x="948" y="571" font-size="16" font-weight="700" style="fill:#fff">3</text>
   <text class="head" x="981" y="572">Báo cáo W1</text>
   <text class="body" x="948" y="606">Ca bình thường, lỗi TURN, giả định.</text>
-  <text class="small" x="948" y="640">Nêu rõ câu hỏi chờ Đoàn/mentor.</text>
+  <text class="small" x="948" y="640">Nêu rõ giả định chờ mentor/BE.</text>
 
-  <rect x="50" y="713" width="1340" height="83" rx="15" fill="#fff2e8" stroke="#f5c49d" stroke-width="1.5"/>
-  <text class="tag" x="77" y="745" style="fill:#b45309">CHƯA CHỐT · DATA CONTRACT V0.5.0 LÀ ĐỀ XUẤT</text>
-  <text class="body" x="77" y="776">Sim dùng 8 mục cấu hình · Mentor xác nhận? · Biết Callee khi nào? · Client gửi gì? · TURN log nối sao?</text>
+  <rect x="50" y="713" width="1340" height="83" rx="15" fill="#e8f6ec" stroke="#9fd3ae" stroke-width="1.5"/>
+  <text class="tag" x="77" y="745" style="fill:#15803d">ĐÃ CHỐT VỚI ĐOÀN · DATA CONTRACT V0.5.0 CHO SIMULATOR</text>
+  <text class="body" x="77" y="776">Chờ xác nhận nguồn production: mentor (8 mục, đo chặng) · BE (biết Callee) · WebRTC core (getStats) · hạ tầng TURN (log)</text>
 </svg>
