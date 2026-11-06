@@ -1,6 +1,6 @@
 # Data Contract v0.5.0 — bản chốt cho simulator
 
-> **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** [v0.4.0](data-contract.md) (phá vỡ tương thích).
+> **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** v0.4.0 (phá vỡ tương thích; bản cũ đã xóa, xem lịch sử git).
 > Nguồn gốc: đề xuất của Đoàn ([`docs/w2-data-contract/`](../w2-data-contract/)), phản hồi của Hiệp ở issue [#1](https://github.com/QuocHiep123/Pharse3/issues/1), và quyết định ở issues [#3](https://github.com/QuocHiep123/Pharse3/issues/3) – [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
 > **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/data_contract_v0.5.0_de_xuat.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml) (sau thu thập, 34 bảng).
 
@@ -37,7 +37,7 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 | # | Chủ đề | Quyết định | Căn cứ |
 |---|---|---|---|
 | D1 | Tách contract | Tách *thu thập* và *sau thu thập*; giữ đường truy nguồn raw → clean/outcome → feature → KPI | #1 mục 1, Đoàn §2 |
-| D2 | “8 TURN” | **Tối đa 8 mục `iceServers` mỗi bên**; UDP/TCP/TLS của cùng máy là mục riêng, chia chung 8 chỗ. Baseline trả đúng 8; policy cải tiến trả 1–8; thiếu thì `insufficient_candidates`, không nhân bản server | #4, Đoàn §11 câu 1–2 |
+| D2 | “8 TURN” | **Tối đa 8 TURN server mỗi bên** (mentor xác nhận: 8 server, không phải 8 URL/transport). Transport UDP/TCP/TLS là thuộc tính của từng server, không chiếm thêm chỗ. Baseline trả đúng 8; policy cải tiến trả 1–8; thiếu thì `insufficient_candidates`, không nhân bản server | Mentor, #4 |
 | D3 | Thời điểm biết Callee | Một request trả hai danh sách; **bỏ `refined`**, giữ `info_level` và `parent_decision_id` cho ca BE chưa có ngữ cảnh Callee | #4, Đoàn §11 câu 3 |
 | D4 | Đơn vị quyết định | Selector chọn **cặp dẫn đầu**; ICE chọn cặp thực tế theo priority. Ghi riêng 3 đối tượng: cặp được cân nhắc, danh sách đã cấp, cấu hình client đã áp dụng. Bỏ `chosen_rank` | Đoàn §9, lab ICE |
 | D5 | Propensity | Theo **hành động** (`action_propensity`), không nhân p_caller×p_callee; chưa ước lượng được thì `null`, không điền 1/k | Đoàn §9 |
@@ -61,7 +61,7 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 
 | # | Assumption | Ai xác nhận | Nếu sai thì |
 |---|---|---|---|
-| A1 | “8 TURN” = 8 mục URL/transport, đủ hoặc tối đa 8 | **Mentor** (bản phân công chỉ ghi “8 TURN mỗi bên”; cách hiểu 8 mục là của Đoàn) | Đổi `requested_max_list_size`, I3 |
+| A1 | “8 TURN” = 8 TURN server mỗi bên (**mentor đã xác nhận**); còn cần chốt đủ hay tối đa 8 | **Mentor** | Đổi `requested_max_list_size`, I3 |
 | A2 | Có phương pháp đo từng chặng | **Mentor** + mẫu log thật | Chặng chỉ là ước lượng (đã là mặc định) |
 | A3 | BE biết ngữ cảnh Callee ngay request đầu, kể cả offline/nhiều thiết bị | **BE** | Khôi phục `refined`/`parent_decision_id` |
 | A4 | App đọc `getStats` chuẩn, không sửa SDK; có bộ đếm RTP/candidate-pair | **WebRTC core** (web/mobile) | Cột bộ đếm để null; KPI chất lượng nới cận |

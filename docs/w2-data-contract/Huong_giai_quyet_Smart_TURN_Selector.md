@@ -2,7 +2,7 @@
 
 Tài liệu này phân tích đề bài, đánh giá các tài liệu đã tìm, chỉ ra phần còn thiếu và gợi ý hướng đi. Tài liệu không đưa ra công thức hay tham số chốt sẵn. Data Contract không thiết kế ở đây; mục 8.4 chỉ tóm tắt dữ liệu theo vòng đời, còn đề xuất nằm ở [De_xuat_Data_Contract_v0.5.0_cho_Hiep.md](De_xuat_Data_Contract_v0.5.0_cho_Hiep.md).
 
-**Cập nhật 05/11.** Tài liệu đã bổ sung hai điều: kết quả lab ICE trên Chromium 156 và coturn ([lab_ice/KET_QUA.md](lab_ice/KET_QUA.md)), và quyết định về hướng thuật toán: baseline giữ 8 TURN, thuật toán cải tiến dùng top-k theo khoảng tin cậy của VIA. Các số từ lab là bằng chứng về cơ chế trên một máy, không phải chất lượng production.
+**Cập nhật 05/11.** Tài liệu đã bổ sung hai điều: kết quả lab ICE trên Chromium 156 và coturn (lab ICE (đã xóa khỏi main, xem lịch sử git)), và quyết định về hướng thuật toán: baseline giữ 8 TURN, thuật toán cải tiến dùng top-k theo khoảng tin cậy của VIA. Các số từ lab là bằng chứng về cơ chế trên một máy, không phải chất lượng production.
 
 **Chốt phạm vi 05/11.** Đoàn đã trả lời 14 câu hỏi ở mục 11. Các phần dưới đây đã được chỉnh theo: chỉ dùng dữ liệu giả lập, chỉ xét đường qua relay, bám bài toán của VIA và không làm thêm ngoài đề bài. Bảng tổng hợp phạm vi nằm ở mục 2.5.
 
@@ -14,7 +14,7 @@ Quy ước tên gọi dùng xuyên suốt:
 - **Chặng giữa:** từ TURN phía Caller đến TURN phía Callee. Chặng này không tồn tại khi hai bên dùng chung một TURN.
 - **Chặng phía Callee:** từ TURN mà Callee dùng đến Callee.
 - **Nhóm mạng:** một tổ hợp quốc gia, vùng, ISP và loại mạng, ví dụ "Hồ Chí Minh, Viettel, 4G".
-- **Mục:** một cấu hình TURN trong `iceServers`, tức một URL trên một server với một giao thức. UDP, TCP và TLS của cùng một server là ba mục. "8 TURN" của đề bài được hiểu là 8 mục.
+- **Mục:** một TURN server trong danh sách. Mentor đã xác nhận "8 TURN" là **8 TURN server** mỗi bên; UDP, TCP, TLS là thuộc tính transport của server, không chiếm thêm chỗ.
 
 ## Mục lục
 
@@ -38,7 +38,7 @@ Quy ước tên gọi dùng xuyên suốt:
 
 1. **VIA phù hợp làm khung xương, nhưng giải một bài toán khác ở điểm quan trọng nhất.** VIA gán đúng một đường đi cho mỗi cuộc gọi. Đề bài yêu cầu trả hai danh sách 8 TURN, rồi ICE trên thiết bị mới chọn cặp thực tế. Vì vậy phần chấm điểm đường đi và top-k có thể học từ VIA, còn phần chuyển top-k thành hai danh sách phải tự thiết kế (mục 6.3).
 2. **Lab ICE cho thấy ICE không tự tìm đường tốt nhất trong danh sách.** ICE chọn cặp có priority cao nhất trong số các cặp kịp xuất hiện và kết nối được. RTT gần như không làm đổi lựa chọn. Do đó Selector phải đúng ngay ở cặp đứng đầu, và việc chọn trong top-k phải do Selector làm, không thể giao cho ICE (mục 2.2).
-3. **Hướng thuật toán đã chọn gồm ba phiên bản.** Geo Baseline và Baseline lịch sử trả đúng 8 mục mỗi bên, tính cả UDP, TCP và TLS. Thuật toán cải tiến dùng top-k theo khoảng tin cậy, nên số mục thay đổi theo mức chắc chắn của dữ liệu, tối đa 8 (mục 6.2). Hiện không có Selector nào đang chạy, nên Geo Baseline là mốc so sánh.
+3. **Hướng thuật toán đã chọn gồm ba phiên bản.** Geo Baseline và Baseline lịch sử trả đúng 8 TURN server mỗi bên. Thuật toán cải tiến dùng top-k theo khoảng tin cậy, nên số mục thay đổi theo mức chắc chắn của dữ liệu, tối đa 8 (mục 6.2). Hiện không có Selector nào đang chạy, nên Geo Baseline là mốc so sánh.
 4. **Phạm vi MVP đã chốt** (mục 2.5): chỉ dữ liệu giả lập, chỉ đường qua relay, không sửa SDK, không mô hình hóa đổ chuông và tín hiệu, không chạy trên traffic thật. Phương pháp bám VIA.
 5. **Tài liệu hiện có đủ cho khung thuật toán. Phần phải tự làm gồm:** dựng danh sách đa dạng, TURN Health, Network Change, danh mục TURN, bộ giả lập và cách đánh giá.
 6. **Một số thông tin trong danh sách tài liệu cần đính chính** (mục 3.8). Đáng chú ý nhất: chưa tìm thấy nguồn nào xác nhận "4 đến 8 TURN là con số vàng". Điều này không ảnh hưởng yêu cầu 8 mục của đề bài.
@@ -119,7 +119,7 @@ Bảng này tổng hợp các câu trả lời ở mục 11.
 |---|---|---|---|
 | Dữ liệu | Tự giả lập rồi so với Geo Baseline | Dữ liệu thật, chạy bóng, thử nghiệm trên traffic thật | 11, 12 |
 | Loại đường | Cặp relay với relay, gồm cả dùng chung một TURN | P2P, STUN, đường chỉ có một đầu relay | 6, 9 |
-| Độ dài danh sách | Tối đa 8 mục mỗi bên, tính riêng UDP, TCP và TLS. Thuật toán cải tiến được trả ít hơn 8 | | 1, 2 |
+| Độ dài danh sách | Tối đa 8 TURN server mỗi bên. Thuật toán cải tiến được trả ít hơn 8 | | 1, 2 |
 | Thời điểm quyết định | Selector biết cả hai bên và trả hai danh sách trong một lần | Joint Ranking hai bước, gọi mù | 3 |
 | Client | ICE chuẩn của WebRTC, trên web và mobile | Sửa SDK, gửi thêm dữ liệu từ SDK | 5, 7 |
 | Đổ chuông và tín hiệu | Giả định candidate về kịp | Thời gian đổ chuông, độ trễ tín hiệu, bên tạo offer, TURN bị loại khỏi cuộc đua | 4 |
@@ -342,7 +342,7 @@ Bản PDF của ba tài liệu nằm ở máy của Đoàn, gửi riêng khi c�
 
 ### 5.2. Hành vi ICE trên trình duyệt thật
 
-**Đã làm được:** lab trên Chromium 156 và coturn đã trả lời phần lớn câu hỏi, xem mục 2.2 và [lab_ice/KET_QUA.md](lab_ice/KET_QUA.md).
+**Đã làm được:** lab trên Chromium 156 và coturn đã trả lời phần lớn câu hỏi, xem mục 2.2 và lab ICE (đã xóa khỏi main, xem lịch sử git).
 
 **Chưa đo, không làm thêm trong MVP và cần ghi vào giới hạn của báo cáo:**
 
@@ -487,7 +487,7 @@ Hai baseline dùng chung bộ quy tắc đa dạng tối thiểu và cùng một
 
 Hai baseline cũng chịu cùng hành vi ICE: lab cho thấy vị trí đầu quyết định chất lượng cuộc gọi, nên phần lớn khác biệt nhiều khả năng đến từ **cặp đứng đầu**, không đến từ độ dài danh sách. Mục 9.2 có cách tách riêng hai yếu tố này.
 
-Cả ba phiên bản đếm giống nhau: UDP, TCP và TLS tính riêng. Mỗi mục TCP hoặc TLS chiếm một chỗ trong 8, nên càng nhiều dự phòng theo giao thức thì càng ít TURN UDP khác nhau. Tỷ lệ này cần tự quyết.
+Cả ba phiên bản đếm giống nhau: 8 TURN server mỗi bên. Transport (UDP, TCP, TLS) là thuộc tính của server nên không làm giảm số server khác nhau.
 
 ### 6.3. Top-k theo khoảng tin cậy và cách chuyển thành danh sách
 
@@ -524,7 +524,7 @@ flowchart TD
 | Đặt chéo tạo ra phương án một relay | Khi cặp dẫn đầu gồm hai TURN khác nhau, đặt TURN của bên kia ở vị trí 2 để có sẵn phương án một relay. Chỉ nên dựa vào thứ tự của cặp đầu, vì các cặp sau đổi thứ tự khi NIC preference hai bên khác nhau |
 | Ghép chéo tạo cặp ngoài ý muốn | Danh sách tạo ra mọi tổ hợp, không chỉ các cặp trong top-k. Cặp ngoài ý muốn có thể đứng trên cặp mong muốn, nên phải kiểm tra điểm của toàn bộ tổ hợp theo thứ tự priority |
 | TURN dự phòng đặt càng sau càng đắt | Chi phí khi TURN chết sau cấp phát tăng theo bình phương vị trí, nên TURN khác miền lỗi nên đặt sớm, không để cuối danh sách |
-| TCP và TLS luôn đứng sau UDP | Vị trí của chúng không đổi được thứ tự này, nhưng mỗi mục vẫn chiếm một trong 8 chỗ. Chúng ghép được với UDP của bên kia, nên nên đặt trên server khác với các TURN UDP chính |
+| TCP và TLS luôn đứng sau UDP | Vị trí của chúng không đổi được thứ tự này, và không chiếm thêm chỗ trong 8 server. Chúng ghép được với UDP của bên kia, nên nên đặt trên server khác với các TURN UDP chính |
 | Hairpin chưa được xác nhận trên hạ tầng thật | Trong mô hình, cặp (A, A) xử lý như mọi cặp khác. Lab mới xác nhận hairpin trên một máy, nên khả năng này là một giả định của danh mục TURN và phải ghi vào giới hạn báo cáo |
 | Danh sách còn dùng khi ICE restart | Giá trị dự phòng phải tính cả lúc thiết lập lẫn lúc restart, không chỉ lúc thiết lập |
 
@@ -832,7 +832,7 @@ Lộ trình bám theo mốc mentor giao: tuần 1 là 04 đến 10/11, báo cáo
 | # | Câu hỏi | Trả lời | Hệ quả |
 |---|---|---|---|
 | 1 | Baseline giữ 8 TURN, còn thuật toán cải tiến trả số TURN theo top-k, tối đa 8: có chấp nhận được không? | Chấp nhận được | Biến thể đệm đủ 8 chỉ dùng để so sánh |
-| 2 | "8 TURN" là 8 server hay 8 mục trong `iceServers`? Có tính riêng UDP, TCP và TLS không? | Tính cả UDP, TCP và TLS, tổng cộng 8 mục | Tối đa 64 cặp relay. Mục TCP, TLS chiếm chỗ của TURN UDP |
+| 2 | "8 TURN" là 8 server hay 8 mục trong `iceServers`? | **Mentor xác nhận: 8 TURN server** | Tối đa 64 cặp server; transport là thuộc tính, không chiếm chỗ |
 | 3 | Selector có biết thông tin Callee khi trả danh sách cho Caller không? | Có | Chấm điểm cặp và trả hai danh sách trong một lần |
 | 4 | Thực tế có thời gian đổ chuông không, độ trễ tín hiệu khoảng bao nhiêu, bên nào tạo offer? | Không làm trong MVP | Giả định candidate về kịp, không mô hình hóa TURN bị loại khỏi cuộc đua |
 | 5 | Client có được tự kích hoạt ICE restart và gửi thời điểm nhận candidate không? | Tuân theo ICE hiện tại của WebRTC | Không thêm yêu cầu riêng cho client, không dùng thời điểm nhận candidate |
@@ -883,7 +883,7 @@ Lộ trình bám theo mốc mentor giao: tuần 1 là 04 đến 10/11, báo cáo
 
 | Thứ tự | Tài liệu | Phần cần tập trung | Mức đã kiểm chứng trong đợt này |
 |---|---|---|---|
-| 0 | [Kết quả lab ICE](lab_ice/KET_QUA.md) | Toàn bộ | Đo trên Chromium 156 và coturn, trên một máy |
+| 0 | Kết quả lab ICE (đã xóa khỏi main, xem lịch sử git) | Toàn bộ | Đo trên Chromium 156 và coturn, trên một máy |
 | 1 | [VIA](https://cs.cmu.edu/~junchenj/via.pdf) | Mục 3.1, 3.2 về số đo giữa các relay, 4, đặc biệt 4.4 về ghép chặng và top-k, 4.5 về chọn trong nhóm; 5.1, 5.3, 5.4 | Đã đọc phần chính của toàn văn |
 | 2 | MSR-TR-2016-57, bản PDF gửi riêng khi cần | Mục 1.2, 3, 4 | Đã đọc toàn văn |
 | 3 | [RFC 8445](https://www.rfc-editor.org/rfc/rfc8445.txt) | Các mục ở mục 3.4 | Đã đối chiếu số mục và các đoạn liên quan |

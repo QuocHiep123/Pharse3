@@ -2,13 +2,12 @@
 
 **Từ:** Đoàn. **Gửi:** Hiệp.
 
-**Đối chiếu với:** `docs/contracts/data-contract.md` (v0.4.0), `docs/superpowers/specs/2026-11-04-turn-intelligence-design.md` và `docs/contracts/erd-and-flow.html`, nhánh `docs/w1-design-and-data-contract`, commit `e4d84f8`.
+**Đối chiếu với:** Data Contract v0.4.0, design spec W1 và ERD v0.4.0 (đều đã xóa khỏi main, xem lịch sử git: nhánh `docs/w1-design-and-data-contract`, commit `e4d84f8`).
 
 **File kèm:**
 
 - [`data_contract_v0.5.0_de_xuat.schema.yaml`](data_contract_v0.5.0_de_xuat.schema.yaml): contract thu thập, viết bằng JSON Schema 2020-12.
 - [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml): các lớp sau thu thập. Đây là bản chuyển tiếp để không mất nội dung; đặc tả đầy đủ của từng lớp viết sau.
-- `KET_QUA.md`: kết quả lab ICE mà mục 1.3 trích dẫn.
 
 > Contract trong đề xuất này là bản thiết kế dữ liệu raw có thể thu thập: nghĩa dữ liệu, schema, nguồn và khả năng thu thập, khóa liên kết, đơn vị và thời gian, nullability. Feature, dự đoán của mô hình, KPI và giả lập được giữ ở file đi kèm. Tài liệu không chốt thuật toán, cách triển khai simulator, detector, ngưỡng vận hành, thiết kế thí nghiệm hay lịch triển khai.
 
@@ -72,7 +71,7 @@ Giữ snapshot bất biến (I12, I13), cách ly truth, `pcr_itt` hai cận, `di
 
 | Chủ đề | Cách làm | Ảnh hưởng đến contract |
 |---|---|---|
-| Độ dài danh sách | Tối đa 8 mục mỗi bên, tính riêng UDP, TCP, TLS. Hai baseline trả đúng 8; thuật toán cải tiến trả theo top-k, được ít hơn 8 | `requested_max_list_size`, `returned_list_size`, `client_turn_transport` trên từng mục |
+| Độ dài danh sách | Tối đa 8 TURN server mỗi bên (mentor xác nhận). Hai baseline trả đúng 8; thuật toán cải tiến trả theo top-k, được ít hơn 8 | `requested_max_list_size`, `returned_list_size`, `client_turn_transport` trên từng mục |
 | Thời điểm quyết định | Selector biết Callee ngay từ đầu, một request trả hai danh sách | Bỏ `refined`, hoãn `locked_*`; giữ `info_level` cho trường hợp BE chưa có ngữ cảnh Callee |
 | Đổ chuông và tín hiệu | Chưa mô hình hóa | Hoãn các cột cần phép đo thêm; vẫn giữ mốc rẻ cho TTFM |
 | Client | ICE chuẩn của WebRTC, trên web và mobile, không sửa SDK | Mọi trường client phải lấy được từ API chuẩn. Bỏ các cột cần hook thấp tầng |
@@ -87,7 +86,7 @@ Giữ snapshot bất biến (I12, I13), cách ly truth, `pcr_itt` hai cận, `di
 
 1. **Việc tách contract:** contract của Hiệp hiện là nguồn duy nhất cho cả feature, KPI và đánh giá. Hiệp có đồng ý tách thành contract thu thập và đặc tả các lớp sau không? Mọi nội dung vẫn được giữ ở file đi kèm (mục 2).
 2. **Hướng sửa:** có đồng ý với các mục 3 đến 11 không? Mục nào làm sai dữ liệu hoặc khó cài trong pipeline thì nêu giúp mình tình huống cụ thể.
-3. **Giả định A1 và A2:** spec ghi A1 (`k = 4`, rank × rank) có nguồn "Mentor (qua Hiệp)", trong khi mình đang theo 8 mục. A2 có nguồn "Hiệp". Hiệp cho mình biết mentor đã nói cụ thể thế nào, và có gì về cách công ty đo từng chặng không.
+3. **Giả định A1 và A2:** spec ghi A1 (`k = 4`, rank × rank) có nguồn "Mentor (qua Hiệp)", trong khi mình đang theo 8 mục (nay mentor xác nhận là 8 TURN server). A2 có nguồn "Hiệp". Hiệp cho mình biết mentor đã nói cụ thể thế nào, và có gì về cách công ty đo từng chặng không.
 4. **Chi tiết schema:** mục 15.3 có các chi tiết mình chọn khi viết YAML. Ba chỗ cần ý kiến nhất là S13 (probe), S15 (bộ đếm) và S16 (tách `call_outcome`).
 5. **Version:** thống nhất cách ghi thay đổi phá vỡ tương thích ở mục 15.1.
 
@@ -358,7 +357,7 @@ Tách ba đối tượng. Không gộp chúng thành một `chosen_rank`, vì ha
 - **Dòng cặp:** ghi các cặp trong top-k và hành động đã chọn, kể cả `in_topk = false`. Chưa biết Callee thì được phép trống. Cặp thực tế khác các cặp đã ghi thì Labeled Data ghi là không có dự đoán, không suy ra. `transport_*` nằm trong khóa nên bắt buộc.
 - **Tập hành động đủ điều kiện:** lưu thành object hoặc snapshot bất biến, định vị được. Hash chỉ để kiểm tra nội dung, không tự dựng lại được hành động.
 - **Độ dài danh sách:** thay `len = min(k, …)` của I3 bằng `returned_list_size ≤ requested_max_list_size`, rank liên tục từ 1. Trả bao nhiêu mục là quy tắc của policy. Thiếu lựa chọn hợp lệ thì báo `insufficient_candidates`, không nhân bản server. `k` đếm mục còn top-k đếm cặp, nên không dùng chung tên.
-- **Khóa danh sách:** khóa bản ghi theo decision, endpoint phía gọi và `entry_id`. Duplicate được định nghĩa theo cấu hình chuẩn hóa. Quy tắc policy cấm lặp server tách khỏi khóa dữ liệu, vì hai URL khác port trên cùng máy và transport vẫn có thể hợp lệ.
+- **Khóa danh sách:** khóa bản ghi theo decision, endpoint phía gọi và `entry_id`. Duplicate được định nghĩa theo cấu hình chuẩn hóa. Quy tắc policy cấm lặp server tách khỏi khóa dữ liệu, vì mỗi mục là một server (transport là thuộc tính).
 - **Propensity theo hành động:**
   - Không nhân `p_caller × p_callee` (§8.4) khi hai bên được chọn chung.
   - Xác suất cặp ICE thực dùng không phải xác suất hành động.
@@ -754,8 +753,8 @@ Các chi tiết dưới đây mang nhãn `x-review` và đang mở để Hiệp 
 | W3C webrtc-stats, W3C WebRTC | Đã đọc đặc tả; chưa thử trên từng trình duyệt |
 | RFC 8656, RFC 8445 | Đã đọc các mục được trích |
 | Exporter coturn | Đã đọc `prom_server.c` bản 4.6.1 và `master`; chưa có bản công ty đang chạy |
-| Số liệu lab | Trích từ `KET_QUA.md`; xem giới hạn ở mục 1.3 |
-| Trường getStats về kết nối | `lab_ice.js` đọc được trên Chromium 156, dùng data channel |
+| Số liệu lab | Trích từ `KET_QUA.md` (đã xóa khỏi main, xem lịch sử git); xem giới hạn ở mục 1.3 |
+| Trường getStats về kết nối | `lab_ice.js` (đã xóa khỏi main) đọc được trên Chromium 156, dùng data channel |
 | Trường getStats về media, `url`, `address`, `iceRole`, bộ đếm tích lũy, bộ đếm theo cặp | Mới theo đặc tả, chưa đo |
 | Mobile, Firefox, Safari | Chưa kiểm tra |
 | Probe, credential theo cuộc gọi, GeoIP, nguồn giám sát máy chủ | Chưa có bằng chứng, là giả định về khả năng thu |

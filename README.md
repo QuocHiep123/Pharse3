@@ -31,7 +31,7 @@ sequenceDiagram
     BE->>B: invite
   and
     BE->>S: select (ctx hai bên)
-    S-->>BE: hai danh sách ≤ 8 mục + cặp dẫn đầu
+    S-->>BE: hai danh sách ≤ 8 TURN server + cặp dẫn đầu
     BE->>BE: ghi Decision Log (decision_id)
   end
   BE-->>A: cấu hình iceServers của A
@@ -85,7 +85,7 @@ Ba đối tượng khác nhau, nối bằng `decision_id`, `decision_device_id`,
 ```mermaid
 flowchart LR
   D["Cặp được cân nhắc<br/>selector_decision_pair<br/><i>is_lead</i>"]
-  L["Danh sách đã cấp<br/>selector_decision.entries<br/><i>tối đa 8 mục/bên</i>"]
+  L["Danh sách đã cấp<br/>selector_decision.entries<br/><i>tối đa 8 TURN server/bên</i>"]
   C["Cấu hình client đã áp dụng<br/>client_applied_config"]
   I["Cặp ICE thực tế<br/>ice_event"]
   O["Kết quả<br/>call_outcome + client_call_report<br/>→ outcome_log"]
@@ -142,10 +142,5 @@ flowchart LR
 | Đường dẫn | Nội dung |
 |---|---|
 | [`docs/contracts/data-contract-v0.5.0.md`](docs/contracts/data-contract-v0.5.0.md) | **Bản chốt**: quyết định, assumption, danh sách bảng, KPI |
-| [`docs/contracts/data-contract.md`](docs/contracts/data-contract.md) | v0.4.0 (lịch sử) |
-| [`docs/contracts/erd-and-flow.html`](docs/contracts/erd-and-flow.html) | ERD + workflow tương tác (còn vẽ theo v0.4.0) |
-| [`docs/w2-data-contract/`](docs/w2-data-contract/) | Đề xuất và hai schema YAML của Đoàn; KPI; lab ICE |
+| [`docs/w2-data-contract/`](docs/w2-data-contract/) | Đề xuất và hai schema YAML của Đoàn; KPI; metric; khảo sát nguồn |
 | [`docs/research/`](docs/research/) | Ghi chú nghiên cứu (dataset, getStats, VIA/OPE, kiến trúc media) |
-| [`docs/superpowers/specs/`](docs/superpowers/specs/) | Design spec W1 |
-
-> **Lưu ý:** `erd-and-flow.html` và spec W1 vẫn theo v0.4.0 (`k=4`, `refined`). Khi khác với [v0.5.0](docs/contracts/data-contract-v0.5.0.md) thì tin v0.5.0 và hai file YAML.

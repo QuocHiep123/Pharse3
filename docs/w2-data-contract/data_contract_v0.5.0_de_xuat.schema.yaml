@@ -121,8 +121,8 @@ x-rules:
   propensity: action_propensity là xác suất của cả hành động. Không nhân p_caller × p_callee khi hai bên được chọn
     chung; xác suất cặp ICE thực dùng không phải xác suất hành động. Nếu danh sách suy ra hoàn toàn tất định từ
     cặp dẫn đầu thì xác suất cặp đại diện được.
-  list_count: Một mục là một URL trên một server với một giao thức. Tối đa 8 mục tổng cộng mỗi bên; UDP, TCP, TLS của cùng máy chiếm 3 trong 8 chỗ, không phải 8 mỗi transport.
-    Baseline trả đúng 8 khi đủ mục hợp lệ; thiếu thì insufficient_candidates, không nhân bản. Thuật toán cải tiến được trả ít hơn. Đây là giả định simulator, chưa xác nhận nghĩa production từ mentor.
+  list_count: Một mục là một TURN server (mentor xác nhận). Tối đa 8 server mỗi bên; UDP, TCP, TLS là thuộc tính transport của server, không chiếm thêm chỗ.
+    Baseline trả đúng 8 khi đủ mục hợp lệ; thiếu thì insufficient_candidates, không nhân bản. Thuật toán cải tiến được trả ít hơn. Con số 8 theo mentor; cách chọn là config simulator.
   decision_without_selector: Chưa có Selector thì BE vẫn ghi selector_decision với decision_source = static_config,
     policy_version = static@1, selection_method = static, propensity_method = not_estimated, và không có dòng selector_decision_pair.
     decision_id luôn có.
@@ -392,7 +392,7 @@ $defs:
     additionalProperties: false
     x-moved-columns: [{column: segment_key, to: Feature Engineering}]
   list_entry:
-    title: 'Một mục trong danh sách đã cấp: một URL trên một server với một giao thức'
+    title: 'Một mục trong danh sách đã cấp: một TURN server, kèm transport được cấu hình'
     type: object
     properties:
       entry_id: {type: string, description: Khóa trong một danh sách, x-change: new}
@@ -983,7 +983,7 @@ $defs:
     x-change: changed
     x-review: S3
     x-removed-columns: [{column: k, replaced_by: 'requested_max_list_size, returned_list_size, topk_pair_count'}, {column: candidates, replaced_by: entries}, {column: chosen_rank, replaced_by: selector_decision_pair.is_lead}, {column: 'candidates[].propensity', replaced_by: 'action_propensity, propensity_method'}, {column: 'candidates[].est_leg_ms, est_path_ms', replaced_by: selector_decision_pair}]
-    x-notes: ['Header chung nằm ở selector_decision_request; I25 kiểm tra các field chung', '8 mục tổng cộng gồm UDP, TCP, TLS; số máy TURN đếm riêng từ entries', 'Trả bao nhiêu mục là quy tắc của policy; thiếu lựa chọn hợp lệ thì fallback_type = insufficient_candidates, không nhân bản server', Quy tắc khi chưa có Selector ở x-rules.decision_without_selector]
+    x-notes: ['Header chung nằm ở selector_decision_request; I25 kiểm tra các field chung', '8 mục = 8 TURN server mỗi bên; transport là thuộc tính của mục', 'Trả bao nhiêu mục là quy tắc của policy; thiếu lựa chọn hợp lệ thì fallback_type = insufficient_candidates, không nhân bản server', Quy tắc khi chưa có Selector ở x-rules.decision_without_selector]
     x-deferred-columns: [{column: decision_mode, reason: Tạm thời chưa chạy bóng}]
     type: object
     allOf:
@@ -1008,7 +1008,7 @@ $defs:
       self_ctx: {$ref: '#/$defs/ctx'}
       peer_ctx: {$ref: '#/$defs/ctx', description: Những gì biết lúc đó}
       selection_method: {$ref: '#/$defs/e_selection_method', x-change: new}
-      requested_max_list_size: {type: integer, minimum: 0, maximum: 8, description: Trần tổng URL/transport cho bên này, x-change: new, x-review: S3}
+      requested_max_list_size: {type: integer, minimum: 0, maximum: 8, description: Trần số TURN server cho bên này, x-change: new, x-review: S3}
       returned_list_size: {type: integer, minimum: 0, maximum: 8, description: Số mục thực trả tổng cộng, x-change: new, x-review: S3}
       entries: {type: array, maxItems: 8, items: {$ref: '#/$defs/list_entry'}, description: Thay candidates, x-change: changed}
       filtered_out: {type: array, items: {$ref: '#/$defs/filtered_turn'}}

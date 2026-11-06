@@ -584,7 +584,7 @@ Bối cảnh một bên lúc quyết định (§4). Field chưa biết ghi unkno
 
 #### `list_entry`
 
-Một mục trong danh sách đã cấp: một URL trên một server với một giao thức. 
+Một mục trong danh sách đã cấp: một TURN server, kèm transport được cấu hình. 
 
 | Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
 |---|---|---|---|---|
