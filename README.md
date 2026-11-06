@@ -143,4 +143,3 @@ flowchart LR
 |---|---|
 | [`docs/contracts/data-contract-v0.5.0.md`](docs/contracts/data-contract-v0.5.0.md) | **Bản chốt**: quyết định, assumption, danh sách bảng, KPI |
 | [`docs/w2-data-contract/`](docs/w2-data-contract/) | Đề xuất và hai schema YAML của Đoàn; KPI; metric; khảo sát nguồn |
-| [`docs/research/`](docs/research/) | Ghi chú nghiên cứu (dataset, getStats, VIA/OPE, kiến trúc media) |
