@@ -1,179 +1,92 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" role="img" aria-labelledby="dg-title">
-  <title id="dg-title">Sơ đồ swimlane: request, allocate, ICE và media, kết thúc, rồi label data, learning và evaluation</title>
-  <style>
-    text{fill:#16202c;font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,sans-serif}
-    .ph{font-weight:600;font-size:14px}
-    .lane{fill:#e9edf3} .lane2{fill:#eef1f6}
-    .ll{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:11.5px;font-weight:600;letter-spacing:.06em}
-    .lls{font-size:11px;fill:#5a6676}
-    .div{stroke:#c6cfdb;stroke-width:1;stroke-dasharray:3 4}
-    .box{stroke-width:1.6}
-    .bt{font-weight:600;font-size:13px}
-    .bs{font-size:11.5px;fill:#5a6676}
-    .bm{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:11.5px}
-    .bmb{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:12px;font-weight:600}
-    .client{fill:#e6ecf2;stroke:#2f5f8f}
-    .feat{fill:#ddedeb;stroke:#0e7c72}
-    .rank{fill:#eae4f5;stroke:#6a3fb8}
-    .conf{fill:#f4e9dd;stroke:#b0600c}
-    .turn{fill:#e9ebee;stroke:#4b5b6e}
-    .obs{fill:#edeff2;stroke:#4a6378;stroke-dasharray:4 3}
-    .evt{fill:#e2ecf4;stroke:#1f6fae}
-    .label{fill:#f7e5ea;stroke:#c0284f;stroke-width:2.2}
-    .learn{fill:#e4f1e8;stroke:#1d8a43}
-    .eval{fill:#f2ecde;stroke:#9a6b00}
-    .flow{fill:none;stroke:#5e6b7c;stroke-width:1.6}
-    .dash{stroke-dasharray:5 4}
-    .loop{fill:none;stroke:#1d8a43;stroke-width:2.4}
-    .ahp{fill:#5e6b7c} .ahg{fill:#1d8a43}
-    .al{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:10.5px;fill:#5a6676}
-    .alg{font-family:"IBM Plex Mono",ui-monospace,Consolas,monospace;font-size:11px;font-weight:600;fill:#1d8a43}
-    .cap{font-size:12px;fill:#5a6676}
-  </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 840" role="img" aria-labelledby="title desc">
+  <title id="title">W1 của Hiệp: từ một cuộc gọi giả lập đến dữ liệu kiểm chứng</title>
+  <desc id="desc">Sơ đồ gồm cấu hình thế giới và network truth ẩn, luồng cuộc gọi qua BE, Selector, client và TURN, dữ liệu raw synthetic, kiểm tra tính nhất quán và đầu ra demo W1. Contract sẵn sàng cho simulator; nguồn thu production chưa xác minh.</desc>
   <defs>
-    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="ahp"/></marker>
-    <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" class="ahg"/></marker>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L9 5 L0 10 Z" fill="#64748b"/></marker>
+    <style>
+      text{font-family:"Segoe UI","Noto Sans",Arial,sans-serif;fill:#172033}
+      .title{font-size:31px;font-weight:750}
+      .subtitle{font-size:16px;fill:#475569}
+      .tag{font-size:13px;font-weight:700;letter-spacing:.07em}
+      .head{font-size:20px;font-weight:700}
+      .body{font-size:16px}
+      .small{font-size:14px;fill:#475569}
+      .mono{font-family:Consolas,"Courier New",monospace;font-size:14px}
+      .card{fill:#fff;stroke:#d8e2ef;stroke-width:1.5}
+      .line{fill:none;stroke:#64748b;stroke-width:2.5;marker-end:url(#arrow)}
+    </style>
   </defs>
 
-  <rect x="0" y="0" width="1200" height="820" fill="#ffffff"/>
+  <rect width="1440" height="840" fill="#f6f9fc"/>
+  <rect x="0" y="0" width="1440" height="12" fill="#0f766e"/>
+  <text class="title" x="50" y="62">W1 · Hiệp dựng simulator có thể kiểm chứng</text>
+  <text class="subtitle" x="50" y="93">04–10/11/2026 · Một cuộc gọi synthetic đi từ giả định đến trace rõ nguồn và kết quả</text>
 
-  <!-- phase headers -->
-  <text class="ph" x="365" y="30" text-anchor="middle">① Request</text>
-  <text class="ph" x="670" y="30" text-anchor="middle">② Allocate</text>
-  <text class="ph" x="880" y="30" text-anchor="middle">③ ICE + media</text>
-  <text class="ph" x="1090" y="30" text-anchor="middle">④ Kết thúc</text>
+  <rect x="50" y="122" width="350" height="312" rx="20" class="card"/>
+  <rect x="50" y="122" width="350" height="9" rx="4" fill="#0f766e"/>
+  <text class="tag" x="76" y="165" style="fill:#0f766e">① ĐẦU VÀO · HIỆP</text>
+  <text class="head" x="76" y="202">Thế giới giả lập</text>
+  <text class="body" x="76" y="237">User: country, miền, ISP, mạng</text>
+  <text class="body" x="76" y="267">TURN: vị trí, ISP, trạng thái</text>
+  <text class="body" x="76" y="297">Traffic, sự cố và seed cố định</text>
+  <rect x="75" y="324" width="300" height="83" rx="12" fill="#e8f5f2"/>
+  <text class="body" x="92" y="350" font-weight="700">Network truth ẩn</text>
+  <text class="small" x="92" y="374">Chỉ simulator biết chất lượng thật.</text>
+  <text class="small" x="92" y="394">Policy và dashboard không đọc.</text>
 
-  <!-- lanes -->
-  <rect class="lane2" x="10" y="44" width="1180" height="64" rx="10"/>
-  <rect class="lane"  x="10" y="116" width="1180" height="80" rx="10"/>
-  <rect class="lane2" x="10" y="204" width="1180" height="96" rx="10"/>
-  <rect class="lane"  x="10" y="308" width="1180" height="52" rx="10"/>
-  <rect class="lane2" x="10" y="368" width="1180" height="64" rx="10"/>
-  <rect class="lane"  x="10" y="456" width="1180" height="352" rx="10"/>
+  <path class="line" d="M405 278 H431"/>
 
-  <text class="ll" x="24" y="72">OBSERVABILITY</text><text class="lls" x="24" y="88">thời gian thực</text>
-  <text class="ll" x="24" y="152">CLIENT A / B</text><text class="lls" x="24" y="168">app của VIN</text>
-  <text class="ll" x="24" y="246">SELECTOR</text><text class="lls" x="24" y="262">bạn xây · ~ms</text>
-  <text class="ll" x="24" y="338">TURN</text>
-  <text class="ll" x="24" y="396">EVENT STORE</text><text class="lls" x="24" y="412">log thô</text>
-  <text class="ll" x="24" y="484">SAU CUỘC GỌI</text><text class="lls" x="24" y="500">nearline · offline</text>
+  <rect x="438" y="122" width="560" height="312" rx="20" class="card"/>
+  <rect x="438" y="122" width="560" height="9" rx="4" fill="#4f46e5"/>
+  <text class="tag" x="464" y="165" style="fill:#4f46e5">② LUỒNG MỘT CUỘC GỌI</text>
+  <text class="head" x="464" y="202">Sự kiện nối tiếp theo call_id</text>
+  <text class="body" x="464" y="237">A gọi → BE tạo call_session</text>
+  <text class="body" x="464" y="270">BE hỏi Selector → Decision Log tạm</text>
+  <text class="body" x="464" y="303">Client áp dụng cấu hình → ICE chọn cặp thật</text>
+  <text class="body" x="464" y="336">Hai client báo chất lượng → BE báo kết thúc</text>
+  <line x1="464" x2="971" y1="360" y2="360" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text class="small" x="464" y="386">Signaling đi qua BE; media đi A → TURN(A) → TURN(B) → B.</text>
+  <text class="small" x="464" y="411">Đoàn cung cấp policy/ranking; interface còn chờ contract chốt.</text>
 
-  <!-- column dividers -->
-  <line class="div" x1="570" y1="44" x2="570" y2="432"/>
-  <line class="div" x1="770" y1="44" x2="770" y2="432"/>
-  <line class="div" x1="990" y1="44" x2="990" y2="432"/>
+  <path class="line" d="M1003 278 H1029"/>
 
-  <!-- observability chips -->
-  <rect class="box obs" x="170" y="54" width="390" height="46" rx="8"/>
-  <text class="bt" x="184" y="73">Dashboard A · Service health</text>
-  <text class="bs" x="184" y="90">latency P99 · mode normal/degraded · tuổi bảng</text>
-  <rect class="box obs" x="590" y="54" width="160" height="46" rx="8"/>
-  <text class="bt" x="602" y="73">Dashboard B · TURN</text>
-  <text class="bs" x="602" y="90">alloc success (bỏ 401)</text>
-  <rect class="box obs" x="790" y="54" width="180" height="46" rx="8"/>
-  <text class="bt" x="802" y="73">Dashboard D · chất lượng</text>
-  <text class="bs" x="802" y="90">RTT · loss · jitter</text>
-  <rect class="box obs" x="1010" y="54" width="160" height="46" rx="8"/>
-  <text class="bt" x="1022" y="73">Funnel · call drop</text>
-  <text class="bs" x="1022" y="90">alloc→ICE→DTLS→media</text>
+  <rect x="1036" y="122" width="354" height="312" rx="20" class="card"/>
+  <rect x="1036" y="122" width="354" height="9" rx="4" fill="#0f766e"/>
+  <text class="tag" x="1062" y="165" style="fill:#0f766e">③ RAW SYNTHETIC</text>
+  <text class="head" x="1062" y="202">Bằng chứng quan sát</text>
+  <text class="mono" x="1062" y="239">selector_decision</text>
+  <text class="mono" x="1062" y="268">client_applied_config</text>
+  <text class="mono" x="1062" y="297">ice_event · call_stats_epoch</text>
+  <text class="mono" x="1062" y="326">call_outcome · client_call_report</text>
+  <line x1="1062" x2="1364" y1="351" y2="351" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text class="small" x="1062" y="380">Gắn data_source = synthetic.</text>
+  <text class="small" x="1062" y="402">Không chép truth thành phép đo.</text>
 
-  <!-- client lane -->
-  <rect class="box client" x="170" y="128" width="128" height="56" rx="8"/>
-  <text class="bt" x="182" y="150">A bấm gọi B</text>
-  <text class="bs" x="182" y="170">HAN · 7552 · 4G</text>
+  <path class="line" d="M1213 442 V475 H724 V489"/>
+  <text class="tag" x="50" y="509" style="fill:#0f766e">④ HIỆP KIỂM TRA VÀ DEMO</text>
 
-  <rect class="box client" x="590" y="128" width="160" height="56" rx="8"/>
-  <text class="bt" x="602" y="146">Allocate k server</text>
-  <text class="bm" x="602" y="162">A: DAD-1, HAN-2</text>
-  <text class="bm" x="602" y="177">B: DAD-1, SGN-2</text>
+  <rect x="50" y="532" width="419" height="147" rx="17" class="card"/>
+  <circle cx="81" cy="565" r="13" fill="#0f766e"/>
+  <text x="76" y="571" font-size="16" font-weight="700" style="fill:#fff">1</text>
+  <text class="head" x="109" y="572">Tái lập được</text>
+  <text class="body" x="76" y="606">Cùng cấu hình + seed → cùng event.</text>
+  <text class="small" x="76" y="640">Thay sự cố → outcome đổi có lý do.</text>
 
-  <rect class="box client" x="790" y="128" width="180" height="56" rx="8"/>
-  <text class="bt" x="802" y="150">ICE chọn đường</text>
-  <text class="bs" x="802" y="170">media A → DAD-1 → B</text>
+  <rect x="486" y="532" width="419" height="147" rx="17" class="card"/>
+  <circle cx="517" cy="565" r="13" fill="#0f766e"/>
+  <text x="512" y="571" font-size="16" font-weight="700" style="fill:#fff">2</text>
+  <text class="head" x="545" y="572">Trace một call_id</text>
+  <text class="body" x="512" y="606">Đề xuất → áp dụng → ICE → kết quả.</text>
+  <text class="small" x="512" y="640">ID, thời gian và trạng thái khớp nhau.</text>
 
-  <rect class="box client" x="1010" y="128" width="160" height="56" rx="8"/>
-  <text class="bt" x="1022" y="150">Cúp máy</text>
-  <text class="bs" x="1022" y="170">client gửi outcome</text>
+  <rect x="922" y="532" width="468" height="147" rx="17" class="card"/>
+  <circle cx="953" cy="565" r="13" fill="#0f766e"/>
+  <text x="948" y="571" font-size="16" font-weight="700" style="fill:#fff">3</text>
+  <text class="head" x="981" y="572">Báo cáo W1</text>
+  <text class="body" x="948" y="606">Ca bình thường, lỗi TURN, giả định.</text>
+  <text class="small" x="948" y="640">Nêu rõ câu hỏi chờ Đoàn/mentor.</text>
 
-  <path class="flow" d="M750 156 H788" marker-end="url(#ah)"/>
-  <path class="flow" d="M970 156 H1008" marker-end="url(#ah)"/>
-
-  <!-- selector lane -->
-  <rect class="box feat" x="170" y="216" width="128" height="72" rx="8"/>
-  <text class="bt" x="182" y="238">Feature</text>
-  <text class="bs" x="182" y="256">nhóm · stress</text>
-  <text class="bs" x="182" y="272">rtt_leg · p_conn</text>
-
-  <rect class="box rank" x="318" y="216" width="108" height="72" rx="8"/>
-  <text class="bt" x="330" y="238">Ranking</text>
-  <text class="bs" x="330" y="256">lọc → J (ms)</text>
-  <text class="bs" x="330" y="272">top-k → rút thăm</text>
-
-  <rect class="box conf" x="446" y="216" width="114" height="72" rx="8"/>
-  <text class="bt" x="458" y="238">Confidence</text>
-  <text class="bs" x="458" y="256">0,57 · medium</text>
-  <text class="bs" x="458" y="272">fallback L1–L3</text>
-
-  <path class="flow" d="M234 184 V214" marker-end="url(#ah)"/>
-  <path class="flow" d="M298 252 H316" marker-end="url(#ah)"/>
-  <path class="flow" d="M426 252 H444" marker-end="url(#ah)"/>
-  <path class="flow" d="M503 216 V156 H588" marker-end="url(#ah)"/>
-  <text class="al" x="510" y="150">iceServers</text>
-
-  <!-- turn lane -->
-  <rect class="box turn" x="590" y="318" width="160" height="34" rx="8"/>
-  <text class="bm" x="602" y="340">DAD-1 · HAN-2 · SGN-2</text>
-  <rect class="box turn" x="790" y="318" width="180" height="34" rx="8"/>
-  <text class="bm" x="802" y="340">relay chung DAD-1</text>
-  <path class="flow dash" d="M670 184 V316" marker-end="url(#ah)"/>
-  <path class="flow dash" d="M880 184 V316" marker-end="url(#ah)"/>
-
-  <!-- event store lane -->
-  <rect class="box evt" x="446" y="380" width="114" height="44" rx="8"/>
-  <text class="bmb" x="458" y="398">DECISION</text>
-  <text class="bs" x="458" y="415">propensity</text>
-  <rect class="box evt" x="590" y="380" width="160" height="44" rx="8"/>
-  <text class="bmb" x="602" y="398">ALLOCATION REPORT</text>
-  <text class="bs" x="602" y="415">Allocate của cả k server</text>
-  <rect class="box evt" x="1010" y="380" width="160" height="44" rx="8"/>
-  <text class="bmb" x="1022" y="398">CALL OUTCOME</text>
-  <text class="bs" x="1022" y="415">relay thực sự dùng</text>
-
-  <path class="flow" d="M503 288 V378" marker-end="url(#ah)"/>
-  <path class="flow" d="M670 352 V378" marker-end="url(#ah)"/>
-  <path class="flow" d="M1090 184 V378" marker-end="url(#ah)"/>
-
-  <!-- after the call -->
-  <path class="flow" d="M503 424 L575 486" marker-end="url(#ah)"/>
-  <path class="flow" d="M670 424 L650 486" marker-end="url(#ah)"/>
-  <path class="flow" d="M1090 424 L772 512" marker-end="url(#ah)"/>
-  <text class="al" x="800" y="452">join theo decision_id</text>
-
-  <rect class="box label" x="470" y="488" width="300" height="88" rx="8"/>
-  <text class="bt" x="486" y="512">⑤ Label data</text>
-  <text class="bs" x="486" y="531">join decision ⋈ allocation ⋈ outcome</text>
-  <text class="bs" x="486" y="548">X (biết trước) · A + propensity · Y (biết sau)</text>
-  <text class="bs" x="486" y="565">nhãn gắn với relay thực sự dùng</text>
-
-  <rect class="box learn" x="170" y="640" width="320" height="96" rx="8"/>
-  <text class="bt" x="186" y="664">⑥ Learning · mỗi 5 phút</text>
-  <text class="bs" x="186" y="684">posterior Bayes phân cấp + decay</text>
-  <text class="bs" x="186" y="701">tính lại J cho mọi cặp</text>
-  <text class="bs" x="186" y="718">validate → publish table_version</text>
-
-  <rect class="box eval" x="750" y="640" width="420" height="96" rx="8"/>
-  <text class="bt" x="766" y="664">⑦ Evaluation · giờ / ngày</text>
-  <text class="bs" x="766" y="684">simulator → shadow → OPE → A/B</text>
-  <text class="bs" x="766" y="701">metric chính + guardrail, CI bootstrap theo cụm</text>
-  <text class="bs" x="766" y="718">→ cổng rollout hoặc rollback</text>
-
-  <path class="flow" d="M540 576 L430 638" marker-end="url(#ah)"/>
-  <path class="flow" d="M700 576 L820 638" marker-end="url(#ah)"/>
-
-  <!-- closed loop back to Feature -->
-  <path class="loop" d="M170 688 H150 V252 H168" marker-end="url(#ahg)"/>
-  <text class="alg" x="160" y="620" text-anchor="start">↺ bảng feature mới</text>
-  <text class="alg" x="160" y="604" text-anchor="start">cuộc gọi SAU dùng</text>
-
-  <text class="cap" x="24" y="790">Đường liền: dữ liệu chính. Đường đứt: client nói chuyện với TURN. Khung viền đứt: chỉ quan sát, không đổi quyết định.</text>
+  <rect x="50" y="713" width="1340" height="83" rx="15" fill="#fff2e8" stroke="#f5c49d" stroke-width="1.5"/>
+  <text class="tag" x="77" y="745" style="fill:#b45309">CHƯA CHỐT · DATA CONTRACT V0.5.0 LÀ ĐỀ XUẤT</text>
+  <text class="body" x="77" y="776">Sim dùng 8 mục cấu hình · Mentor xác nhận? · Biết Callee khi nào? · Client gửi gì? · TURN log nối sao?</text>
 </svg>

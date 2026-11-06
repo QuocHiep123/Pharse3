@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.coverage
+.env
+logs/
+reports/
+.cache/
+
+# data (never commit)
+data/
+WebRTC-QoE Dataset/
+*.zip
+
+# local-only explainer
+docs/contracts/data-contract-explained.md

@@ -1,0 +1,1230 @@
+# Data Contract v0.5.0 (đề xuất): contract thu thập, viết bằng JSON Schema 2020-12 trên YAML.
+# Đi kèm De_xuat_Data_Contract_v0.5.0_cho_Hiep.md, so với contract v0.4.0 tại commit e4d84f8.
+# Trạng thái: v0.5.0 dùng cho simulator; nguồn production chờ xác nhận theo issue #3.
+#
+# Phạm vi: dữ liệu một nguồn ghi trực tiếp, Decision Log và bảng tham chiếu.
+# Pipeline, Feature Engineering, Labeled Data, KPI, giả lập và API nằm ở dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml.
+#
+# Cách đọc:
+#   - Mỗi bảng là một mục trong $defs, có x-status: active hoặc deferred.
+#   - Cột ngoài `required` được phép vắng mặt. null chỉ hợp lệ khi type/anyOf cho phép.
+#   - x-change so với v0.4.0: new, changed, additive. Không ghi nghĩa là giữ như v0.4.0.
+#   - x-review: S2 đến S20 là chi tiết chọn khi viết schema, đang mở để góp ý.
+#   - x-deferred-columns là cột hoãn, x-moved-columns là cột chuyển sang lớp sau, x-removed-columns là cột bỏ.
+#
+# Cách kiểm tra một bản ghi: validate với {"$ref": "#/$defs/<tên bảng>"}.
+# Bất biến một dòng được cài bằng if/then; bất biến nhiều bảng nằm ở x-invariants.
+
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:turn-selector:data-contract:0.5.0
+title: 'Data Contract v0.5.0: contract thu thập cho simulator'
+description: 'Contract này đặc tả dữ liệu raw có thể thu thập: nghĩa, schema, nguồn và khả năng thu thập, khóa liên
+  kết, đơn vị và thời gian, nullability. Không chốt thuật toán, feature, KPI, simulator, ngưỡng vận hành hay lịch
+  triển khai. Tệp không ràng buộc gì ở gốc; mỗi bảng được validate qua $defs.'
+
+x-contract:
+  version: 0.5.0
+  based_on: 0.4.0, commit e4d84f8, nhánh docs/w1-design-and-data-contract
+  proposal_document: De_xuat_Data_Contract_v0.5.0_cho_Hiep.md
+  companion_schema: dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml
+  status: simulator_ready
+  production_status: pending_source_verification
+  decision_document: docs/contracts/data-contract-v0.5.0.md
+  breaking_changes: true
+x-lifecycle:
+  status: Chốt ranh giới thu thập cho simulator; downstream có version riêng
+  steps:
+  - step: Call logs, getStats, TURN metrics, probe giữa các TURN
+    layer: File này
+  - step: 'Feature tables: chặng, backbone, health, load'
+    layer: Feature Engineering, ở file đi kèm
+  - step: Ranking Engine, Selector API, client và ICE
+    layer: Thuật toán; API ở file đi kèm
+  - step: Decision Log
+    layer: File này
+  - step: Outcome Log
+    layer: Đầu vào ở file này; view sau pipeline ở file đi kèm
+  - step: Labeled Data, Dashboard, Evaluation
+    layer: File đi kèm
+x-conventions:
+  time: UTC, ISO-8601 đến ms; Postgres timestamptz
+  duration: Chỉ hợp lệ khi trừ trên cùng một đồng hồ đã biết; ưu tiên monotonic trên cùng endpoint và process. *_mono_ms
+    đi với clock_session_id. Bản này chưa cần clock_domain theo từng dòng.
+  partition: dt là ngày UTC của event_ts
+  units: Thời gian và độ trễ ms; loss % 0–100; jitter ms; bitrate kbps; tỷ lệ 0–1
+  unknown_vs_null: Enum dùng unknown khi chưa biết; null là không áp dụng hoặc chưa có số đo. Thiếu số đo không
+    điền 0, không điền trung bình.
+  key_columns: 'Cột trong khóa không null: dùng ''unknown'' hoặc ''-'''
+  privacy: user_hash là HMAC-SHA256. Chỉ lưu IP máy chủ TURN. Không lưu IP người dùng, relatedAddress, relatedPort
+    hay credential secret.
+  requiredness: Mức nguồn không quyết định field bắt buộc hay nullable; mỗi field chốt theo từng trạng thái event.
+  optional_vs_null: Field ngoài required có thể vắng mặt; chỉ field có type null hoặc anyOf null mới nhận null. Không dùng sentinel cho số đo.
+  temporal_join: 'Tham chiếu turn_id vào dim_turn là lookup theo business key tại as_of: valid_from <= as_of < valid_to, null valid_to là vô hạn. 0 kết quả là unmapped, nhiều kết quả là ambiguous; không tự chọn bản mới nhất.'
+  hundred_percent: 100% chỉ nghĩa là không chủ động lấy mẫu, không bảo đảm dữ liệu về đủ. Coverage thực tế nằm ở
+    telemetry_coverage.
+x-source-levels:
+  A: Service hoặc app tự tạo được sau khi tích hợp
+  B: 'Thu được có điều kiện: SDK, exporter, quyền truy cập, cấu hình'
+  C: Cần phép đo hoặc hệ thống mới; không giả định trong profile nền
+x-data-tiers:
+  required: Không chủ động lấy mẫu trong phạm vi x-call-scope. Chỉ nghĩa là không lấy mẫu, không bảo đảm dữ liệu
+    về đủ
+  conditional: Có khi nguồn có năng lực; không có thì không có dòng, phần thiếu nằm ở telemetry_coverage
+  sampled: Lấy mẫu theo §6.3 của v0.4.0
+x-call-scopes:
+  all_calls: Ghi cho mọi cuộc gọi
+  relay_or_failed: Chỉ giữ khi cuộc gọi có lúc đi qua relay, hoặc khi cuộc gọi thất bại (x-rules.relay_scope)
+  not_call: Không gắn với cuộc gọi
+x-field-promotion-criteria:
+  description: Một field chỉ được nâng từ dự kiến lên thu được khi có đủ các mục sau
+  requires:
+  - owner của nguồn
+  - API hoặc log cụ thể
+  - ví dụ event
+  - đơn vị và đồng hồ
+  - khóa join
+  - hành vi khi thiếu
+  - phạm vi nền tảng và phiên bản
+x-observation-profiles:
+  obs_base:
+    description: Call logs, getStats và TURN metrics theo capability, Decision Log. Không có probe; health phải
+      khai báo có hay không
+    tables_expected:
+    - call_session
+    - selector_decision_request
+    - selector_decision
+    - endpoint_network_context
+    - ice_event
+    - call_stats_epoch
+    - call_stats_5s
+    - call_outcome
+    - client_call_report
+    - turn_health_1m
+    tables_conditional:
+    - client_applied_config
+    - selector_decision_pair
+    tables_absent:
+    - turn_probe
+    - turn_allocation
+  obs_active:
+    description: obs_base thêm probe giữa các TURN. Đây là dạng của vòng đời dữ liệu
+    adds:
+    - turn_probe
+  obs_infra:
+    description: Thêm log của TURN khi có nguồn
+    adds:
+    - turn_allocation
+    - các cột lỗi allocation của turn_health_1m
+x-rules:
+  decision_objects: Tách cặp được cân nhắc (selector_decision_pair), hành động của Selector (selector_decision.entries)
+    và cấu hình client đã áp dụng (client_applied_config). Không gộp thành chosen_rank.
+  propensity: action_propensity là xác suất của cả hành động. Không nhân p_caller × p_callee khi hai bên được chọn
+    chung; xác suất cặp ICE thực dùng không phải xác suất hành động. Nếu danh sách suy ra hoàn toàn tất định từ
+    cặp dẫn đầu thì xác suất cặp đại diện được.
+  list_count: Một mục là một URL trên một server với một giao thức. Tối đa 8 mục tổng cộng mỗi bên; UDP, TCP, TLS của cùng máy chiếm 3 trong 8 chỗ, không phải 8 mỗi transport.
+    Baseline trả đúng 8 khi đủ mục hợp lệ; thiếu thì insufficient_candidates, không nhân bản. Thuật toán cải tiến được trả ít hơn. Đây là giả định simulator, chưa xác nhận nghĩa production từ mentor.
+  decision_without_selector: Chưa có Selector thì BE vẫn ghi selector_decision với decision_source = static_config,
+    policy_version = static@1, selection_method = static, propensity_method = not_estimated, và không có dòng selector_decision_pair.
+    decision_id luôn có.
+  pair_rows: Ghi các cặp trong top-k và hành động đã chọn. Cặp thực tế khác các cặp đã ghi thì Labeled Data ghi
+    là không có dự đoán, không suy ra. info_level khác full thì không ghi dòng selector_decision_pair; không đặt null trong khóa cặp.
+  applied_config: Decision mới không tự đổi cấu hình client đang dùng. ice_attempt trỏ decision theo cấu hình đã
+    áp dụng.
+  list_duplicate: Duplicate định nghĩa theo normalized_config_key. Quy tắc policy cấm lặp server tách khỏi khóa
+    dữ liệu.
+  candidate_type_of_a_side: Loại candidate của mỗi đầu lấy từ local candidate của chính đầu đó. Remote candidate
+    là bằng chứng phụ; remote prflx không tự nói lên loại thật.
+  turn_identity_evidence: 'Raw chỉ ghi bằng chứng: local_turn_url, relayed_ip_local, relayed_ip_remote. Tra máy
+    TURN do pipeline làm qua dim_turn_endpoint. Không dùng TURN do Selector yêu cầu làm bằng chứng.'
+  rtt_samples: Cửa sổ RTT chỉ có mẫu mới khi roundTripTimeMeasurements tăng; không lặp RTT cũ.
+  counters: Bộ đếm tích lũy đọc ở cuối epoch và tại mỗi lần đổi cặp. Hiệu giữa hai lần đọc liên tiếp cho số trung
+    bình của một đường. Chỉ trừ khi cùng định danh stream. Bộ đếm của candidate-pair tính riêng theo cặp.
+  network_epoch: Tăng khi client phát hiện đổi mạng. Nền tảng không phát hiện được thì giữ 0 và báo ở telemetry_coverage,
+    không được hiểu là không đổi mạng.
+  network_context: endpoint_network_context là snapshot BE ghi khi nhận context ban đầu hoặc tín hiệu đổi mạng; geo/ISP tra lúc nhận, network_type do client báo. Không lưu IP user; không dùng ctx tại decision để thay context epoch mới. observed_ts là đồng hồ BE, epoch_start_ts là đồng hồ client, không trừ chéo.
+  turn_identity: Lookup dim_turn_endpoint theo IP máy chủ, role và thời điểm event trong khoảng hiệu lực; 0 dòng là unmapped, nhiều turn_id là ambiguous, thiếu bằng chứng là unknown. Không dùng ý định Selector để phá hòa.
+  inventory_coverage: 'Country không có TURN trong inventory chỉ là no_turn_observed; unhealthy khác với không có inventory. Chỉ kết luận not_deployed khi phạm vi inventory đã xác nhận đầy đủ. Simulator khai báo inventory_scope trong run manifest/config.'
+  relay_scope: Trước cuộc gọi không biết sẽ đi relay hay P2P, nên không lọc từ đầu. Bảng all_calls ghi cho mọi cuộc
+    gọi. Bảng relay_or_failed chỉ giữ khi cuộc gọi có lúc đi qua relay, hoặc khi cuộc gọi thất bại. Thất bại nghĩa
+    là đã bắt máy mà ICE hoặc media không đạt hoặc chưa rõ; cuộc gọi không bắt máy không tính. Không lọc theo đường
+    được chọn là relay, vì cuộc gọi thất bại không có đường được chọn. Trong giả lập, mọi cuộc gọi chạy ice_transport_policy
+    = relay.
+  end_signal: BE ghi điều quan sát được, client báo lý do nếu có. Phân loại thành end_reason do pipeline làm, có
+    version.
+x-invariants:
+- id: I1
+  level: FAIL
+  status: changed
+  enforced_by: pipeline
+  rule: Mọi event có call_id đều có call_session tương ứng.
+- id: I2
+  level: WARN
+  status: changed
+  enforced_by: pipeline
+  rule: Mỗi call_session có đúng một call_outcome trong 72 giờ; thiếu thì là orphan nhưng vẫn ở trong cohort.
+- id: I3
+  level: FAIL
+  status: changed
+  enforced_by: pipeline
+  rule: returned_list_size ≤ requested_max_list_size; rank liên tục 1..len; không trùng normalized_config_key trong
+    một danh sách.
+- id: I4
+  level: WARN
+  status: changed
+  enforced_by: pipeline
+  rule: TURN thực dùng nằm trong danh sách đã áp dụng cùng bên, trừ static_fallback. Danh tính chưa identified thì
+    bỏ qua.
+- id: I6
+  level: FAIL
+  status: changed
+  enforced_by: schema
+  rule: 'Trên raw: answered = false ⇒ end_signal ∈ {rejected, cancelled, not_answered_timeout, invite_undelivered,
+    signaling_lost, unknown}. Bản theo end_reason nằm ở file đi kèm.'
+- id: I10
+  level: FAIL
+  status: changed
+  enforced_by: schema_and_pipeline
+  rule: 0 ≤ value_ms ≤ 10000; 0 ≤ loss_pct ≤ 100; jitter ≥ 0; allocation_result = success ⇔ error_code = none; unknown
+    thì error_code null. Range và allocation kiểm tra bằng schema; tổng histogram bằng số cửa sổ assessable kiểm tra ở pipeline.
+- id: I11
+  level: WARN
+  status: unchanged
+  enforced_by: pipeline
+  rule: event_id duy nhất.
+- id: I14
+  level: FAIL
+  status: unchanged
+  enforced_by: pipeline
+  rule: Selector không chặn lời mời gọi; lỗi hoặc timeout ⇒ decision_source = static_fallback.
+- id: I17
+  level: FAIL
+  status: unchanged
+  enforced_by: pipeline
+  rule: Với endpoint derivation = sdk, stats_sampling_prob và stats_sampling_reason khớp §6.3 khi có đủ dữ liệu.
+- id: I22
+  level: FAIL
+  status: unchanged
+  enforced_by: pipeline
+  rule: Endpoint derivation = pipeline có mọi cửa sổ đã gửi; mỗi endpoint chỉ một derivation.
+- id: I25
+  level: FAIL
+  status: new
+  enforced_by: pipeline
+  review: S3
+  rule: decision_id của selector_decision và selector_decision_pair phải có header selector_decision_request cùng call_id. parent_decision_id tham chiếu header cùng call_id và sớm hơn. phase, request_ts, policy_version, info_level của các list phải khớp header; field riêng từng bên được khác.
+- id: I26
+  level: FAIL
+  status: new
+  enforced_by: pipeline
+  rule: Mỗi decision_id có bảng cặp không trống thì mỗi metric có đúng một is_lead=true; mọi metric phải có cùng cặp lead (hai TURN và hai transport). Cặp lead khớp hai entries rank 1 của danh sách Caller/Callee. info_level khác full hoặc static_config thì không có dòng pair.
+- id: I29
+  level: FAIL
+  status: new
+  enforced_by: pipeline
+  rule: dim_turn_endpoint không có bản ghi trùng hay khoảng hiệu lực chồng lấn không có chủ đích của cùng một quan
+    hệ.
+- id: I30
+  level: FAIL
+  status: new
+  enforced_by: pipeline
+  rule: turn_probe có src_turn_id khác dst_turn_id.
+- id: I31
+  level: FAIL
+  status: new
+  enforced_by: pipeline
+  rule: interval_low ≤ interval_high khi cả hai có giá trị.
+x-concept-map:
+  note: Ánh xạ khái niệm, không phải phép chuyển cơ học; không suy được thì để thiếu.
+  mappings:
+  - from: chosen_rank
+    to: selector_decision_pair.is_lead
+  - from: candidates[].propensity, joint_propensity
+    to: action_propensity, propensity_method
+  - from: k
+    to: requested_max_list_size, returned_list_size, topk_pair_count
+  - from: connected
+    to: outcome_log.ice_connected, media_connected, outcome_status
+  - from: end_reason trên call_outcome
+    to: end_signal, client_end_reason; outcome_log.end_reason
+  - from: answer_ts
+    to: answer_received_at_be
+  - from: success
+    to: allocation_result
+  - from: ice_attempt.transport
+    to: ice_event.client_turn_transport; ice_attempt.client_turn_transport_*
+  - from: checks_start_ts khi không có hook
+    to: ice_event với ice_state = checking
+  - from: ice_trigger = fallback
+    to: bỏ
+  - from: path_leg_measurement với mesh_probe
+    to: turn_probe
+  - from: turn_health_1m.health_status
+    to: liveness_ok; health_snapshot.health_status
+  - from: stats_status trên call_outcome
+    to: client_call_report.stats_status
+  not_mechanical:
+  - connected = true cũ chỉ chứng minh ICE theo định nghĩa cũ, không tự chứng minh media_connected = true.
+  - Propensity từng bên không tự chuyển thành xác suất của hành động nếu không biết cơ chế chọn; dữ liệu cũ có thể
+    phải để action_propensity = null.
+x-review-flags:
+  note: Chi tiết chọn khi viết schema, đang mở để Hiệp góp ý.
+  S2: 'Tên và cột của client_applied_config: config_source, is_fallback_config, applied_entries'
+  S3: Giữ selector_decision theo từng bên, lặp field cấp quyết định, thêm I25
+  S4: normalized_config_key, eligible_action_set, confidence_evidence
+  S6: ice_event thêm dtls_state_change, restart_requested, event_mono_ms, clock_session_id
+  S7: call_stats_5s thêm packets_received, rtt_measurements_delta
+  S11: Enum observation_state và cột cùng tên trên turn_health_1m, turn_probe
+  S12: decision_source = static_config và policy_version = static@1 khi chưa có Selector
+  S13: Bảng turn_probe và các cột của nó
+  S14: liveness_ok, liveness_method thay cho health_status trên raw
+  S15: Bộ đếm tích lũy trên call_stats_epoch và trên dòng selected_pair_change của ice_event
+  S16: end_signal, client_end_reason, và bảng client_call_report tách từ call_outcome
+  S17: local_turn_url trên ice_event
+  S18: server_session_id, credential_ref trên turn_allocation
+  S19: Bỏ giá trị refined của decision_phase
+  S20: sequence_no bắt buộc và nằm trong khóa của call_stats_epoch, vì checkpoint tạo nhiều dòng cùng epoch
+x-out-of-scope:
+- 'Pipeline làm sạch, Feature Engineering, Labeled Data, KPI và đánh giá, giả lập, API Selector: xem file đi kèm'
+- Mô hình ICE trong simulator, nhiễu, tham số lab
+- Mô hình ghép chặng, gate, ngưỡng
+- Detector stall, tiêu chí xác nhận, chu kỳ đo
+- Margin, power, benchmark, luật thắng thua, sensitivity
+- Phân công, tiến độ
+
+$defs:
+  # ---------- Kiểu chung và enum ----------
+  e_confidence_level: {type: string, enum: [high, medium, low]}
+  rtt_hist: {type: object, propertyNames: {enum: [lt100, '100_200', '200_300', '300_400', ge400]}, additionalProperties: {type: integer, minimum: 0}, description: 'Số cửa sổ theo bucket; {} khi không có cửa sổ đánh giá được'}
+  loss_hist: {type: object, propertyNames: {enum: [lt1, '1_3', '3_5', ge5]}, additionalProperties: {type: integer, minimum: 0}, description: 'Số cửa sổ theo bucket; {} khi không có cửa sổ đánh giá được'}
+  jitter_hist: {type: object, propertyNames: {enum: [lt10, '10_30', '30_50', ge50]}, additionalProperties: {type: integer, minimum: 0}, description: 'Số cửa sổ theo bucket; {} khi không có cửa sổ đánh giá được'}
+  e_data_source: {type: string, enum: [synthetic, lab_zenodo, lab_controlled, public_reference, production], x-contract-ref: §1.1, description: lab_controlled là giá trị bổ sung cho lab tự làm, x-change: changed}
+  e_producer: {type: string, enum: [client_sdk, signaling, selector, turn_server, probe_agent, simulator], x-contract-ref: §1.1}
+  e_side: {type: string, enum: [caller, callee], x-contract-ref: §2}
+  e_network_type: {type: string, enum: [wifi, 4g, 5g, ethernet, unknown], x-contract-ref: §2}
+  e_media_kind: {type: string, enum: [audio, video], x-contract-ref: §2}
+  e_platform: {type: string, enum: [ios, android, web, desktop, unknown], x-contract-ref: §2}
+  e_call_type: {type: string, enum: [one_to_one, group, unknown], x-contract-ref: §2}
+  e_stats_derivation: {type: string, enum: [sdk, pipeline], x-contract-ref: §2}
+  e_info_level: {type: string, enum: [full, caller_only, country_only, none], x-contract-ref: §2}
+  e_decision_phase: {type: string, enum: [initial, context_update, restart], x-contract-ref: §2, description: context_update là request mới có parent_decision_id khi có thêm Callee context; không đổi cấu hình nếu client chưa áp dụng, x-change: changed, x-review: S19}
+  e_decision_source: {type: string, enum: [api, static_config, static_fallback, cache], x-contract-ref: §2, description: 'static_config: chưa có Selector, BE cấp danh sách tĩnh. static_fallback: có Selector nhưng lỗi hoặc timeout', x-change: changed, x-review: S12}
+  e_connection_mode: {type: string, enum: [post_answer, pre_connect], x-contract-ref: §2}
+  e_ice_transport_policy: {type: string, enum: [relay, all], x-contract-ref: §2}
+  e_transport: {type: string, enum: [udp, tcp, tls], x-contract-ref: §2, description: Giao thức từ client tới TURN}
+  e_candidate_protocol: {type: string, enum: [udp, tcp], description: 'Giao thức của candidate, khác với giao thức từ client tới TURN', x-change: new}
+  e_measurement_kind: {type: string, enum: [one_way, rtt], x-contract-ref: §2}
+  e_measurement_point: {type: string, enum: [client, turn_server, probe_agent], x-contract-ref: §2}
+  e_candidate_type: {type: string, enum: [host, srflx, prflx, relay, unknown], x-contract-ref: §2}
+  e_ice_trigger: {type: string, enum: [initial, restart_network_change, restart_failure, restart_disconnected, restart_quality], description: 'Bỏ fallback; thêm restart_disconnected, restart_quality', x-change: changed}
+  e_rtc_ice_state: {type: string, enum: [new, checking, connected, completed, disconnected, failed, closed], x-contract-ref: W3C, description: Trạng thái quan sát trong ice_event, x-change: new}
+  e_rtc_dtls_state: {type: string, enum: [new, connecting, connected, closed, failed], x-contract-ref: W3C, x-change: new}
+  e_ice_role: {type: string, enum: [controlling, controlled, unknown], x-contract-ref: W3C, x-change: new}
+  e_ice_event_type: {type: string, enum: [ice_state_change, selected_pair_change, dtls_state_change, restart_requested], x-change: new}
+  e_event_observation_source: {type: string, enum: [event, polling], x-change: new}
+  e_alloc_error: {type: string, enum: [none, timeout, unauthorized_401, forbidden_403, quota_486, capacity_508, redirect_300, unreachable, other], description: 'Kết quả cuối của allocation, không phải từng request', x-change: changed}
+  e_allocation_result: {type: string, enum: [success, failure, unknown], x-change: new}
+  e_allocation_source: {type: string, enum: [turn_log], x-change: new, description: Bỏ sdk_hook vì không sửa SDK}
+  e_filter_reason: {type: string, enum: [down, overloaded, degraded, maintenance, policy, health_stale], x-contract-ref: §5.2, description: Thêm health_stale, x-change: changed}
+  e_stats_status: {type: string, enum: [kept_critical, kept_sampled, not_sampled, truncated, lost, not_applicable], x-contract-ref: §2}
+  e_conn_state: {type: string, enum: [connected, disconnected, failed], x-contract-ref: §2}
+  e_first_media_definition: {type: string, enum: [rtp_first_packet, decoded_frame, playout], x-change: new}
+  e_observation_status: {type: string, enum: [observed, error_reported, not_observed, unsupported, session_closed, telemetry_lost], description: 'Không thấy candidate là not_observed, không suy ra nguyên nhân', x-change: new}
+  e_anchor_kind: {type: string, enum: [set_local_description, peer_connection_created, ice_restart_requested, other], description: 'Mốc cục bộ, không phải lúc gửi Allocate', x-change: new}
+  e_collection_method: {type: string, enum: [icecandidate_callback, sdk_hook, polling], x-change: new}
+  e_selection_method: {type: string, enum: [deterministic, greedy, thompson, ucb, epsilon, static], x-change: new}
+  e_propensity_method: {type: string, enum: [exact, monte_carlo, not_estimated], x-change: new}
+  e_list_role: {type: string, enum: [lead, topk, failure_domain_backup, transport_backup, padding], x-change: new}
+  e_config_source: {type: string, enum: [selector, static_config, static_fallback, cache, unknown], x-change: new}
+  e_interval_kind: {type: string, enum: [mean_ci, prediction, other], description: Khoảng cho giá trị trung bình khác khoảng dự đoán từng cuộc gọi, x-change: new}
+  e_gate_status: {type: string, enum: [passed, failed, not_evaluated, not_applicable], x-change: new}
+  e_endpoint_role: {type: string, enum: [listen, relay, both], x-contract-ref: §3.4}
+  e_turn_status: {type: string, enum: [active, maintenance, retired], x-contract-ref: §3.1}
+  e_access_kind: {type: string, enum: [fixed, mobile, mixed], x-contract-ref: §3.2}
+  e_geo_source: {type: string, enum: [ip_geo, sdk_claimed, both, unknown], x-contract-ref: §4, description: unknown cho ctx chưa biết, x-change: changed}
+  e_vn_region: {type: string, enum: [north, central, south, unknown], x-contract-ref: §1, description: null là không áp dụng}
+  e_fallback_type: {type: string, enum: [data_backoff, health_missing, selector_error, insufficient_candidates], x-change: new}
+  e_segment_level: {type: string, enum: [L4, L3, L2, L1, LA, L0], x-contract-ref: §9.0, description: 'LA: cấp khu vực, bổ sung', x-change: changed}
+  e_pair_check_state: {type: string, enum: [waiting, in_progress, succeeded, failed], x-contract-ref: §5.5}
+  e_telemetry_support: {type: string, enum: [full, partial], x-contract-ref: §5.5}
+  e_observation_state: {type: string, enum: [measured, not_measured, stale, lost, ambiguous, not_applicable], description: Trạng thái của một quan sát, x-change: new}
+  e_end_signal: {type: string, enum: [hangup, rejected, cancelled, not_answered_timeout, invite_undelivered, signaling_lost, unknown], description: Điều BE quan sát trực tiếp lúc kết thúc, x-change: new, x-review: S16}
+  e_liveness_method: {type: string, enum: [exporter_scrape, allocate_check, none], x-change: new, x-review: S14}
+  e_probe_protocol: {type: string, enum: [udp, tcp, tls, icmp], description: Nên trùng giao thức media; icmp chỉ khi không đo được cách khác, x-change: new, x-review: S13}
+
+  # ---------- Object dùng chung ----------
+  event_envelope:
+    title: Cột chung của mọi bảng event thô (§1.1)
+    type: object
+    properties:
+      event_id: {type: string, format: uuid, description: 'Duy nhất, dùng dedup'}
+      contract_version: {type: string}
+      data_source: {$ref: '#/$defs/e_data_source'}
+      producer: {$ref: '#/$defs/e_producer'}
+      event_ts: {type: string, format: date-time, description: Theo đồng hồ producer; pipeline không ghi đè}
+      ingest_ts: {type: string, format: date-time, description: Lúc collector nhận}
+      sim_run_id: {type: [string, 'null'], description: Bắt buộc khi data_source = synthetic}
+      dt: {type: string, format: date, description: Ngày UTC của event_ts}
+    required: [event_id, contract_version, data_source, producer, event_ts, ingest_ts, dt]
+    allOf:
+      - {if: {required: [data_source], properties: {data_source: {const: synthetic}}}, then: {required: [sim_run_id], properties: {sim_run_id: {not: {type: 'null'}}}}}
+  ctx:
+    title: Bối cảnh một bên lúc quyết định (§4). Field chưa biết ghi unknown
+    type: object
+    properties:
+      user_hash: {type: [string, 'null']}
+      country: {type: string}
+      vn_region: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      city: {type: string}
+      isp: {type: string}
+      asn: {type: [integer, 'null']}
+      network_type: {$ref: '#/$defs/e_network_type'}
+      geo_source: {$ref: '#/$defs/e_geo_source'}
+      geo_mismatch: {type: [boolean, 'null']}
+      device_id: {type: string}
+      platform: {$ref: '#/$defs/e_platform'}
+      os_version: {type: [string, 'null']}
+      app_version: {type: [string, 'null']}
+      sdk_version: {type: [string, 'null']}
+      device_model: {type: [string, 'null']}
+      browser_name: {type: [string, 'null']}
+      browser_version: {type: [string, 'null']}
+    required: [country, city, isp, network_type, geo_source, device_id, platform]
+    additionalProperties: false
+    x-moved-columns: [{column: segment_key, to: Feature Engineering}]
+  list_entry:
+    title: 'Một mục trong danh sách đã cấp: một URL trên một server với một giao thức'
+    type: object
+    properties:
+      entry_id: {type: string, description: Khóa trong một danh sách, x-change: new}
+      rank: {type: integer, minimum: 1, description: 'Vị trí trong danh sách, liên tục từ 1'}
+      turn_id: {type: [string, 'null'], description: Có thể null nếu mục là endpoint hoặc pool chưa gắn máy, x-change: changed}
+      config_ref: {type: [string, 'null'], description: URL hoặc tham chiếu cấu hình, x-change: new}
+      normalized_config_key: {type: string, description: Định nghĩa duplicate trong một danh sách, x-change: new, x-review: S4}
+      client_turn_transport: {$ref: '#/$defs/e_transport', description: Selector muốn dùng giao thức nào tới TURN, x-change: new}
+      roles: {type: array, items: {$ref: '#/$defs/e_list_role'}, x-change: new}
+      score: {type: [number, 'null'], description: Chỉ so trong một decision}
+      score_components: {type: [object, 'null'], description: Gồm backoff_level; hạ ưu tiên do tải ghi tại đây theo quy ước}
+      reason_codes: {type: [array, 'null'], items: {type: string}}
+    required: [entry_id, rank, normalized_config_key, client_turn_transport, roles]
+    additionalProperties: false
+  filtered_turn:
+    title: TURN bị lọc
+    type: object
+    properties:
+      turn_id: {type: string}
+      reason: {$ref: '#/$defs/e_filter_reason'}
+    required: [turn_id, reason]
+    additionalProperties: false
+  confidence_evidence:
+    title: Căn cứ của mức tin cậy
+    type: object
+    properties:
+      segment_level: {anyOf: [{$ref: '#/$defs/e_segment_level'}, {type: 'null'}]}
+      n_calls: {type: [integer, 'null'], minimum: 0}
+      note: {type: [string, 'null']}
+    required: []
+    additionalProperties: false
+  eligible_action_set:
+    title: Tham chiếu tới tập hành động đủ điều kiện
+    type: object
+    properties:
+      ref: {type: string, description: 'Object hoặc snapshot bất biến, định vị được'}
+      content_hash: {type: [string, 'null'], description: 'Chỉ để kiểm tra nội dung, không tự dựng lại hành động'}
+    required: [ref]
+    additionalProperties: false
+  failure_domain:
+    title: 'Miền lỗi; chỉ ghi chiều có nguồn hạ tầng, tuyến cáp để null nếu chưa có chứng cứ'
+    type: object
+    properties:
+      provider: {type: [string, 'null']}
+      site: {type: [string, 'null']}
+      zone: {type: [string, 'null']}
+      host: {type: [string, 'null']}
+      network: {type: [string, 'null']}
+      cable_route: {type: [string, 'null']}
+    required: []
+    additionalProperties: false
+  applied_entry:
+    title: Một mục của danh sách client đã áp dụng. Không lưu credential
+    type: object
+    properties:
+      rank: {type: integer, minimum: 1}
+      turn_url: {type: string}
+      client_turn_transport: {$ref: '#/$defs/e_transport'}
+    required: [rank, turn_url, client_turn_transport]
+    additionalProperties: false
+
+  # ---------- Bảng tham chiếu ----------
+  dim_turn:
+    title: Danh mục TURN (SCD2)
+    x-kind: dimension
+    x-status: active
+    x-grain: Một phiên bản hiệu lực của một turn_id
+    x-contract-ref: §3.1
+    x-primary-key: [turn_id, valid_from]
+    x-source-level: A
+    x-producer: Hạ tầng
+    x-change: changed
+    x-deferred-columns: [{column: 'hairpin_supported, hairpin_test', reason: 'Cặp (A, A) xử lý như mọi cặp; khả năng hairpin là giả định của danh mục'}, {column: 'turn_pool_id, turn_instance_id', reason: Chưa cần khi danh mục tự xây}]
+    type: object
+    properties:
+      turn_id: {type: string, description: <country>-<city>-<host>-<nn>}
+      hostname: {type: string, description: 'Riêng của máy, hoặc chung của pool'}
+      country: {type: string}
+      vn_region: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      city: {type: string}
+      lat: {type: number}
+      lon: {type: number}
+      host_isp: {type: string}
+      host_asn: {type: integer}
+      capacity_alloc: {type: [integer, 'null'], minimum: 0, description: Null nếu chưa xác định được, x-change: changed}
+      transports: {type: array, items: {$ref: '#/$defs/e_transport'}}
+      status: {$ref: '#/$defs/e_turn_status'}
+      valid_from: {type: string, format: date-time}
+      valid_to: {type: [string, 'null'], format: date-time}
+      failure_domain: {anyOf: [{$ref: '#/$defs/failure_domain'}, {type: 'null'}], x-change: additive}
+    required: [turn_id, hostname, country, city, lat, lon, host_isp, host_asn, transports, status, valid_from]
+    additionalProperties: false
+  dim_turn_endpoint:
+    title: Ánh xạ IP sang máy TURN (SCD2)
+    x-kind: dimension
+    x-status: active
+    x-grain: 'Một quan hệ IP, turn_id, vai trò trong một khoảng hiệu lực'
+    x-contract-ref: §3.4
+    x-primary-key: [mapping_id]
+    x-foreign-keys: [{columns: [turn_id], references: dim_turn, reference_columns: [turn_id], reference_mode: temporal, as_of: valid_from}]
+    x-source-level: A
+    x-producer: Hạ tầng
+    x-change: changed
+    x-notes: [Một IP có thể gắn nhiều turn_id; IP không còn là khóa duy nhất, Chặn bản ghi trùng và khoảng hiệu lực chồng lấn không có chủ đích của cùng một quan hệ, Lookup theo x-rules.turn_identity]
+    x-deferred-columns: [{column: endpoint_id, reason: Chưa cần khi danh mục tự xây}]
+    type: object
+    properties:
+      mapping_id: {type: string, x-change: new}
+      ip: {type: string, description: Chỉ IP máy chủ TURN}
+      turn_id: {type: string}
+      role: {$ref: '#/$defs/e_endpoint_role'}
+      hostname: {type: [string, 'null']}
+      valid_from: {type: string, format: date-time}
+      valid_to: {type: [string, 'null'], format: date-time}
+      source: {type: [string, 'null'], description: Nguồn của ánh xạ, x-change: new}
+    required: [mapping_id, ip, turn_id, role, valid_from]
+    additionalProperties: false
+  dim_asn:
+    title: Danh mục ASN
+    x-kind: dimension
+    x-status: active
+    x-grain: Một ASN
+    x-contract-ref: §3.2
+    x-primary-key: [asn]
+    x-source-level: B
+    x-change: unchanged
+    type: object
+    properties:
+      asn: {type: integer}
+      isp: {type: string}
+      country: {type: string}
+      access_kind: {$ref: '#/$defs/e_access_kind'}
+    required: [asn, isp, country, access_kind]
+    additionalProperties: false
+  dim_country_area:
+    title: Quốc gia sang khu vực
+    x-kind: dimension
+    x-status: active
+    x-grain: Một quốc gia trong một phiên bản bảng
+    x-primary-key: [country, area_map_version]
+    x-source-level: A
+    x-change: new
+    type: object
+    properties:
+      country: {type: string}
+      area: {type: string}
+      area_map_version: {type: string}
+    required: [country, area, area_map_version]
+    additionalProperties: false
+
+  # ---------- Call logs ----------
+  call_session:
+    title: 'Cuộc gọi, tạo khi A bấm gọi'
+    x-kind: event
+    x-status: active
+    x-grain: Một cuộc gọi
+    x-contract-ref: §5.1
+    x-primary-key: [call_id]
+    x-data-tier: required
+    x-call-scope: all_calls
+    x-source-level: A
+    x-producer: signaling
+    x-change: changed
+    x-deferred-columns: [{column: 'experiment_id, arm, randomization_unit, experiment_cluster_id, assignment_ts, assignment_hash', reason: Tạm thời chưa thử nghiệm trên traffic thật}]
+    x-moved-columns: [{column: scenario_tag, to: sim_call_tag}, {column: observation_profile, to: run_manifest}]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      call_id: {type: string, format: uuid}
+      caller_hash: {type: string}
+      callee_hash: {type: string}
+      initiated_ts: {type: string, format: date-time}
+      media_kind: {$ref: '#/$defs/e_media_kind'}
+      call_type: {$ref: '#/$defs/e_call_type'}
+      caller_device_id: {type: string}
+      connection_mode: {$ref: '#/$defs/e_connection_mode'}
+      ice_transport_policy: {anyOf: [{$ref: '#/$defs/e_ice_transport_policy'}, {type: 'null'}], description: 'Cấu hình BE gửi. Cuộc gọi thật là all, giả lập là relay'}
+      be_region: {type: [string, 'null']}
+      be_instance: {type: [string, 'null']}
+    required: [call_id, caller_hash, callee_hash, initiated_ts, media_kind, call_type, caller_device_id, connection_mode]
+    unevaluatedProperties: false
+  client_applied_config:
+    title: Cấu hình client đã áp dụng
+    x-kind: event
+    x-status: active
+    x-grain: Một lần áp dụng cấu hình trên một PC và generation
+    x-primary-key: [applied_config_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}, {columns: [applied_decision_id], references: selector_decision_request}, {columns: [applied_decision_id, side, decision_device_id], references: selector_decision}]
+    x-data-tier: conditional
+    x-call-scope: all_calls
+    x-capability: App ghi được mốc áp dụng cấu hình; thiếu thì báo ở telemetry_coverage
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: new
+    x-review: S2
+    x-deferred-columns: [{column: ice_trickle, reason: Giả định có trickle ICE theo WebRTC chuẩn}]
+    x-notes: [Bằng chứng client đã thực sự dùng cấu hình nào. Danh sách BE đã cấp nằm ở selector_decision.entries, decision_device_id là device_id của dòng danh sách được cấp; có thể là '-' khi chưa biết thiết bị Callee và khác device_id thực tế]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [applied_decision_id], properties: {applied_decision_id: {type: string}}}, then: {required: [decision_device_id], properties: {decision_device_id: {type: string, minLength: 1}}}}
+    properties:
+      applied_config_id: {type: string, format: uuid}
+      call_id: {type: string, format: uuid}
+      applied_decision_id: {type: [string, 'null'], format: uuid, description: Null nếu dùng cấu hình không từ decision}
+      decision_device_id: {type: [string, 'null'], description: device_id trong khóa của selector_decision; khác device_id client thực khi danh sách ban đầu dùng '-'}
+      list_hash: {type: string}
+      applied_ts: {type: string, format: date-time}
+      side: {$ref: '#/$defs/e_side'}
+      endpoint_id: {type: string}
+      device_id: {type: string}
+      pc_id: {type: string}
+      ice_generation: {type: integer, minimum: 0}
+      applied_ice_transport_policy: {anyOf: [{$ref: '#/$defs/e_ice_transport_policy'}, {type: 'null'}], description: Căn cứ của I18}
+      config_source: {$ref: '#/$defs/e_config_source'}
+      is_fallback_config: {type: [boolean, 'null']}
+      applied_entries: {type: [array, 'null'], items: {$ref: '#/$defs/applied_entry'}, description: Chỉ khi cấu hình không tra được qua applied_decision_id, x-change: new, x-review: S2}
+    required: [applied_config_id, call_id, list_hash, applied_ts, side, endpoint_id, device_id, pc_id, ice_generation, config_source]
+    unevaluatedProperties: false
+
+  endpoint_network_context:
+    title: Context mạng của endpoint tại mỗi network epoch
+    x-kind: event
+    x-status: active
+    x-grain: Một call_id × side × device_id × network_epoch × context_version
+    x-primary-key: [call_id, side, device_id, network_epoch, context_version]
+    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-data-tier: conditional
+    x-call-scope: all_calls
+    x-source-level: A
+    x-producer: signaling (BE ghi snapshot từ client report và GeoIP lúc nhận; simulator tự tạo)
+    x-change: new
+    x-notes:
+    - Ghi epoch ban đầu và khi nhận thay đổi; context_version tăng khi bổ sung context cùng epoch, không ghi đè snapshot cũ.
+    - Context hiện hành của epoch là version lớn nhất đã ingest tại cutoff. Không dùng thông tin đến sau cutoff cho feature quá khứ.
+    - Thiếu khả năng phát hiện đổi mạng phải ghi telemetry_coverage; vắng dòng không chứng minh không đổi mạng.
+    - epoch_start_ts là thời điểm client báo; observed_ts/event_ts là đồng hồ BE. Không tính delay bằng phép trừ hai đồng hồ này.
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      call_id: {type: string, format: uuid}
+      side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      network_epoch: {type: integer, minimum: 0}
+      context_version: {type: integer, minimum: 1}
+      epoch_start_ts: {type: [string, 'null'], format: date-time}
+      observed_ts: {type: string, format: date-time}
+      country: {type: string, description: ISO country hoặc unknown}
+      city: {type: string}
+      vn_region: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      isp: {type: string}
+      asn: {type: [integer, 'null']}
+      network_type: {$ref: '#/$defs/e_network_type'}
+      geo_source: {$ref: '#/$defs/e_geo_source'}
+      context_status: {type: string, enum: [complete, partial, unknown]}
+      network_type_source: {type: string, enum: [client_report, synthetic, unknown]}
+      epoch_clock_source: {type: string, enum: [client, synthetic, unknown], description: Đồng hồ của epoch_start_ts; observed_ts luôn theo BE producer}
+      missing_reason: {type: [string, 'null']}
+    required: [call_id, side, device_id, network_epoch, context_version, observed_ts, country, city, isp, network_type, geo_source, context_status, network_type_source, epoch_clock_source]
+    unevaluatedProperties: false
+
+  # ---------- getStats và sự kiện ICE ----------
+  ice_event:
+    title: Dòng thời gian ICE theo từng endpoint
+    x-kind: event
+    x-status: active
+    x-grain: Một sự kiện quan sát trên một endpoint
+    x-primary-key: [event_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-data-tier: required
+    x-call-scope: all_calls
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: new
+    x-moved-columns: [{column: 'local_turn_id, remote_turn_id', to: clean_ice_event_columns}]
+    x-notes: ['Ghi cho mọi cuộc gọi, vì đây là căn cứ để lọc dữ liệu relay', Remote candidate không có url và relayProtocol theo W3C; biết đủ hai bên thì cần telemetry của hai đầu, Bộ đếm tại lúc đổi cặp chỉ cho stream audio; video nằm ở call_stats_epoch]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [source], properties: {source: {const: polling}}}, then: {required: [poll_interval_ms], properties: {poll_interval_ms: {not: {type: 'null'}}}}}
+      - {if: {required: [event_type], properties: {event_type: {const: restart_requested}}}, then: {required: [trigger], properties: {trigger: {not: {type: 'null'}}}}}
+    properties:
+      call_id: {type: string, format: uuid}
+      attempt_seq: {type: [integer, 'null'], minimum: 0}
+      pc_id: {type: string}
+      ice_generation: {type: integer, minimum: 0}
+      side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      event_type: {$ref: '#/$defs/e_ice_event_type'}
+      event_mono_ms: {type: [number, 'null'], minimum: 0, x-review: S6}
+      clock_session_id: {type: [string, 'null'], x-review: S6}
+      ice_state: {anyOf: [{$ref: '#/$defs/e_rtc_ice_state'}, {type: 'null'}]}
+      dtls_state: {anyOf: [{$ref: '#/$defs/e_rtc_dtls_state'}, {type: 'null'}], x-review: S6}
+      local_candidate_type: {anyOf: [{$ref: '#/$defs/e_candidate_type'}, {type: 'null'}]}
+      remote_candidate_type: {anyOf: [{$ref: '#/$defs/e_candidate_type'}, {type: 'null'}]}
+      client_turn_transport: {anyOf: [{$ref: '#/$defs/e_transport'}, {type: 'null'}], description: Chỉ của đầu quan sát}
+      candidate_protocol: {anyOf: [{$ref: '#/$defs/e_candidate_protocol'}, {type: 'null'}]}
+      relayed_ip_local: {type: [string, 'null'], description: Chỉ khi là relay}
+      relayed_ip_remote: {type: [string, 'null'], description: Chỉ khi là relay; có thể null}
+      selected_pair_changes: {type: [integer, 'null'], minimum: 0, description: selectedCandidatePairChanges; không phải lần tăng nào cũng là đổi đường}
+      ice_role: {anyOf: [{$ref: '#/$defs/e_ice_role'}, {type: 'null'}]}
+      trigger: {anyOf: [{$ref: '#/$defs/e_ice_trigger'}, {type: 'null'}], description: Khi event_type = restart_requested}
+      reason: {type: [string, 'null']}
+      source: {$ref: '#/$defs/e_event_observation_source'}
+      poll_interval_ms: {type: [number, 'null'], minimum: 0}
+      local_turn_url: {type: [string, 'null'], description: url của local candidate trong cặp được chọn; chỉ có ở đầu quan sát, x-change: new, x-review: S17}
+      prev_pair_rtt_total_s: {type: [number, 'null'], minimum: 0, description: candidate-pair.totalRoundTripTime của cặp vừa rời; chỉ khi selected_pair_change, x-change: new, x-review: S15}
+      prev_pair_responses: {type: [integer, 'null'], minimum: 0, description: candidate-pair.responsesReceived của cặp vừa rời, x-change: new, x-review: S15}
+      audio_rtcp_rtt_total_s: {type: [number, 'null'], minimum: 0, description: remote-inbound-rtp.totalRoundTripTime của stream audio tại lúc đổi cặp, x-change: new, x-review: S15}
+      audio_rtcp_rtt_measurements: {type: [integer, 'null'], minimum: 0, description: remote-inbound-rtp.roundTripTimeMeasurements, x-change: new, x-review: S15}
+      audio_packets_received_total: {type: [integer, 'null'], minimum: 0, description: inbound-rtp.packetsReceived, x-change: new, x-review: S15}
+      audio_packets_lost_total: {type: [integer, 'null'], description: inbound-rtp.packetsLost; có thể âm, x-change: new, x-review: S15}
+      audio_jitter_sum_ms: {type: [number, 'null'], minimum: 0, description: Tổng các lần đọc inbound-rtp.jitter, x-change: new, x-review: S15}
+      audio_jitter_samples: {type: [integer, 'null'], minimum: 0, x-change: new, x-review: S15}
+      audio_stats_stream_ref: {type: [string, 'null'], description: Chỉ trừ bộ đếm khi cùng stream, x-change: new, x-review: S15}
+    required: [call_id, pc_id, ice_generation, side, device_id, event_type, source]
+    unevaluatedProperties: false
+  call_stats_epoch:
+    title: Tóm tắt getStats theo epoch
+    x-kind: event
+    x-status: active
+    x-grain: Một call_id × endpoint_side × device_id × media_kind × network_epoch × sequence_no
+    x-contract-ref: §5.7
+    x-primary-key: [call_id, endpoint_side, device_id, media_kind, network_epoch, sequence_no]
+    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-data-tier: required
+    x-call-scope: relay_or_failed
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: changed
+    x-conditional-columns: {columns: [derivation, window_s, media_rtcp_rtt_hist, loss_hist, jitter_estimate_hist, rtt_windows_assessable, loss_windows_assessable, jitter_windows_assessable, valid_rtt_samples, valid_jitter_samples, media_rtcp_rtt_p50, media_rtcp_rtt_p95, ice_stun_rtt_p50, ice_stun_rtt_p95, jitter_estimate_p95, measurement_coverage, quality_rule_version], reason: 'Tổng hợp ở client, phục vụ PoorFraction ở §13.2 của v0.4.0, không phải VIA. Chỉ giữ nếu WebRTC core xác nhận chi phí trên web và mobile'}
+    x-removed-columns: [{column: 'packets_expected, packets_lost', replaced_by: 'packets_received_total, packets_lost_total'}]
+    x-moved-columns: [{column: path_attribution_status, to: clean_stats_columns}]
+    x-deferred-columns: [{column: 'window_anchor_ts, first_window_idx, stream_scope, rtp_recv_window_status, rtp_send_window_status, rtp_no_receive_window_count, rtp_recv_active_window_count, rtp_recv_unknown_window_count', reason: Phát hiện gián đoạn không có trong đề bài hay VIA}]
+    x-notes: ['Bộ đếm tích lũy cho số trung bình cấp cuộc gọi, là số VIA dùng', Quy tắc đọc bộ đếm ở x-rules.counters]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      call_id: {type: string, format: uuid}
+      endpoint_side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      media_kind: {$ref: '#/$defs/e_media_kind'}
+      network_epoch: {type: integer, minimum: 0}
+      sequence_no: {type: integer, minimum: 0, description: Tăng theo mỗi lần gửi; dòng có số lớn nhất là dòng hiện hành, x-change: new, x-review: S20}
+      epoch_start_ts: {type: string, format: date-time}
+      epoch_end_ts: {type: string, format: date-time}
+      is_checkpoint: {type: [boolean, 'null'], x-change: new}
+      network_type: {anyOf: [{$ref: '#/$defs/e_network_type'}, {type: 'null'}], x-change: additive}
+      audio_active_duration_s: {type: [number, 'null'], minimum: 0}
+      first_media_sent_ts: {type: [string, 'null'], format: date-time}
+      first_media_received_ts: {type: [string, 'null'], format: date-time}
+      first_media_definition: {anyOf: [{$ref: '#/$defs/e_first_media_definition'}, {type: 'null'}], x-change: new, x-review: S8}
+      first_media_observation_status: {type: [string, 'null'], x-change: new, x-review: S8}
+      media_rtcp_rtt_total_s: {type: [number, 'null'], minimum: 0, description: remote-inbound-rtp.totalRoundTripTime tại cuối epoch, x-change: new, x-review: S15}
+      media_rtcp_rtt_measurements: {type: [integer, 'null'], minimum: 0, description: remote-inbound-rtp.roundTripTimeMeasurements, x-change: new, x-review: S15}
+      ice_stun_rtt_total_s: {type: [number, 'null'], minimum: 0, description: candidate-pair.totalRoundTripTime của cặp đang chọn lúc cuối epoch, x-change: new, x-review: S15}
+      ice_stun_responses: {type: [integer, 'null'], minimum: 0, description: candidate-pair.responsesReceived của cặp đó, x-change: new, x-review: S15}
+      packets_received_total: {type: [integer, 'null'], minimum: 0, description: inbound-rtp.packetsReceived, x-change: new, x-review: S15}
+      packets_lost_total: {type: [integer, 'null'], description: inbound-rtp.packetsLost; có thể âm, x-change: new, x-review: S15}
+      jitter_estimate_sum_ms: {type: [number, 'null'], minimum: 0, description: Tổng các lần đọc inbound-rtp.jitter; W3C chỉ có giá trị hiện tại nên phải lấy mẫu, x-change: new, x-review: S15}
+      jitter_estimate_samples: {type: [integer, 'null'], minimum: 0, x-change: new, x-review: S15}
+      stats_stream_ref: {type: [string, 'null'], description: 'Định danh stream của bộ đếm, để phát hiện đổi stream hoặc reset', x-change: new, x-review: S15}
+      derivation: {anyOf: [{$ref: '#/$defs/e_stats_derivation'}, {type: 'null'}]}
+      window_s: {type: [integer, 'null'], minimum: 0}
+      media_rtcp_rtt_hist: {anyOf: [{$ref: '#/$defs/rtt_hist'}, {type: 'null'}]}
+      loss_hist: {anyOf: [{$ref: '#/$defs/loss_hist'}, {type: 'null'}]}
+      jitter_estimate_hist: {anyOf: [{$ref: '#/$defs/jitter_hist'}, {type: 'null'}]}
+      rtt_windows_assessable: {type: [integer, 'null'], minimum: 0}
+      loss_windows_assessable: {type: [integer, 'null'], minimum: 0}
+      jitter_windows_assessable: {type: [integer, 'null'], minimum: 0}
+      valid_rtt_samples: {type: [integer, 'null'], minimum: 0}
+      valid_jitter_samples: {type: [integer, 'null'], minimum: 0}
+      media_rtcp_rtt_p50: {type: [number, 'null'], minimum: 0}
+      media_rtcp_rtt_p95: {type: [number, 'null'], minimum: 0}
+      ice_stun_rtt_p50: {type: [number, 'null'], minimum: 0}
+      ice_stun_rtt_p95: {type: [number, 'null'], minimum: 0}
+      jitter_estimate_p95: {type: [number, 'null'], minimum: 0}
+      measurement_coverage: {type: [number, 'null'], minimum: 0, maximum: 1}
+      quality_rule_version: {type: [string, 'null']}
+    required: [call_id, endpoint_side, device_id, media_kind, network_epoch, sequence_no, epoch_start_ts, epoch_end_ts]
+    unevaluatedProperties: false
+  call_stats_5s:
+    title: 'Thống kê theo cửa sổ, chẩn đoán'
+    x-kind: event
+    x-status: active
+    x-grain: Một call_id × endpoint_side × device_id × media_kind × window_idx
+    x-contract-ref: §5.8
+    x-primary-key: [call_id, endpoint_side, device_id, media_kind, window_idx]
+    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-data-tier: sampled
+    x-call-scope: relay_or_failed
+    x-capability: 'Lấy mẫu theo §6.3, trừ derivation = pipeline'
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: changed
+    x-moved-columns: [{column: 'packets_expected, loss_pct, rtt_sample_valid, jitter_sample_valid, quality_rule_version, path_attribution_status, restart_gap', to: clean_stats_columns}]
+    x-deferred-columns: [{column: 'rtp_recv_status, rtp_send_status', reason: Phát hiện gián đoạn không có trong đề bài hay VIA; mở lại thì cần thêm packets_sent}]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      call_id: {type: string, format: uuid}
+      endpoint_side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      media_kind: {$ref: '#/$defs/e_media_kind'}
+      window_idx: {type: integer, minimum: 0}
+      window_s: {type: integer, minimum: 0}
+      window_start_ts: {type: string, format: date-time}
+      network_epoch: {type: integer, minimum: 0}
+      network_type: {anyOf: [{$ref: '#/$defs/e_network_type'}, {type: 'null'}]}
+      media_rtcp_rtt_ms: {type: [number, 'null'], minimum: 0}
+      ice_stun_rtt_ms: {type: [number, 'null'], minimum: 0}
+      jitter_estimate_ms: {type: [number, 'null'], minimum: 0}
+      packets_lost: {type: [integer, 'null']}
+      audio_active_s: {type: [number, 'null'], minimum: 0}
+      first_media_sent_ts: {type: [string, 'null'], format: date-time}
+      first_media_received_ts: {type: [string, 'null'], format: date-time}
+      bitrate_send_kbps: {type: [number, 'null'], minimum: 0}
+      bitrate_recv_kbps: {type: [number, 'null'], minimum: 0}
+      conn_state: {anyOf: [{$ref: '#/$defs/e_conn_state'}, {type: 'null'}]}
+      rtt_measurements_delta: {type: [integer, 'null'], minimum: 0, description: Delta của roundTripTimeMeasurements, x-change: new, x-review: S7}
+      packets_received: {type: [integer, 'null'], minimum: 0, description: Số gói nhận trong cửa sổ, x-change: new, x-review: S7}
+    required: [call_id, endpoint_side, device_id, media_kind, window_idx, window_s, window_start_ts, network_epoch]
+    unevaluatedProperties: false
+
+  # ---------- TURN metrics ----------
+  turn_health_1m:
+    title: Sức khỏe TURN theo phút
+    x-kind: event
+    x-status: active
+    x-grain: Một turn_id × minute_ts
+    x-contract-ref: §6.1
+    x-primary-key: [turn_id, minute_ts]
+    x-foreign-keys: [{columns: [turn_id], references: dim_turn}]
+    x-data-tier: required
+    x-call-scope: not_call
+    x-capability: Từng metric phụ thuộc nguồn; exporter coturn không có lỗi allocation
+    x-source-level: B
+    x-producer: turn_server hoặc health checker
+    x-change: changed
+    x-moved-columns: [{column: 'health_status, health_score, health_rule_version, assigned_by, utilization_pct', to: 'health_snapshot, feat_turn_health'}]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      turn_id: {type: string}
+      minute_ts: {type: string, format: date-time}
+      active_allocations: {type: [integer, 'null'], minimum: 0, x-change: changed}
+      cpu_pct: {type: [number, 'null'], minimum: 0, maximum: 100, x-change: changed}
+      bandwidth_mbps: {type: [number, 'null'], minimum: 0, description: 'Không lấy từ turn_traffic_* hay turn_total_traffic_*, vì chỉ cập nhật khi session kết thúc', x-change: changed}
+      alloc_attempts: {type: [integer, 'null'], minimum: 0, description: Không lấy từ delta của gauge allocation, x-change: changed}
+      alloc_failures: {type: [integer, 'null'], minimum: 0, x-change: changed}
+      observation_state: {anyOf: [{$ref: '#/$defs/e_observation_state'}, {type: 'null'}], x-change: new, x-review: S11}
+      alloc_failures_by_code: {type: [object, 'null'], description: '486 là quota theo username, 508 là thiếu capacity', x-change: additive}
+      last_observed_ts: {type: [string, 'null'], format: date-time, x-change: new}
+      sample_count: {type: [integer, 'null'], minimum: 0, x-change: new}
+      source: {type: [string, 'null'], description: Nguồn và phiên bản của từng nhóm metric, x-change: new}
+      ingest_delay_ms: {type: [number, 'null'], minimum: 0, x-change: new}
+      liveness_ok: {type: [boolean, 'null'], description: Tín hiệu sống quan sát trực tiếp; null là không có phép kiểm tra, x-change: new, x-review: S14}
+      liveness_method: {$ref: '#/$defs/e_liveness_method', x-change: new, x-review: S14}
+    required: [turn_id, minute_ts, liveness_method]
+    unevaluatedProperties: false
+  turn_allocation:
+    title: Giao dịch allocation theo log của TURN
+    x-kind: event
+    x-status: active
+    x-grain: 'Một session allocation trong log của một TURN, với kết quả cuối'
+    x-contract-ref: §5.3
+    x-primary-key: [turn_id, server_session_id]
+    x-foreign-keys: [{columns: [turn_id], references: dim_turn}]
+    x-data-tier: conditional
+    x-call-scope: not_call
+    x-capability: Có log TURN và cách trích định danh; thiếu thì báo ở telemetry_coverage
+    x-source-level: C
+    x-producer: turn_server
+    x-change: changed
+    x-removed-columns: [{column: success, replaced_by: allocation_result}, {column: 'request_ts, alloc_ms, attempt_seq, is_preallocation, turn_url, rank, ice_generation', replaced_by: 'bỏ, vì chỉ có khi client có hook'}]
+    x-moved-columns: [{column: 'allocation_id, call_id, decision_id, side, device_id, match_method', to: clean_allocation_columns}]
+    x-notes: [401 rồi thành công là một allocation thành công, Không ghi credential secret, Nhiều cuộc gọi dùng chung username thì bảng chỉ dùng được cho thống kê theo TURN]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [allocation_result], properties: {allocation_result: {const: success}}}, then: {required: [error_code], properties: {error_code: {const: none}}}}
+      - {if: {required: [allocation_result], properties: {allocation_result: {const: failure}}}, then: {required: [error_code], properties: {error_code: {enum: [timeout, unauthorized_401, forbidden_403, quota_486, capacity_508, redirect_300, unreachable, other]}}}}
+      - {if: {required: [allocation_result], properties: {allocation_result: {const: unknown}}}, then: {properties: {error_code: {type: 'null'}}}}
+    properties:
+      turn_id: {type: string}
+      transport: {anyOf: [{$ref: '#/$defs/e_transport'}, {type: 'null'}], x-change: changed}
+      turn_server_ip: {type: [string, 'null']}
+      relayed_ip: {type: [string, 'null']}
+      response_ts: {type: [string, 'null'], format: date-time}
+      allocation_result: {$ref: '#/$defs/e_allocation_result', description: Thay success, x-change: new}
+      error_code: {anyOf: [{$ref: '#/$defs/e_alloc_error'}, {type: 'null'}], x-change: changed}
+      source: {$ref: '#/$defs/e_allocation_source', x-change: new}
+      released_ts: {type: [string, 'null'], format: date-time}
+      server_session_id: {type: string, description: Định danh session trong log của TURN, x-change: new, x-review: S18}
+      credential_ref: {type: [string, 'null'], description: 'Định danh theo cuộc gọi trích từ username, không phải secret; null nếu nhiều cuộc gọi dùng chung username', x-change: new, x-review: S18}
+      release_reason: {type: [string, 'null'], description: Chỉ điều log của TURN cho biết; không suy ra call_end hay other_device_answered, x-change: changed}
+    required: [turn_id, server_session_id, allocation_result, source]
+    unevaluatedProperties: false
+
+  # ---------- Probe giữa các TURN ----------
+  turn_probe:
+    title: Probe giữa các TURN
+    x-kind: event
+    x-status: active
+    x-grain: Một cặp TURN có hướng × cửa sổ đo × phương pháp × giao thức
+    x-contract-ref: '§5.6, phần turn_turn'
+    x-primary-key: [src_turn_id, dst_turn_id, window_start_ts, method_version, protocol]
+    x-foreign-keys: [{columns: [src_turn_id], references: dim_turn}, {columns: [dst_turn_id], references: dim_turn}]
+    x-data-tier: conditional
+    x-call-scope: not_call
+    x-capability: 'Cần tác tử đo riêng; coturn không tự đo. Không có nguồn thì không có dòng, backbone chỉ ước lượng được khi có mẫu dùng chung TURN'
+    x-source-level: C
+    x-producer: probe_agent
+    x-change: new
+    x-review: S13
+    x-notes: ['Tách từ path_leg_measurement với leg_type = turn_turn, method = mesh_probe', Không probe từ một TURN đến chính nó (I30), Nên đi đúng IP relay và cùng giao thức với media; probe có thể lệch so với đường media]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [measurement_kind], properties: {measurement_kind: {const: one_way}}}, then: {required: [clock_sync_err_ms], properties: {clock_sync_err_ms: {not: {type: 'null'}}}}}
+    properties:
+      src_turn_id: {type: string}
+      dst_turn_id: {type: string}
+      src_ip: {type: [string, 'null'], description: Chỉ IP máy chủ TURN}
+      dst_ip: {type: [string, 'null'], description: Chỉ IP máy chủ TURN}
+      window_start_ts: {type: string, format: date-time}
+      window_end_ts: {type: string, format: date-time}
+      method_version: {type: string}
+      protocol: {$ref: '#/$defs/e_probe_protocol'}
+      target_port: {type: [integer, 'null'], minimum: 0, maximum: 65535}
+      measurement_kind: {$ref: '#/$defs/e_measurement_kind', description: Nên đo rtt; một chiều cần đồng bộ đồng hồ}
+      measurement_point: {$ref: '#/$defs/e_measurement_point'}
+      value_ms: {type: [number, 'null'], minimum: 0, maximum: 10000}
+      value_ms_p95: {type: [number, 'null'], minimum: 0, maximum: 10000}
+      loss_pct: {type: [number, 'null'], minimum: 0, maximum: 100}
+      jitter_ms: {type: [number, 'null'], minimum: 0}
+      n_samples: {type: integer, minimum: 0}
+      clock_sync_err_ms: {type: [number, 'null'], minimum: 0}
+      observation_state: {anyOf: [{$ref: '#/$defs/e_observation_state'}, {type: 'null'}]}
+      missing_reason: {type: [string, 'null']}
+    required: [src_turn_id, dst_turn_id, window_start_ts, window_end_ts, method_version, protocol, measurement_kind, measurement_point, n_samples]
+    unevaluatedProperties: false
+
+  # ---------- Decision Log ----------
+  selector_decision_request:
+    title: Header chung của một quyết định Selector hoặc cấu hình tĩnh
+    x-kind: event
+    x-status: active
+    x-grain: Một decision_id, dùng chung cho danh sách hai bên và dự đoán cặp
+    x-primary-key: [decision_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}, {columns: [parent_decision_id], references: selector_decision_request}]
+    x-data-tier: required
+    x-call-scope: all_calls
+    x-source-level: A
+    x-producer: signaling
+    x-change: new
+    x-notes: [BE tạo cả khi chưa có Selector; header ghi trước hoặc cùng transaction với list, Parent giữ khả năng quyết định lại khi context thay đổi; không giả định BE luôn biết Callee]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      decision_id: {type: string, format: uuid}
+      call_id: {type: string, format: uuid}
+      parent_decision_id: {type: [string, 'null'], format: uuid}
+      phase: {$ref: '#/$defs/e_decision_phase'}
+      request_ts: {type: string, format: date-time}
+      policy_version: {type: string}
+      info_level: {$ref: '#/$defs/e_info_level'}
+    required: [decision_id, call_id, phase, request_ts, policy_version, info_level]
+    unevaluatedProperties: false
+  selector_decision:
+    title: Hành động của Selector cho một bên
+    x-kind: event
+    x-status: active
+    x-grain: Một decision_id × side × device_id
+    x-contract-ref: §5.2
+    x-primary-key: [decision_id, side, device_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}, {columns: [decision_id], references: selector_decision_request}, {columns: [parent_decision_id], references: selector_decision_request}]
+    x-data-tier: required
+    x-call-scope: all_calls
+    x-source-level: A
+    x-producer: 'signaling (BE ghi, Selector không tự ghi)'
+    x-change: changed
+    x-review: S3
+    x-removed-columns: [{column: k, replaced_by: 'requested_max_list_size, returned_list_size, topk_pair_count'}, {column: candidates, replaced_by: entries}, {column: chosen_rank, replaced_by: selector_decision_pair.is_lead}, {column: 'candidates[].propensity', replaced_by: 'action_propensity, propensity_method'}, {column: 'candidates[].est_leg_ms, est_path_ms', replaced_by: selector_decision_pair}]
+    x-notes: ['Header chung nằm ở selector_decision_request; I25 kiểm tra các field chung', '8 mục tổng cộng gồm UDP, TCP, TLS; số máy TURN đếm riêng từ entries', 'Trả bao nhiêu mục là quy tắc của policy; thiếu lựa chọn hợp lệ thì fallback_type = insufficient_candidates, không nhân bản server', Quy tắc khi chưa có Selector ở x-rules.decision_without_selector]
+    x-deferred-columns: [{column: decision_mode, reason: Tạm thời chưa chạy bóng}]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [decision_source], properties: {decision_source: {enum: [api, cache]}, fallback_type: {not: {const: health_missing}}}}, then: {required: [health_snapshot_id], properties: {health_snapshot_id: {not: {type: 'null'}}}}}
+      - {if: {required: [decision_source], properties: {decision_source: {const: static_config}}}, then: {required: [selection_method], properties: {selection_method: {const: static}}}}
+      - {if: {required: [propensity_method], properties: {propensity_method: {const: monte_carlo}}}, then: {required: [propensity_n_samples, action_propensity], properties: {propensity_n_samples: {not: {type: 'null'}}, action_propensity: {not: {type: 'null'}}}}}
+      - {if: {required: [propensity_method], properties: {propensity_method: {const: not_estimated}}}, then: {properties: {action_propensity: {type: 'null'}}}}
+    properties:
+      decision_id: {type: string, format: uuid, description: Chung cho hai bên của một request; không phải PK riêng}
+      parent_decision_id: {type: [string, 'null'], format: uuid, x-change: new}
+      call_id: {type: string, format: uuid}
+      side: {$ref: '#/$defs/e_side'}
+      phase: {$ref: '#/$defs/e_decision_phase'}
+      device_id: {type: string}
+      request_ts: {type: string, format: date-time}
+      response_ts: {type: [string, 'null'], format: date-time, description: Null khi timeout}
+      api_latency_ms: {type: [number, 'null'], minimum: 0, description: Do BE đo}
+      policy_version: {type: string}
+      decision_source: {$ref: '#/$defs/e_decision_source'}
+      info_level: {$ref: '#/$defs/e_info_level'}
+      self_ctx: {$ref: '#/$defs/ctx'}
+      peer_ctx: {$ref: '#/$defs/ctx', description: Những gì biết lúc đó}
+      selection_method: {$ref: '#/$defs/e_selection_method', x-change: new}
+      requested_max_list_size: {type: integer, minimum: 0, maximum: 8, description: Trần tổng URL/transport cho bên này, x-change: new, x-review: S3}
+      returned_list_size: {type: integer, minimum: 0, maximum: 8, description: Số mục thực trả tổng cộng, x-change: new, x-review: S3}
+      entries: {type: array, maxItems: 8, items: {$ref: '#/$defs/list_entry'}, description: Thay candidates, x-change: changed}
+      filtered_out: {type: array, items: {$ref: '#/$defs/filtered_turn'}}
+      topk_pair_count: {type: [integer, 'null'], minimum: 0, description: 'Đếm theo cặp, khác list size', x-change: new}
+      topk_capped: {type: [boolean, 'null'], x-change: new}
+      is_exploration: {type: boolean}
+      exploration_epsilon: {type: [number, 'null'], minimum: 0, maximum: 1, description: Null nếu policy không có ε, x-change: changed}
+      action_propensity: {type: [number, 'null'], minimum: 0, maximum: 1, description: 'Xác suất của cả hành động. Chưa ước lượng được thì null, không điền 1/k', x-change: new}
+      propensity_method: {$ref: '#/$defs/e_propensity_method', x-change: new}
+      propensity_n_samples: {type: [integer, 'null'], minimum: 0, description: Khi monte_carlo, x-change: new}
+      eligible_action_set: {anyOf: [{$ref: '#/$defs/eligible_action_set'}, {type: 'null'}], x-change: new, x-review: S4}
+      confidence: {type: [number, 'null'], minimum: 0, maximum: 1, x-change: changed}
+      confidence_level: {$ref: '#/$defs/e_confidence_level'}
+      confidence_evidence: {anyOf: [{$ref: '#/$defs/confidence_evidence'}, {type: 'null'}], x-change: new, x-review: S4}
+      fallback_reason: {type: [string, 'null']}
+      fallback_type: {anyOf: [{$ref: '#/$defs/e_fallback_type'}, {type: 'null'}], x-change: additive}
+      feature_snapshot_id: {type: [string, 'null'], description: 'Null khi policy không dùng feature, như Geo Baseline hay danh sách tĩnh'}
+      health_snapshot_id: {type: [string, 'null'], description: 'Null khi static_config, static_fallback hoặc fallback_type = health_missing'}
+      error_code: {type: [string, 'null']}
+    required: [decision_id, call_id, side, phase, device_id, request_ts, policy_version, decision_source, info_level, self_ctx, peer_ctx, selection_method, requested_max_list_size, returned_list_size, entries, filtered_out, is_exploration, propensity_method, confidence_level]
+    unevaluatedProperties: false
+  selector_decision_pair:
+    title: Cặp được mô hình cân nhắc
+    x-kind: event
+    x-status: active
+    x-grain: Một decision_id × cặp × metric
+    x-primary-key: [decision_id, turn_caller, turn_callee, transport_caller, transport_callee, metric]
+    x-foreign-keys: [{columns: [decision_id], references: selector_decision_request}, {columns: [call_id], references: call_session}]
+    x-data-tier: conditional
+    x-call-scope: all_calls
+    x-capability: Chỉ có khi có dự đoán; danh sách tĩnh và Geo Baseline thì không có dòng
+    x-source-level: A
+    x-producer: signaling (từ response của Selector)
+    x-change: new
+    x-notes: ['Đầu ra mô hình do service tự tạo được, không phải số đo mạng', 'Luôn ghi hành động đã chọn, kể cả in_topk = false', Chưa biết Callee (info_level khác full) thì không ghi dòng pair; không để null trong khóa, Hai TURN trùng nhau là trường hợp dùng chung một TURN, 'metric phải trùng tên đại lượng ở Outcome Log để Labeled Data so được, ví dụ media_rtcp_rtt hay ice_stun_rtt']
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [interval_level], properties: {interval_level: {type: number}}}, then: {required: [interval_kind, interval_low, interval_high], properties: {interval_kind: {not: {type: 'null'}}, interval_low: {not: {type: 'null'}}, interval_high: {not: {type: 'null'}}}}}
+    properties:
+      decision_id: {type: string, format: uuid}
+      call_id: {type: string, format: uuid}
+      turn_caller: {type: string}
+      turn_callee: {type: string}
+      transport_caller: {$ref: '#/$defs/e_transport'}
+      transport_callee: {$ref: '#/$defs/e_transport'}
+      metric: {type: string}
+      unit: {type: string}
+      est_value: {type: [number, 'null']}
+      interval_low: {type: [number, 'null']}
+      interval_high: {type: [number, 'null']}
+      interval_kind: {anyOf: [{$ref: '#/$defs/e_interval_kind'}, {type: 'null'}]}
+      interval_level: {type: [number, 'null'], minimum: 0, maximum: 1}
+      in_topk: {type: boolean}
+      is_lead: {type: boolean}
+      estimate_source: {type: [string, 'null']}
+      estimator_version: {type: [string, 'null']}
+      input_snapshot_id: {type: [string, 'null'], description: Cutoff hoặc snapshot nguồn}
+      gate_status: {$ref: '#/$defs/e_gate_status'}
+      gate_reason: {type: [string, 'null']}
+      gate_rule_version: {type: [string, 'null'], description: Cần nếu policy_version không tham chiếu bất biến tới quy tắc}
+    required: [decision_id, call_id, turn_caller, turn_callee, transport_caller, transport_callee, metric, unit, in_topk, is_lead, gate_status]
+    unevaluatedProperties: false
+
+  # ---------- Đầu vào của Outcome Log ----------
+  call_outcome:
+    title: Điều BE quan sát về kết quả cuộc gọi
+    x-kind: event
+    x-status: active
+    x-grain: Một cuộc gọi
+    x-contract-ref: §5.9
+    x-primary-key: [call_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-data-tier: required
+    x-call-scope: all_calls
+    x-source-level: A
+    x-producer: signaling
+    x-change: changed
+    x-review: S16
+    x-removed-columns: [{column: connected, replaced_by: 'outcome_log.ice_connected, dtls_connected, media_connected, outcome_status'}, {column: answer_ts, replaced_by: answer_received_at_be}]
+    x-moved-columns: [{column: 'outcome_version, outcome_status, outcome_provenance, finalized_ts, ice_connected, dtls_connected, media_connected, media_connected_rule_version, setup_failure_observed, end_reason, dropped, n_ice_attempts, n_network_changes, duration_s, pair_group', to: outcome_log}]
+    x-deferred-columns: [{column: 'caller_signaling_rtt_ms, callee_signaling_rtt_ms, n_devices_rung', reason: Không mô hình hóa đổ chuông và tín hiệu trong phạm vi hiện tại}]
+    x-notes: [Outcome Log là view sau pipeline (outcome_log); bảng này chỉ là đầu vào, 'BE không quan sát được dropped_turn hay dropped_network, nên end_reason do pipeline phân loại từ end_signal, client_end_reason và sự kiện ICE']
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [answered], properties: {answered: {const: false}}}, then: {required: [end_signal], properties: {end_signal: {enum: [rejected, cancelled, not_answered_timeout, invite_undelivered, signaling_lost, unknown]}}}}
+    properties:
+      call_id: {type: string, format: uuid}
+      ring_ts: {type: [string, 'null'], format: date-time, description: 'Lúc BE nhận tin đổ chuông, không phải lúc thiết bị bắt đầu đổ', x-source-level: A, x-change: changed}
+      answer_received_at_be: {type: [string, 'null'], format: date-time, description: Thay answer_ts, x-source-level: A, x-change: new}
+      answered: {type: [boolean, 'null'], x-change: changed}
+      answered_device_id: {type: [string, 'null']}
+      end_ts: {type: [string, 'null'], format: date-time, x-change: changed}
+      end_signal: {$ref: '#/$defs/e_end_signal', x-change: new, x-review: S16}
+      end_signal_side: {anyOf: [{$ref: '#/$defs/e_side'}, {type: 'null'}], description: 'Bên phát tín hiệu kết thúc, nếu biết', x-change: new, x-review: S16}
+      caller_ctx_final: {anyOf: [{$ref: '#/$defs/ctx'}, {type: 'null'}], x-change: changed}
+      callee_ctx_final: {anyOf: [{$ref: '#/$defs/ctx'}, {type: 'null'}], x-change: changed}
+      converted_to_group: {type: [boolean, 'null']}
+      converted_ts: {type: [string, 'null'], format: date-time}
+    required: [call_id, end_signal]
+    unevaluatedProperties: false
+  client_call_report:
+    title: Điều mỗi đầu gửi về cuộc gọi
+    x-kind: event
+    x-status: active
+    x-grain: Một call_id × side × device_id
+    x-contract-ref: '§5.9, §6.3'
+    x-primary-key: [call_id, side, device_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-data-tier: required
+    x-call-scope: all_calls
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: new
+    x-review: S16
+    x-notes: ['Hai nguồn không ghi chung một dòng, và stats_status là của từng đầu', 'answer_clicked_at_client và answer_observed_at_peer cùng đồng hồ client với first_media_received_ts của đầu đó, nên TTFM mỗi bên trừ được trên một đồng hồ', App crash hoặc mất mạng thì có thể không có dòng; pipeline báo ở coverage]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      call_id: {type: string, format: uuid}
+      side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      answer_clicked_at_client: {type: [string, 'null'], format: date-time, x-source-level: B, x-change: new}
+      answer_observed_at_peer: {type: [string, 'null'], format: date-time, x-source-level: B, x-change: new}
+      client_end_reason: {type: [string, 'null'], description: 'Lý do app báo nếu có, chưa phân loại', x-change: new, x-review: S16}
+      stats_status: {anyOf: [{$ref: '#/$defs/e_stats_status'}, {type: 'null'}], x-change: changed}
+      stats_sampling_prob: {type: [number, 'null'], minimum: 0, maximum: 1, x-change: changed}
+      stats_sampling_reason: {type: [string, 'null'], x-change: changed}
+      sampling_rule_version: {type: [string, 'null'], x-change: changed}
+    required: [call_id, side, device_id]
+    unevaluatedProperties: false
+
+  # ---------- Hoãn, giữ định nghĩa để mở lại ----------
+  candidate_observation:
+    title: Quan sát relay candidate
+    x-kind: event
+    x-status: deferred
+    x-grain: 'Một candidate quan sát được, hoặc một dòng not_observed cho một mục cấu hình trong một chu kỳ thu'
+    x-primary-key: [observation_id]
+    x-foreign-keys: [{columns: [call_id], references: call_session}, {columns: [applied_config_id], references: client_applied_config}]
+    x-call-scope: relay_or_failed
+    x-capability: SDK ghi được candidate callback; thiếu thì ghi ở telemetry_coverage
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: new
+    x-notes: [Chỉ dùng để chẩn đoán cho đến khi có số ước lượng đã kiểm chứng, Chỉ khi chứng minh được thao tác đã chạy và bị cắt mới coi là dữ liệu bị cắt]
+    x-deferred-reason: 'Chưa dùng thời điểm nhận candidate và không sửa SDK. Đây là nguồn trực tiếp duy nhất theo từng TURN, nên mở lại nếu feature chặng ước lượng không đủ tốt'
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+      - {if: {required: [observation_status], properties: {observation_status: {const: observed}}}, then: {required: [candidate_observed_mono_ms], properties: {candidate_observed_mono_ms: {not: {type: 'null'}}}}}
+      - {if: {required: [observation_status], properties: {observation_status: {enum: [not_observed, unsupported, session_closed, telemetry_lost]}}}, then: {properties: {candidate_latency_ms: {type: 'null'}, candidate_observed_mono_ms: {type: 'null'}}}}
+    properties:
+      observation_id: {type: string, format: uuid, x-review: S5}
+      call_id: {type: string, format: uuid}
+      side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      endpoint_id: {type: string}
+      pc_id: {type: string}
+      gathering_cycle_id: {type: string}
+      ice_generation: {type: integer, minimum: 0}
+      applied_config_id: {type: [string, 'null'], format: uuid}
+      clock_session_id: {type: [string, 'null'], description: Đồng hồ monotonic của phiên app hoặc process, x-review: S5}
+      gathering_anchor_mono_ms: {type: [number, 'null'], minimum: 0}
+      anchor_kind: {anyOf: [{$ref: '#/$defs/e_anchor_kind'}, {type: 'null'}]}
+      candidate_observed_mono_ms: {type: [number, 'null'], minimum: 0}
+      candidate_id: {type: [string, 'null']}
+      server_config_id: {type: [string, 'null']}
+      turn_url: {type: [string, 'null']}
+      client_turn_transport: {anyOf: [{$ref: '#/$defs/e_transport'}, {type: 'null'}], description: Local relayProtocol}
+      candidate_protocol: {anyOf: [{$ref: '#/$defs/e_candidate_protocol'}, {type: 'null'}], x-review: S5}
+      candidate_type: {anyOf: [{$ref: '#/$defs/e_candidate_type'}, {type: 'null'}], x-review: S5}
+      relayed_ip: {type: [string, 'null'], description: Chỉ IP máy chủ TURN}
+      observation_status: {$ref: '#/$defs/e_observation_status'}
+      missing_reason: {type: [string, 'null']}
+      collection_method: {anyOf: [{$ref: '#/$defs/e_collection_method'}, {type: 'null'}]}
+      reported_error_code: {type: [integer, 'null'], description: 'Mã từ icecandidateerror, gồm cả 701 do trình duyệt báo', x-review: S5}
+      candidate_latency_ms: {type: [number, 'null'], minimum: 0, description: Chênh lệch hai mốc trên cùng đồng hồ. Không phải RTT}
+    required: [observation_id, call_id, side, device_id, endpoint_id, pc_id, gathering_cycle_id, ice_generation, observation_status]
+    unevaluatedProperties: false
+  ice_candidate_pair:
+    title: 'Cặp candidate, chỉ để chẩn đoán'
+    x-kind: event
+    x-status: deferred
+    x-grain: Một cặp trong một attempt
+    x-contract-ref: §5.5
+    x-primary-key: [call_id, attempt_seq, pair_id]
+    x-call-scope: relay_or_failed
+    x-capability: Tùy telemetry
+    x-source-level: B
+    x-producer: client_sdk
+    x-change: unchanged
+    x-notes: [current_rtt_ms gần như luôn trống với cặp không được chọn; danh sách 8 tạo đến 64 dòng mỗi attempt, allocation_never_checked_rate tính từ bảng này chỉ là chẩn đoán]
+    x-deferred-reason: 'Lab chỉ thấy 1 trên 32 cặp có RTT trong 90 giây, trong khi danh sách 8 mục tạo đến 64 dòng mỗi lần thử. Cặp được chọn đã có ở ice_event'
+    type: object
+    allOf:
+      - {$ref: '#/$defs/event_envelope'}
+    properties:
+      call_id: {type: string, format: uuid}
+      attempt_seq: {type: integer, minimum: 0}
+      ice_generation: {type: integer, minimum: 0}
+      pair_id: {type: string}
+      local_candidate_id: {type: string}
+      remote_candidate_id: {type: string}
+      local_candidate_type: {$ref: '#/$defs/e_candidate_type'}
+      remote_candidate_type: {$ref: '#/$defs/e_candidate_type'}
+      local_turn_id: {type: [string, 'null']}
+      remote_turn_id: {type: [string, 'null']}
+      pair_priority: {type: [number, 'null']}
+      check_state: {anyOf: [{$ref: '#/$defs/e_pair_check_state'}, {type: 'null'}]}
+      check_count: {type: [integer, 'null'], minimum: 0}
+      nominated: {type: [boolean, 'null']}
+      selected: {type: [boolean, 'null']}
+      current_rtt_ms: {type: [number, 'null'], minimum: 0}
+      telemetry_support: {anyOf: [{$ref: '#/$defs/e_telemetry_support'}, {type: 'null'}]}
+    required: [call_id, attempt_seq, ice_generation, pair_id, local_candidate_id, remote_candidate_id, local_candidate_type, remote_candidate_type]
+    unevaluatedProperties: false

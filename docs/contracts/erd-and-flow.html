@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TURN Selector - ERD và luồng</title>
+<style>
+  :root { --bg:#fff; --fg:#1d2330; --muted:#5b6475; --card:#f5f7fb; --line:#d9deea; --acc:#2f5bea; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12151c; --fg:#e6e9f2; --muted:#9aa3b8; --card:#1b2030; --line:#2c3350; --acc:#7c9bff; }
+  }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.6 system-ui,Segoe UI,sans-serif; }
+  header, section { max-width:1200px; margin:0 auto; padding:16px; }
+  h1 { margin:8px 0 4px; font-size:24px; }
+  h2 { margin-top:32px; font-size:20px; border-bottom:2px solid var(--line); padding-bottom:6px; }
+  nav a { margin-right:14px; color:var(--acc); text-decoration:none; font-weight:600; }
+  .muted { color:var(--muted); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 16px; margin:12px 0; overflow-x:auto; }
+  .mermaid { text-align:center; }
+  table { border-collapse:collapse; width:100%; font-size:14px; }
+  th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--card); }
+  code { background:var(--card); padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TURN Selector Intelligence - Data Contract v0.4.0</h1>
+  <div class="muted">Sơ đồ quan hệ bảng (ERD), luồng cuộc gọi và luồng dữ liệu. Nguồn: <code>docs/contracts/data-contract.md</code> (v0.4.0). <strong>Đã được thay thế bởi v0.5.0</strong>: xem <code>docs/contracts/data-contract-v0.5.0.md</code>; luồng ở đây còn vẽ rank 1 × rank 1 và <code>decision_id</code> là PK.</div>
+  <nav><a href="#erd">1. ERD</a><a href="#call">2. Luồng cuộc gọi</a><a href="#data">3. Luồng dữ liệu</a><a href="#fk">4. Khóa liên kết</a></nav>
+</header>
+
+<section id="erd">
+  <h2>1. ERD - các bảng event + dimension</h2>
+  <p class="muted">Chỉ hiện cột khóa và cột chính. Cột đầy đủ xem contract §5, §6. Bảng feature store ở mục 3.</p>
+  <div class="card"><pre class="mermaid">
+erDiagram
+  dim_turn ||--o{ dim_turn_endpoint : "turn_id"
+  dim_turn ||--o{ turn_health_1m : "turn_id"
+  dim_turn ||--o{ turn_allocation : "turn_id"
+  dim_asn  ||--o{ dim_user : "home_asn"
+
+  call_session ||--o{ selector_decision : "call_id"
+  call_session ||--o{ ice_attempt : "call_id"
+  call_session ||--o{ path_leg_measurement : "call_id"
+  call_session ||--o{ call_stats_epoch : "call_id"
+  call_session ||--o{ call_stats_5s : "call_id"
+  call_session ||--|| call_outcome : "call_id"
+  call_session ||--|| fact_call : "call_id"
+  selector_decision ||--o{ turn_allocation : "decision_id"
+  selector_decision ||--o{ ice_attempt : "decision_id"
+  turn_allocation ||--o| ice_attempt : "allocation_id"
+  ice_attempt ||--o{ ice_candidate_pair : "call_id+attempt_seq"
+  call_stats_5s }o--o{ call_stats_epoch : "pipeline tinh"
+  call_outcome ||--|| fact_call : "KPI"
+
+  dim_turn {
+    text turn_id PK
+    text country
+    text city
+    text status
+    timestamptz valid_from
+    timestamptz valid_to
+  }
+  dim_turn_endpoint {
+    text ip
+    text turn_id FK
+    enum role
+    timestamptz valid_from
+  }
+  dim_asn {
+    int asn PK
+    text isp
+    enum access_kind
+  }
+  dim_user {
+    text user_hash PK
+    int home_asn FK
+    enum cohort
+  }
+  call_session {
+    uuid call_id PK
+    timestamptz initiated_ts
+    enum media_kind
+    enum call_type
+    text caller_device_id
+    enum connection_mode
+    enum ice_transport_policy
+    text be_region
+    text experiment_id
+    text arm
+  }
+  selector_decision {
+    uuid decision_id PK
+    uuid call_id FK
+    enum side
+    enum phase
+    text device_id
+    text policy_version
+    int api_latency_ms
+    array candidates
+    int chosen_rank
+    bool is_exploration
+  }
+  turn_allocation {
+    uuid allocation_id PK
+    uuid call_id FK
+    uuid decision_id FK
+    text turn_id FK
+    int rank
+    enum transport
+    int alloc_ms
+    bool success
+    enum error_code
+  }
+  ice_attempt {
+    uuid call_id PK
+    int attempt_seq PK
+    uuid decision_id FK
+    uuid caller_allocation_id FK
+    uuid callee_allocation_id FK
+    enum trigger
+    enum state
+    enum path_type
+    timestamptz ice_connected_ts
+  }
+  ice_candidate_pair {
+    uuid call_id FK
+    int attempt_seq FK
+    text pair_id
+    enum check_state
+    bool selected
+  }
+  path_leg_measurement {
+    uuid call_id FK
+    enum leg_type
+    enum granularity
+    enum method
+    enum measurement_kind
+    float value_ms
+    int n_samples
+  }
+  call_stats_epoch {
+    uuid call_id FK
+    enum endpoint_side
+    int network_epoch
+    enum derivation
+    map media_rtcp_rtt_hist
+    map loss_hist
+    map jitter_estimate_hist
+    float measurement_coverage
+  }
+  call_stats_5s {
+    uuid call_id FK
+    timestamptz window_start_ts
+    float ice_stun_rtt_ms
+    enum conn_state
+  }
+  call_outcome {
+    uuid call_id PK
+    timestamptz ring_ts
+    timestamptz answer_ts
+    bool answered
+    bool connected
+    bool dropped
+    enum end_reason
+    enum pair_group
+  }
+  fact_call {
+    uuid call_id PK
+    enum poor_category
+    enum quality_assessment_status
+    float joint_propensity
+    text actual_turn_id_caller
+    text actual_turn_id_callee
+  }
+  turn_health_1m {
+    text turn_id PK
+    timestamptz minute_ts PK
+    float health_score
+    enum health_status
+  }
+  </pre></div>
+</section>
+
+<section id="call">
+  <h2>2. Luồng một cuộc gọi (hai mặt phẳng: signaling qua BE, media qua TURN)</h2>
+  <p class="muted">Ghi chú trong ngoặc là bảng được ghi ở bước đó. Selector không chặn lời mời tới B: BE gửi lời mời song song với việc gọi Selector (I14).</p>
+  <div class="card"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant A as Người gọi A (SDK)
+  participant BE as Spring Boot BE (signaling)
+  participant S as Selector API
+  participant TA as TURN của A
+  participant TB as TURN của B
+  participant B as Người nghe B (SDK)
+
+  A->>BE: bấm gọi
+  Note over BE: ghi call_session
+  par BE gọi Selector và gửi lời mời song song (I14)
+    BE->>S: POST /v1/turn/select (phase=initial, chỉ biết A)
+    S-->>BE: top-k TURN cho A
+    Note over BE: ghi selector_decision (caller). Lỗi/timeout: static_fallback
+    BE-->>A: danh sách TURN + ice_transport_policy
+  and
+    BE->>B: invite (không chờ Selector)
+  end
+  B-->>BE: ring
+  Note over BE: ghi ring_ts
+  BE->>S: POST /v1/turn/select (phase=refined, mỗi thiết bị B đổ chuông một request)
+  S-->>BE: top-k cho A và B
+  Note over BE: ghi selector_decision (mỗi thiết bị B một decision_id)
+  BE-->>B: danh sách TURN cho B
+  B->>BE: bấm nghe
+  Note over BE: ghi answer_ts
+  A->>TA: allocate (rank 1)
+  B->>TB: allocate (rank 1)
+  Note over A,B: ghi turn_allocation (alloc_ms)
+  A->>BE: SDP/ICE qua signaling
+  BE->>B: chuyển tiếp
+  A->>TA: ICE check
+  TA->>TB: nối TURN với TURN
+  TB->>B: ICE check
+  Note over A,B: ghi ice_attempt (ice_connected_ts, path_type)
+  A-)B: Media: A, TURN A, TURN B, B
+  Note over A,B: ghi call_stats_epoch (100%) và call_stats_5s (lấy mẫu)
+  Note over A,B: ghi path_leg_measurement (từng chặng, ms)
+  A->>BE: hoặc B: kết thúc
+  Note over BE: ghi call_outcome (end_reason, dropped)
+  </pre></div>
+
+  <h3>Nhánh lỗi chính</h3>
+  <div class="card"><pre class="mermaid">
+flowchart TD
+  start([A bấm gọi]) --> inv{Invite tới B?}
+  inv -- không --> e1[end_reason = invite_undelivered]
+  inv -- có --> ring{B bấm nghe?}
+  ring -- không nghe --> e2[not_answered]
+  ring -- từ chối --> e3[rejected]
+  ring -- A tắt trước --> e4[cancelled_by_caller]
+  ring -- nghe --> ice{ICE connected?}
+  ice -- thất bại --> fb{còn TURN rank kế?}
+  fb -- có --> retry[ice_attempt mới, trigger=fallback] --> ice
+  fb -- không --> e5[ice_failed = setup_fail]
+  ice -- được --> talk[Đang gọi: call_stats_epoch]
+  talk --> net{Đổi mạng?}
+  net -- có --> rs[ICE restart, network_epoch + 1] --> talk
+  net -- không --> endq{Kết thúc}
+  endq -- bình thường --> ok[normal_hangup]
+  endq -- rớt mạng/TURN --> dr[dropped_network / dropped_turn = drop]
+  endq -- app crash --> ac[app_crash, không tính drop]
+  </pre></div>
+</section>
+
+<section id="data">
+  <h2>3. Luồng dữ liệu: producer, raw, clean, feature store, Selector</h2>
+  <div class="card"><pre class="mermaid">
+flowchart LR
+  subgraph P[Producer ghi raw event]
+    SDK[client_sdk]
+    SIG[signaling / BE]
+    SEL[selector]
+    TS[turn_server]
+    PR[probe_agent]
+    SIM[simulator]
+  end
+  subgraph R[Raw]
+    CS[call_session]
+    SD[selector_decision]
+    TA2[turn_allocation]
+    IA[ice_attempt]
+    PL[path_leg_measurement]
+    ST[call_stats_epoch / 5s]
+    CO[call_outcome]
+    TH[turn_health_1m]
+    SH[service_health_1m]
+  end
+  subgraph C[Clean layer - pipeline]
+    CLK[Hiệu chỉnh đồng hồ]
+    DQ[dq_results]
+    MATCH[Ghép allocation với ICE + actual_turn_id]
+    FC[fact_call + KPI]
+  end
+  subgraph F[Feature store - snapshot mỗi ngày]
+    F1[feat_leg_stats]
+    F2[feat_turn_turn]
+    F3[feat_turn_health]
+    F4[feat_path_history]
+    F5[feat_callee_prior]
+    F6[feat_turn_alloc_latency]
+    HS[health_snapshot mỗi phút]
+  end
+  API[[POST /v1/turn/select]]
+  DASH[Dashboard / insight report]
+
+  SIG --> CS & CO
+  SEL --> SD
+  SDK --> TA2 & IA & PL & ST
+  TS --> TH
+  PR --> PL
+  SIM -.thay thế toàn bộ.-> R
+  R --> CLK --> DQ --> MATCH --> FC
+  PL --> F1 & F2
+  TH --> F3 & HS
+  FC --> F4 & F5
+  TA2 --> F6
+  F --> API
+  API --> SEL
+  FC --> DASH
+  DQ --> DASH
+  </pre></div>
+  <p class="muted">Hiệp: raw, clean, feature store, simulator, dashboard. Đoàn: thuật toán và API Selector.</p>
+</section>
+
+<section id="fk">
+  <h2>4. Khóa liên kết (để check ERD)</h2>
+  <div class="card">
+  <table>
+    <tr><th>Bảng con</th><th>Cột</th><th>Trỏ tới</th><th>Ghi chú</th></tr>
+    <tr><td>selector_decision</td><td>call_id</td><td>call_session</td><td>1 cuộc gọi có nhiều decision (initial, refined mỗi thiết bị B, restart)</td></tr>
+    <tr><td>turn_allocation</td><td>decision_id, call_id, turn_id</td><td>selector_decision, dim_turn</td><td>allocation_id do client sinh</td></tr>
+    <tr><td>ice_attempt</td><td>(call_id, attempt_seq) PK; decision_id</td><td>call_session, selector_decision</td><td>decision_id là của thiết bị B đã bắt máy (I20)</td></tr>
+    <tr><td>ice_attempt</td><td>caller_allocation_id, callee_allocation_id</td><td>turn_allocation</td><td>Có thể null, khi đó pipeline ghép theo quy tắc §8.3</td></tr>
+    <tr><td>path_leg_measurement</td><td>call_id (null với probe)</td><td>call_session</td><td>leg user_turn hoặc turn_turn; probe không thuộc cuộc gọi nào</td></tr>
+    <tr><td>call_stats_epoch</td><td>(call_id, endpoint_side, device_id, media_kind, network_epoch)</td><td>call_session</td><td>Một derivation cho mỗi endpoint vào KPI</td></tr>
+    <tr><td>call_outcome</td><td>call_id</td><td>call_session</td><td>1-1, BE ghi</td></tr>
+    <tr><td>dim_turn_endpoint</td><td>turn_id</td><td>dim_turn</td><td>Một IP thuộc đúng một turn_id tại một thời điểm</td></tr>
+  </table>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default', securityLevel: 'loose',
+    sequence: { useMaxWidth: false }, er: { useMaxWidth: false }, flowchart: { useMaxWidth: false } });
+</script>
+</body>
+</html>
