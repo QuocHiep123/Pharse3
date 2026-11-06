@@ -1,12 +1,12 @@
 # Smart TURN Selector: Bản đồ hướng giải quyết
 
-Tài liệu này phân tích đề bài, đánh giá các tài liệu đã tìm, chỉ ra phần còn thiếu và gợi ý hướng đi. Tài liệu không đưa ra công thức hay tham số chốt sẵn. Data Contract không thiết kế ở đây; mục 8.4 chỉ tóm tắt dữ liệu theo vòng đời, còn đề xuất nằm ở [De_xuat_Data_Contract_v0.5.0_cho_Hiep.md](De_xuat_Data_Contract_v0.5.0_cho_Hiep.md).
+Tài liệu này phân tích đề bài, đánh giá các tài liệu đã tìm, chỉ ra phần còn thiếu và gợi ý hướng đi. Tài liệu không đưa ra công thức hay tham số chốt sẵn. Data Contract không thiết kế ở đây; mục 8.4 chỉ tóm tắt dữ liệu theo vòng đời, còn đề xuất nằm ở [DATA_CONTRACT_v0.5.0.md](DATA_CONTRACT_v0.5.0.md).
 
-**Cập nhật 05/11.** Tài liệu đã bổ sung hai điều: kết quả lab ICE trên Chromium 156 và coturn ([lab_ice/KET_QUA.md](lab_ice/KET_QUA.md)), và quyết định về hướng thuật toán: baseline giữ 8 TURN, thuật toán cải tiến dùng top-k theo khoảng tin cậy của VIA. Các số từ lab là bằng chứng về cơ chế trên một máy, không phải chất lượng production.
+**Cập nhật 05/11.** Tài liệu đã bổ sung hai điều: kết quả lab ICE trên Chromium 156 và coturn (tóm tắt ở mục 11 của [DATA_CONTRACT_v0.5.0.md](DATA_CONTRACT_v0.5.0.md); dữ liệu gốc ở commit `553a4d4`), và quyết định về hướng thuật toán: baseline giữ 8 TURN, thuật toán cải tiến dùng top-k theo khoảng tin cậy của VIA. Các số từ lab là bằng chứng về cơ chế trên một máy, không phải chất lượng production.
 
 **Chốt phạm vi 05/11.** Đoàn đã trả lời 14 câu hỏi ở mục 11. Các phần dưới đây đã được chỉnh theo: chỉ dùng dữ liệu giả lập, chỉ xét đường qua relay, bám bài toán của VIA và không làm thêm ngoài đề bài. Bảng tổng hợp phạm vi nằm ở mục 2.5.
 
-**Vòng đời dữ liệu (tạm thời):** call logs, getStats, TURN metrics và probe giữa các TURN đi vào feature (chặng, backbone, health, load); Ranking Engine và Selector API trả danh sách cho client và ICE; Decision Log nối với Outcome Log để phục vụ Dashboard, đánh giá và cập nhật feature. Phần ảnh hưởng đến Data Contract nằm ở [đề xuất cho Hiệp](De_xuat_Data_Contract_v0.5.0_cho_Hiep.md).
+**Vòng đời dữ liệu (tạm thời):** call logs, getStats, TURN metrics và probe giữa các TURN đi vào feature (chặng, backbone, health, load); Ranking Engine và Selector API trả danh sách cho client và ICE; Decision Log nối với Outcome Log để phục vụ Dashboard, đánh giá và cập nhật feature. Phần ảnh hưởng đến Data Contract nằm ở [DATA_CONTRACT_v0.5.0.md](DATA_CONTRACT_v0.5.0.md).
 
 Quy ước tên gọi dùng xuyên suốt:
 
@@ -342,7 +342,7 @@ Bản PDF của ba tài liệu nằm ở máy của Đoàn, gửi riêng khi c�
 
 ### 5.2. Hành vi ICE trên trình duyệt thật
 
-**Đã làm được:** lab trên Chromium 156 và coturn đã trả lời phần lớn câu hỏi, xem mục 2.2 và [lab_ice/KET_QUA.md](lab_ice/KET_QUA.md).
+**Đã làm được:** lab trên Chromium 156 và coturn đã trả lời phần lớn câu hỏi, xem mục 2.2 và mục 11 của [DATA_CONTRACT_v0.5.0.md](DATA_CONTRACT_v0.5.0.md).
 
 **Chưa đo, không làm thêm trong MVP và cần ghi vào giới hạn của báo cáo:**
 
@@ -700,7 +700,7 @@ Rủi ro lớn nhất của giả lập là thuật toán thắng chỉ vì ngư
 
 ### 8.4. Dữ liệu theo vòng đời
 
-Phần này chia theo các bước của vòng đời. Danh sách trường cụ thể nằm ở [YAML contract](data_contract_v0.5.0_de_xuat.schema.yaml) và [YAML các lớp sau thu thập](dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml). Trong MVP, toàn bộ dữ liệu này do giả lập sinh ra.
+Phần này chia theo các bước của vòng đời. Danh sách trường cụ thể nằm ở [YAML contract](data_contract_v0.5.0.schema.yaml) và [YAML các lớp sau thu thập](dac_ta_sau_thu_thap_v0.5.0.schema.yaml). Trong MVP, toàn bộ dữ liệu này do giả lập sinh ra.
 
 **Raw, thuộc Data Contract thu thập:**
 
@@ -883,7 +883,7 @@ Lộ trình bám theo mốc mentor giao: tuần 1 là 04 đến 10/11, báo cáo
 
 | Thứ tự | Tài liệu | Phần cần tập trung | Mức đã kiểm chứng trong đợt này |
 |---|---|---|---|
-| 0 | [Kết quả lab ICE](lab_ice/KET_QUA.md) | Toàn bộ | Đo trên Chromium 156 và coturn, trên một máy |
+| 0 | Kết quả lab ICE (mục 11 của [DATA_CONTRACT_v0.5.0.md](DATA_CONTRACT_v0.5.0.md)) | Toàn bộ | Đo trên Chromium 156 và coturn, trên một máy |
 | 1 | [VIA](https://cs.cmu.edu/~junchenj/via.pdf) | Mục 3.1, 3.2 về số đo giữa các relay, 4, đặc biệt 4.4 về ghép chặng và top-k, 4.5 về chọn trong nhóm; 5.1, 5.3, 5.4 | Đã đọc phần chính của toàn văn |
 | 2 | MSR-TR-2016-57, bản PDF gửi riêng khi cần | Mục 1.2, 3, 4 | Đã đọc toàn văn |
 | 3 | [RFC 8445](https://www.rfc-editor.org/rfc/rfc8445.txt) | Các mục ở mục 3.4 | Đã đối chiếu số mục và các đoạn liên quan |

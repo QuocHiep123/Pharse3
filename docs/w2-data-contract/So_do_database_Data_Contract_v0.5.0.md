@@ -1,6 +1,6 @@
-# Sơ đồ database của Data Contract v0.5.0 (đề xuất)
+# Sơ đồ database của Data Contract v0.5.0
 
-Sơ đồ sinh tự động từ [data_contract_v0.5.0_de_xuat.schema.yaml](data_contract_v0.5.0_de_xuat.schema.yaml) và [dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml](dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml). Giải thích từng bảng, từng cột và giá trị enum nằm ở [Bang_du_lieu_Data_Contract_v0.5.0.md](Bang_du_lieu_Data_Contract_v0.5.0.md). Khi các file khác nhau thì tin YAML.
+Sơ đồ sinh tự động từ [data_contract_v0.5.0.schema.yaml](data_contract_v0.5.0.schema.yaml) và [dac_ta_sau_thu_thap_v0.5.0.schema.yaml](dac_ta_sau_thu_thap_v0.5.0.schema.yaml). Giải thích từng bảng, từng cột và giá trị enum nằm ở [Bang_du_lieu_Data_Contract_v0.5.0.md](Bang_du_lieu_Data_Contract_v0.5.0.md). Khi các file khác nhau thì tin YAML.
 
 ## Mục lục
 

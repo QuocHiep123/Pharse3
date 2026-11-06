@@ -1,9 +1,9 @@
 # Data Contract v0.5.0 (đề xuất): contract thu thập, viết bằng JSON Schema 2020-12 trên YAML.
-# Đi kèm De_xuat_Data_Contract_v0.5.0_cho_Hiep.md, so với contract v0.4.0 tại commit e4d84f8.
+# Đi kèm DATA_CONTRACT_v0.5.0.md, so với contract v0.4.0 tại commit e4d84f8.
 # Trạng thái: v0.5.0 dùng cho simulator; nguồn production chờ xác nhận theo issue #3.
 #
 # Phạm vi: dữ liệu một nguồn ghi trực tiếp, Decision Log và bảng tham chiếu.
-# Pipeline, Feature Engineering, Labeled Data, KPI, giả lập và API nằm ở dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml.
+# Pipeline, Feature Engineering, Labeled Data, KPI, giả lập và API nằm ở dac_ta_sau_thu_thap_v0.5.0.schema.yaml.
 #
 # Cách đọc:
 #   - Mỗi bảng là một mục trong $defs, có x-status: active hoặc deferred.
@@ -25,11 +25,11 @@ description: 'Contract này đặc tả dữ liệu raw có thể thu thập: ng
 x-contract:
   version: 0.5.0
   based_on: 0.4.0, commit e4d84f8, nhánh docs/w1-design-and-data-contract
-  proposal_document: De_xuat_Data_Contract_v0.5.0_cho_Hiep.md
-  companion_schema: dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml
+  proposal_document: DATA_CONTRACT_v0.5.0.md
+  companion_schema: dac_ta_sau_thu_thap_v0.5.0.schema.yaml
   status: simulator_ready
   production_status: pending_source_verification
-  decision_document: docs/contracts/data-contract-v0.5.0.md
+  decision_document: DATA_CONTRACT_v0.5.0.md
   breaking_changes: true
 x-lifecycle:
   status: Chốt ranh giới thu thập cho simulator; downstream có version riêng

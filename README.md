@@ -6,7 +6,7 @@
 
 | | |
 |---|---|
-| **Trạng thái contract** | [Data Contract v0.5.0](docs/contracts/data-contract-v0.5.0.md) · `simulator_ready` · nguồn production chờ xác minh |
+| **Trạng thái contract** | [Data Contract v0.5.0](docs/w2-data-contract/DATA_CONTRACT_v0.5.0.md) · `simulator_ready` · nguồn production chờ xác minh |
 | **Phân công** | **Hiệp**: simulator, raw synthetic, pipeline, dashboard · **Đoàn**: thuật toán Selector, interface, đề xuất contract |
 | **Đọc tiếp** | [Khảo sát nguồn dữ liệu](docs/w2-data-contract/KHAO_SAT_NGUON_DU_LIEU.md) · [Định nghĩa metric](docs/w2-data-contract/metric_config_v0.5.0.yaml) · [W1 của Hiệp](docs/W1_HIEP.md) · [Quyết định cho simulator](docs/w2-data-contract/README.md) · [KPI MVP](docs/w2-data-contract/KPI_MVP_v0.5.0.md) · [Hướng giải quyết của Đoàn](docs/w2-data-contract/Huong_giai_quyet_Smart_TURN_Selector.md) |
 
@@ -141,11 +141,7 @@ flowchart LR
 
 | Đường dẫn | Nội dung |
 |---|---|
-| [`docs/contracts/data-contract-v0.5.0.md`](docs/contracts/data-contract-v0.5.0.md) | **Bản chốt**: quyết định, assumption, danh sách bảng, KPI |
-| [`docs/contracts/data-contract.md`](docs/contracts/data-contract.md) | v0.4.0 (lịch sử) |
-| [`docs/contracts/erd-and-flow.html`](docs/contracts/erd-and-flow.html) | ERD + workflow tương tác (còn vẽ theo v0.4.0) |
+| [`docs/w2-data-contract/DATA_CONTRACT_v0.5.0.md`](docs/w2-data-contract/DATA_CONTRACT_v0.5.0.md) | **Bản chốt**: quyết định, assumption, danh sách bảng, KPI |
 | [`docs/w2-data-contract/`](docs/w2-data-contract/) | Đề xuất và hai schema YAML của Đoàn; KPI; lab ICE |
 | [`docs/research/`](docs/research/) | Ghi chú nghiên cứu (dataset, getStats, VIA/OPE, kiến trúc media) |
-| [`docs/superpowers/specs/`](docs/superpowers/specs/) | Design spec W1 |
 
-> **Lưu ý:** `erd-and-flow.html` và spec W1 vẫn theo v0.4.0 (`k=4`, `refined`). Khi khác với [v0.5.0](docs/contracts/data-contract-v0.5.0.md) thì tin v0.5.0 và hai file YAML.

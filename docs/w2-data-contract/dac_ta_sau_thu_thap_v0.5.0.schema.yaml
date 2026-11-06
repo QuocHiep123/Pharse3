@@ -13,8 +13,8 @@ description: Gồm pipeline làm sạch, Outcome Log, Feature Engineering, Label
 x-spec:
   version: 0.5.0-de-xuat
   based_on: 0.4.0, commit e4d84f8, nhánh docs/w1-design-and-data-contract
-  contract_schema: data_contract_v0.5.0_de_xuat.schema.yaml
-  proposal_document: De_xuat_Data_Contract_v0.5.0_cho_Hiep.md
+  contract_schema: data_contract_v0.5.0.schema.yaml
+  proposal_document: DATA_CONTRACT_v0.5.0.md
   kpi_document: KPI_MVP_v0.5.0.md
   status: Bản chuyển tiếp để không mất nội dung khi tách contract thu thập. Giữ nguyên nghĩa của bản đề xuất trước,
     chỉ sửa chỗ buộc phải đổi theo ranh giới mới. Đặc tả đầy đủ của từng lớp viết sau.
@@ -1353,7 +1353,7 @@ $defs:
     x-grain: Một metric × phiên bản định nghĩa
     x-primary-key: [metric_name, metric_definition_version]
     x-source-level: A
-    x-producer: contracts/kpi.yaml
+    x-producer: metric_config_v0.5.0.yaml
     x-change: new
     x-notes: [active không biến dữ liệu thiếu thành đủ; metric unknown không được coi là đạt, Outcome dùng toàn cohort; quality chỉ tổng hợp trên mẫu đo và luôn hiển thị coverage, Synthetic và production phải báo cáo tách, Không so sánh hai nhóm địa lý hoặc P2P/relay như đại diện toàn cohort khi coverage khác nhau hoặc không biết]
     type: object

@@ -1,5 +1,5 @@
 # Định nghĩa metric cho dashboard và đánh giá, Data Contract v0.5.0.
-# Mỗi phần tử là một dòng metric_config (xem $defs/metric_config trong dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml).
+# Mỗi phần tử là một dòng metric_config (xem $defs/metric_config trong dac_ta_sau_thu_thap_v0.5.0.schema.yaml).
 # Cùng một metric_definition_version phải được dùng ở simulator, pipeline và dashboard.
 # Bốn nhóm: Call Quality (theo KPI_MVP_v0.5.0.md), TURN Performance, Service Health, Algorithm Quality.
 #

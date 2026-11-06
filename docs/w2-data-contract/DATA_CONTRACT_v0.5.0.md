@@ -1,10 +1,10 @@
 # Data Contract v0.5.0 — bản chốt cho simulator
 
-> **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** [v0.4.0](data-contract.md) (phá vỡ tương thích).
-> Nguồn gốc: đề xuất của Đoàn ([`docs/w2-data-contract/`](../w2-data-contract/)), phản hồi của Hiệp ở issue [#1](https://github.com/QuocHiep123/Pharse3/issues/1), và quyết định ở issues [#3](https://github.com/QuocHiep123/Pharse3/issues/3) – [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
-> **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/data_contract_v0.5.0_de_xuat.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml) (sau thu thập, 34 bảng).
+> **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** v0.4.0 (phá vỡ tương thích; bản cũ đã gỡ khỏi `main`, xem lịch sử git).
+> Nguồn gốc: đề xuất của Đoàn ([`docs/w2-data-contract/`]()), phản hồi của Hiệp ở issue [#1](https://github.com/QuocHiep123/Pharse3/issues/1), và quyết định ở issues [#3](https://github.com/QuocHiep123/Pharse3/issues/3) – [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
+> **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0.schema.yaml`](data_contract_v0.5.0.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0.schema.yaml`](dac_ta_sau_thu_thap_v0.5.0.schema.yaml) (sau thu thập, 34 bảng).
 
-**Khảo sát nguồn dữ liệu và câu hỏi cho từng bên:** [KHAO_SAT_NGUON_DU_LIEU.md](../w2-data-contract/KHAO_SAT_NGUON_DU_LIEU.md). **Bộ lọc 10 kịch bản và mẫu bằng chứng insight:** [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md).
+**Khảo sát nguồn dữ liệu và câu hỏi cho từng bên:** [KHAO_SAT_NGUON_DU_LIEU.md](KHAO_SAT_NGUON_DU_LIEU.md). **Bộ lọc 10 kịch bản và mẫu bằng chứng insight:** [KPI_MVP](KPI_MVP_v0.5.0.md).
 
 **Chốt ở đây nghĩa là gì.** Hiệp và Đoàn dùng cùng một interface dữ liệu để chạy simulator. Chốt **không** có nghĩa là BE, WebRTC core hay mentor đã xác nhận field production thu được. Mọi mục ở phần 3 là *assumption của simulator*.
 
@@ -47,14 +47,14 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 | D9 | Thiếu dữ liệu | Không ép thành `false`/`0`/“tốt”. `null` chỉ khi schema cho phép; thiếu dòng biểu diễn bằng `telemetry_coverage` | #1, #3, #7 |
 | D10 | Network context | Bảng `endpoint_network_context`, grain `call_id × side × device_id × network_epoch`, BE ghi khi có context đầu hoặc tín hiệu đổi mạng; `context_version`; không lưu IP người dùng | #6 |
 | D11 | Country không có TURN | `turn_availability_status ∈ {local_turn_available, no_healthy_turn, no_turn_observed, unknown}` + `used_fallback_turn` trên `fact_call_endpoint`; `inventory_scope` trong `run_manifest`; `dim_country_area` làm cầu nối khu vực. `no_turn_observed` ≠ `not_deployed` | #5, Đoàn §5.6 |
-| D12 | KPI telemetry-aware | KPI outcome tính trên toàn cohort; KPI chất lượng (RTT/loss/jitter) luôn kèm `sample_count`, `eligible_count`, `measurement_coverage`. Không so country có/không có TURN nếu coverage không tương đương | #7, [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md) |
+| D12 | KPI telemetry-aware | KPI outcome tính trên toàn cohort; KPI chất lượng (RTT/loss/jitter) luôn kèm `sample_count`, `eligible_count`, `measurement_coverage`. Không so country có/không có TURN nếu coverage không tương đương | #7, [KPI_MVP](KPI_MVP_v0.5.0.md) |
 | D13 | Fact analytic | `fact_call`: 1 dòng/`call_id` trong cohort (left join từ `call_session`), bản hiện hành theo `as_of_ts` + `fact_version` (dữ liệu đến muộn). `fact_call_endpoint`: 1 dòng/`call_id × side × device_id`. `fact_pair_evaluation`: 1 dòng/`decision_id × metric × cặp`, chỉ cặp thực tế có nhãn; setup thất bại chỉ gắn nhãn `connection_success`; dự đoán và quan sát phải cùng đại lượng | #8 |
 | D14 | `pcr_itt` | Hai cận: `low=K/N`, `high=(K+U_quality+U_outcome)/N`; `N=0` thì undefined | Đoàn §11.4, #3 |
 | D15 | Synthetic | Mọi raw synthetic có `data_source=synthetic`, `sim_run_id`; truth nằm bảng riêng, không chép thành quan sát | #2 |
 | D16 | Version | v0.5.0 là thay đổi **phá vỡ tương thích**; giữ nhãn `simulator_ready` cho tới khi hai bên duyệt và nguồn production được xác minh | #1 mục 5 |
-| D17 | Latency của TURN | Theo đề mentor, Latency P50/P95 của TURN là **RTT qua TURN** (từ `getStats`), không phải thời gian cấp phát (`alloc_ms` đã bỏ vì cần hook SDK). Gán cho một TURN chỉ khi đường `relay_same`; RTT của đường `relay_relay` chỉ dùng xếp hạng tương đối | Đề mentor, [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md) |
+| D17 | Latency của TURN | Theo đề mentor, Latency P50/P95 của TURN là **RTT qua TURN** (từ `getStats`), không phải thời gian cấp phát (`alloc_ms` đã bỏ vì cần hook SDK). Gán cho một TURN chỉ khi đường `relay_same`; RTT của đường `relay_relay` chỉ dùng xếp hạng tương đối | Đề mentor, [KPI_MVP](KPI_MVP_v0.5.0.md) |
 | D18 | Đáp án tối ưu của simulator | `sim_decision_oracle` (chỉ synthetic, đọc `truth_leg_5m`) cho top-k có chứa cặp tốt nhất không, regret của cặp dẫn đầu, cặp thực tế và danh sách. Policy, feature, health không đọc (I34). Dashboard được đọc, ở trang ghi rõ synthetic-only | Đề mentor (Algorithm Quality), #2 |
-| D19 | Định nghĩa metric | 30 metric ở [`metric_config_v0.5.0.yaml`](../w2-data-contract/metric_config_v0.5.0.yaml): Call Quality, TURN Performance, Service Health, Algorithm Quality. Cùng một phiên bản dùng ở simulator, pipeline và dashboard | Đề mentor, #7, #8 |
+| D19 | Định nghĩa metric | 30 metric ở [`metric_config_v0.5.0.yaml`](metric_config_v0.5.0.yaml): Call Quality, TURN Performance, Service Health, Algorithm Quality. Cùng một phiên bản dùng ở simulator, pipeline và dashboard | Đề mentor, #7, #8 |
 | D20 | Sự cố và phục hồi | `fact_call` có `failure_phase` (pre/post allocation, mid call), `n_ice_restarts`, `detected_to_ice_recovery_ms`; `fault_to_recovery_ms` chỉ synthetic. Kịch bản 1–10 thành bộ lọc trong KPI_MVP | Đề mentor (kịch bản 8, 10) |
 
 ## 3. Assumption chờ xác nhận
@@ -387,7 +387,7 @@ flowchart TD
   Q -- unknown --> UQ["U_quality"]
 ```
 
-Định nghĩa đầy đủ (CSR, Setup Failure, Drop, CST, TTFM, RTT P50/P95, Loss, Jitter, Media Quality) ở [KPI_MVP_v0.5.0.md](../w2-data-contract/KPI_MVP_v0.5.0.md). Ngưỡng VIA (320 ms, 1,2 %, 12 ms) khác ngưỡng nội bộ (300 ms, 3 %, 30 ms); báo cáo phải nêu đang dùng ngưỡng nào.
+Định nghĩa đầy đủ (CSR, Setup Failure, Drop, CST, TTFM, RTT P50/P95, Loss, Jitter, Media Quality) ở [KPI_MVP_v0.5.0.md](KPI_MVP_v0.5.0.md). Ngưỡng VIA (320 ms, 1,2 %, 12 ms) khác ngưỡng nội bộ (300 ms, 3 %, 30 ms); báo cáo phải nêu đang dùng ngưỡng nào.
 
 ## 7. Bất biến đổi nghĩa so với v0.4.0
 
@@ -437,3 +437,19 @@ Danh sách đầy đủ ở `x-invariants` trong hai YAML.
 ## 10. Quy ước version
 
 `MAJOR.MINOR.PATCH`: đổi nghĩa/xóa/đổi khóa là **MAJOR** (hoặc MINOR khi chưa có dữ liệu production, nhưng phải ghi *breaking*); thêm bảng/cột tùy chọn là MINOR; sửa câu chữ là PATCH. Mọi thay đổi cập nhật đồng thời YAML, tài liệu này, ERD và changelog.
+
+## 11. Bằng chứng nền
+
+Các quyết định D2–D7 dựa trên lab ICE của Đoàn (Chromium 156 + coturn 4.6.1, một máy, chặng giữa không có độ trễ thêm, dùng data channel; chưa đo Firefox, Safari, mobile). Đây là bằng chứng về **cơ chế**, không phải tham số production. Dữ liệu và script gốc đã gỡ khỏi `main`; xem commit `553a4d4` hoặc nhánh `docs/w2-datacontract`.
+
+| Nguồn | Kết quả | Ảnh hưởng đến contract |
+|---|---|---|
+| Lab | ICE đi theo priority, không tìm đường tốt nhất: cặp đầu bị ghim ở RTT 64–132 ms khi đường tốt nhất là 23 ms | Bỏ `chosen_rank`; ghi riêng cặp dẫn đầu và cặp thực tế |
+| Lab | TURN cấp phát chậm hơn có thể bị bỏ; Callee giữ TURN đến một ngưỡng độ trễ tín hiệu rồi mất | Không thấy candidate không phải lỗi TURN; cần dòng thời gian ICE |
+| Lab | TURN hỏng khi cuộc gọi dưới 7 giây thì ICE tự chuyển; từ 8 giây thì không; phát hiện `disconnected` sau 6,4–7,7 giây; ICE restart 162–193 ms | Bỏ `trigger = fallback`; đo phục hồi từ `ice_event` |
+| Lab | Danh sách 8 chỉ có 1 trên 32 cặp có RTT | `ice_candidate_pair` hoãn; không dùng để đo các TURN khác |
+| W3C webrtc-stats | `url`, `relayProtocol` không có trên remote candidate | Mỗi đầu xác định loại candidate bằng local candidate của chính nó |
+| RFC 8656 §7.4 | 486 là quota theo username, 508 là thiếu capacity | Không gộp cả hai thành quá tải |
+| `prom_server.c` coturn (4.6.1, `master`) | Không có bộ đếm lỗi allocation; `turn_traffic_*` chỉ tính session đã kết thúc | `alloc_failures`, `bandwidth_mbps` có thể null; allocation lấy từ log |
+| VIA (SIGCOMM 2016) | Dùng kết quả đầu cuối của đường đã dùng và tomography tuyến tính | Raw cần trung bình cấp cuộc gọi, danh tính TURN và probe giữa các TURN |
+

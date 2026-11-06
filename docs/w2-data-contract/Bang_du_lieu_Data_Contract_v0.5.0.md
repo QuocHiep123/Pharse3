@@ -1,6 +1,6 @@
-# Giải thích các bảng của Data Contract v0.5.0 (đề xuất)
+# Giải thích các bảng của Data Contract v0.5.0
 
-Tài liệu sinh tự động từ [data_contract_v0.5.0_de_xuat.schema.yaml](data_contract_v0.5.0_de_xuat.schema.yaml) và [dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml](dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml). Sơ đồ database và danh sách bảng nằm ở [So_do_database_Data_Contract_v0.5.0.md](So_do_database_Data_Contract_v0.5.0.md). Nghĩa và lý do của từng thay đổi nằm ở [đề xuất cho Hiệp](De_xuat_Data_Contract_v0.5.0_cho_Hiep.md). Khi các file khác nhau thì tin YAML.
+Tài liệu sinh tự động từ [data_contract_v0.5.0.schema.yaml](data_contract_v0.5.0.schema.yaml) và [dac_ta_sau_thu_thap_v0.5.0.schema.yaml](dac_ta_sau_thu_thap_v0.5.0.schema.yaml). Sơ đồ database và danh sách bảng nằm ở [So_do_database_Data_Contract_v0.5.0.md](So_do_database_Data_Contract_v0.5.0.md). Quyết định và lý do nằm ở [DATA_CONTRACT_v0.5.0.md](DATA_CONTRACT_v0.5.0.md). Khi các file khác nhau thì tin YAML.
 
 **Cách đọc:** "Bắt buộc" trống nghĩa là được null. PK là khóa chính, FK là khóa ngoại. Mọi bảng event còn có các cột chung `event_envelope`, không lặp lại trong từng bảng; chi tiết ở mục 1.10.
 
@@ -1119,7 +1119,7 @@ Danh mục user. **Một dòng:** Một user_hash · **Mức nguồn:** B
 
 #### `fact_call`
 
-**Trạng thái:** chưa đủ cột. Một dòng mỗi cuộc gọi. **Một dòng:** Một call_id trong cohort · **Nguồn ghi:** pipeline · **Mức nguồn:** D
+**Trạng thái:** đủ cột (issue #8). Một dòng mỗi cuộc gọi. **Một dòng:** Một call_id trong cohort · **Nguồn ghi:** pipeline · **Mức nguồn:** D
 
 | Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
 |---|---|---|---|---|
@@ -1293,7 +1293,7 @@ Một dòng cho một endpoint tham gia cuộc gọi, gồm metric tổng hợp 
 
 #### `metric_config`
 
-Metadata của một metric. **Một dòng:** Một metric × phiên bản định nghĩa · **Nguồn ghi:** contracts/kpi.yaml · **Mức nguồn:** A
+Metadata của một metric. **Một dòng:** Một metric × phiên bản định nghĩa · **Nguồn ghi:** metric_config_v0.5.0.yaml · **Mức nguồn:** A
 
 | Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
 |---|---|---|---|---|

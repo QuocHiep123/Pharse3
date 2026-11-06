@@ -1,6 +1,6 @@
 # KPI MVP cho Data Contract v0.5.0
 
-Tài liệu này chốt **định nghĩa phân tích cho simulator** theo issues [#7](https://github.com/QuocHiep123/Pharse3/issues/7) và [#8](https://github.com/QuocHiep123/Pharse3/issues/8). Khả năng thu thập production vẫn phụ thuộc xác nhận của BE, WebRTC core và mentor. Các field cùng grain nằm trong `dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`.
+Tài liệu này chốt **định nghĩa phân tích cho simulator** theo issues [#7](https://github.com/QuocHiep123/Pharse3/issues/7) và [#8](https://github.com/QuocHiep123/Pharse3/issues/8). Khả năng thu thập production vẫn phụ thuộc xác nhận của BE, WebRTC core và mentor. Các field cùng grain nằm trong `dac_ta_sau_thu_thap_v0.5.0.schema.yaml`.
 
 ## Cohort và các trạng thái thiếu
 

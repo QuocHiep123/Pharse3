@@ -1,6 +1,6 @@
 # Khảo sát nguồn dữ liệu cho Data Contract v0.5.0
 
-Sản phẩm W1 của Hiệp: khảo sát nguồn dữ liệu **TURN / Selector / SDK / Call** và trả lời mỗi bảng của [Data Contract v0.5.0](../contracts/data-contract-v0.5.0.md) lấy từ đâu, đã kiểm chứng đến mức nào, còn phải hỏi ai.
+Sản phẩm W1 của Hiệp: khảo sát nguồn dữ liệu **TURN / Selector / SDK / Call** và trả lời mỗi bảng của [Data Contract v0.5.0](DATA_CONTRACT_v0.5.0.md) lấy từ đâu, đã kiểm chứng đến mức nào, còn phải hỏi ai.
 
 > **Tình trạng chung (06/11/2026):** chưa có log thật, danh sách field hay mẫu `getStats` từ hệ thống Call. Bằng chứng duy nhất đã kiểm chứng là (1) lab ICE trên Chromium 156 + coturn 4.6.1 một máy, và (2) đọc mã nguồn coturn (`prom_server.c`, bản 4.6.1 và `master`). Mọi thứ còn lại là **giả định của simulator**. Chưa có số liệu nào ở đây dùng để khẳng định kết quả production.
 
