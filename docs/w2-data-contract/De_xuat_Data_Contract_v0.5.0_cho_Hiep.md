@@ -2,6 +2,8 @@
 
 **Từ:** Đoàn. **Gửi:** Hiệp.
 
+> **Trạng thái (06/11/2026):** đây là bản đề xuất gốc, giữ làm lý do thay đổi. Bản chốt nằm ở [data-contract-v0.5.0.md](../contracts/data-contract-v0.5.0.md) và hai YAML; khi khác nhau thì tin bản chốt. Một số số liệu trong tài liệu này đã cũ: contract hiện có 20 bảng thu thập và 34 bảng sau thu thập, `fact_call`, `fact_call_endpoint`, `fact_pair_evaluation` đã đủ cột, và “8 TURN” đã được mentor xác nhận là 8 TURN server.
+
 **Đối chiếu với:** Data Contract v0.4.0, design spec W1 và ERD v0.4.0 (đều đã xóa khỏi main, xem lịch sử git: nhánh `docs/w1-design-and-data-contract`, commit `e4d84f8`).
 
 **File kèm:**
@@ -488,7 +490,7 @@ Feature không thuộc contract thu thập, nhưng raw phải đủ để tính 
 
 ### 11.3. Labeled Data
 
-Labeled Data chỉ nối Decision Log với Outcome Log rồi gắn nhãn, không tạo thêm dự đoán. Để tính KPI ITT trong simulator, chốt `fact_call` có một dòng trên mỗi `call_id` thuộc cohort. File đi kèm vẫn chưa định nghĩa đủ cột; đánh giá dự đoán theo cặp cần bảng hoặc view riêng, vì còn hai câu:
+Labeled Data chỉ nối Decision Log với Outcome Log rồi gắn nhãn, không tạo thêm dự đoán. Để tính KPI ITT trong simulator, chốt `fact_call` có một dòng trên mỗi `call_id` thuộc cohort. Ở bản đề xuất này file đi kèm chưa định nghĩa đủ cột (nay đã đủ); đánh giá dự đoán theo cặp cần bảng hoặc view riêng, vì còn hai câu:
 
 1. Cuộc gọi thiết lập thất bại không có cặp thực tế, vậy nhãn gắn vào cặp dẫn đầu thế nào?
 2. Dự đoán và kết quả có cùng đại lượng không? Ví dụ RTT dự đoán là `media_rtcp_rtt` hay `ice_stun_rtt`.
@@ -695,7 +697,7 @@ Việc xác nhận diễn ra trước khi đưa contract cho BE và WebRTC core 
 
 ### 15.3. Schema kèm theo và các chi tiết cần góp ý
 
-File contract có 18 bảng, trong đó 2 bảng hoãn. File đi kèm có 31 bảng, trong đó 3 bảng hoãn và `fact_call` chưa đủ cột. Mỗi bảng nằm trong `$defs`, có grain, khóa, mức nguồn thu; `x-change` cho biết phần thay đổi. Cột không có trong `required` có thể vắng mặt; chỉ nhận `null` khi type/schema cho phép. `x-deferred-columns`, `x-moved-columns`, `x-removed-columns` ghi rõ cột đi đâu. Để kiểm tra một bản ghi, validate với `{"$ref": "#/$defs/<tên bảng>"}`.
+Ở bản đề xuất, file contract có 18 bảng (2 hoãn) và file đi kèm có 31 bảng (3 hoãn, `fact_call` chưa đủ cột); bản chốt hiện là 20 và 34 bảng. Mỗi bảng nằm trong `$defs`, có grain, khóa, mức nguồn thu; `x-change` cho biết phần thay đổi. Cột không có trong `required` có thể vắng mặt; chỉ nhận `null` khi type/schema cho phép. `x-deferred-columns`, `x-moved-columns`, `x-removed-columns` ghi rõ cột đi đâu. Để kiểm tra một bản ghi, validate với `{"$ref": "#/$defs/<tên bảng>"}`.
 
 Các chi tiết dưới đây mang nhãn `x-review` và đang mở để Hiệp góp ý.
 

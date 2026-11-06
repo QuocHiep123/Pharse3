@@ -150,7 +150,7 @@ Bảng được sinh từ YAML. *Nguồn*: A = service tự tạo; B = thu có �
 
 ### 4.3. Bảng fact (Labeled Data và Evaluation)
 
-Chi tiết cột của ba bảng dùng cho dashboard và đánh giá. Kiểu và ràng buộc đầy đủ ở YAML. Cột ngoài “Bắt buộc” được phép vắng mặt; `null` chỉ hợp lệ khi kiểu cho phép. Thiếu dữ liệu biểu diễn bằng `unknown`/`null` kèm trạng thái, không phải `0`/`false`.
+Chi tiết cột của ba bảng dùng cho dashboard và đánh giá. Số cột ở mục 4.1–4.2 chỉ đếm cột riêng của bảng; các bảng dưới đây liệt kê thêm 5 cột chung (`contract_version`, `data_source`, `sim_run_id`, `pipeline_run_id`, `dt`). Kiểu và ràng buộc đầy đủ ở YAML. Cột ngoài “Bắt buộc” được phép vắng mặt; `null` chỉ hợp lệ khi kiểu cho phép. Thiếu dữ liệu biểu diễn bằng `unknown`/`null` kèm trạng thái, không phải `0`/`false`.
 
 #### `fact_call`
 

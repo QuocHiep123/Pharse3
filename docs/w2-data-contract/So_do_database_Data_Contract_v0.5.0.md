@@ -900,6 +900,8 @@ erDiagram
 ```mermaid
 erDiagram
     call_session ||--o{ fact_call : "call_id"
+    fact_call ||--o{ fact_pair_evaluation : "call_id"
+    selector_decision_request ||--o{ fact_pair_evaluation : "decision_id"
     fact_call {
         uuid call_id PK,FK
         int local_hour_vn "null"
@@ -928,10 +930,32 @@ erDiagram
         varchar device_class_caller "null"
         varchar device_class_callee "null"
     }
+    fact_pair_evaluation {
+        uuid decision_id PK,FK
+        varchar metric PK
+        varchar turn_caller PK
+        enum transport_caller PK
+        varchar turn_callee PK
+        enum transport_callee PK
+        uuid call_id FK
+        bool is_lead
+        bool in_topk
+        float est_value "null"
+        float interval_low "null"
+        float interval_high "null"
+        enum actual_pair_matches "tristate"
+        enum label_status
+        float observed_value "null"
+        enum in_interval "tristate"
+        float error_value "null"
+        varchar label_rule_version
+        datetime as_of_ts
+    }
     metric_config {
         varchar metric_name PK
         varchar metric_definition_version PK
         varchar detector_version "null"
+
         enum mode
         json applies_to_sources "null"
         json applies_to_platforms "null"
@@ -945,7 +969,27 @@ erDiagram
 
 ```mermaid
 erDiagram
-
+    call_session ||--o{ sim_decision_oracle : "call_id"
+    selector_decision_request ||--o{ sim_decision_oracle : "decision_id"
+    sim_decision_oracle {
+        uuid decision_id PK,FK
+        varchar metric PK
+        uuid call_id FK
+        varchar unit
+        bool lower_is_better
+        varchar truth_version
+        datetime truth_cutoff_ts
+        int eligible_pair_count
+        varchar oracle_turn_caller "null"
+        varchar oracle_turn_callee "null"
+        float oracle_value "null"
+        enum oracle_in_lists "tristate"
+        enum oracle_in_topk "tristate"
+        float list_regret "null"
+        float lead_regret "null"
+        float actual_regret "null"
+        enum actual_pair_matches_oracle "tristate"
+    }
     truth_leg_5m {
         datetime ts_bucket
         varchar src_id

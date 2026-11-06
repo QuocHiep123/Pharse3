@@ -524,7 +524,7 @@ flowchart TD
 | Đặt chéo tạo ra phương án một relay | Khi cặp dẫn đầu gồm hai TURN khác nhau, đặt TURN của bên kia ở vị trí 2 để có sẵn phương án một relay. Chỉ nên dựa vào thứ tự của cặp đầu, vì các cặp sau đổi thứ tự khi NIC preference hai bên khác nhau |
 | Ghép chéo tạo cặp ngoài ý muốn | Danh sách tạo ra mọi tổ hợp, không chỉ các cặp trong top-k. Cặp ngoài ý muốn có thể đứng trên cặp mong muốn, nên phải kiểm tra điểm của toàn bộ tổ hợp theo thứ tự priority |
 | TURN dự phòng đặt càng sau càng đắt | Chi phí khi TURN chết sau cấp phát tăng theo bình phương vị trí, nên TURN khác miền lỗi nên đặt sớm, không để cuối danh sách |
-| TCP và TLS luôn đứng sau UDP | Vị trí của chúng không đổi được thứ tự này, và không chiếm thêm chỗ trong 8 server. Chúng ghép được với UDP của bên kia, nên nên đặt trên server khác với các TURN UDP chính |
+| TCP và TLS luôn đứng sau UDP | Vị trí của chúng không đổi được thứ tự này, và không chiếm thêm chỗ trong 8 server. Chúng ghép được với UDP của bên kia, nên nên bật TCP hoặc TLS dự phòng trên server khác miền lỗi với các TURN UDP chính |
 | Hairpin chưa được xác nhận trên hạ tầng thật | Trong mô hình, cặp (A, A) xử lý như mọi cặp khác. Lab mới xác nhận hairpin trên một máy, nên khả năng này là một giả định của danh mục TURN và phải ghi vào giới hạn báo cáo |
 | Danh sách còn dùng khi ICE restart | Giá trị dự phòng phải tính cả lúc thiết lập lẫn lúc restart, không chỉ lúc thiết lập |
 
@@ -563,7 +563,7 @@ Mỗi tầng được so sánh với tầng trước để biết tầng đó c�
 
 - **Câu hỏi:** nếu không dùng lịch sử, cách chọn hợp lý nhất là gì?
 - **Hướng gợi ý:** trả đúng 8 mục mỗi bên, chọn theo khoảng cách, miền và quốc gia, có giới hạn đa dạng tối thiểu. Baseline cần đủ tốt để việc thắng nó có ý nghĩa.
-- **Cần tự quyết:** khoảng cách đường chim bay hay khoảng cách theo tuyến; ưu tiên cùng ISP ra sao; thứ tự đặt TURN khác miền lỗi; bao nhiêu mục UDP, TCP và TLS. Tọa độ TURN lấy từ danh mục tự xây.
+- **Cần tự quyết:** khoảng cách đường chim bay hay khoảng cách theo tuyến; ưu tiên cùng ISP ra sao; thứ tự đặt TURN khác miền lỗi; server nào bật thêm TCP hoặc TLS dự phòng. Tọa độ TURN lấy từ danh mục tự xây.
 - **Xong khi:** chạy được đủ 10 kịch bản và giải thích được từng kết quả.
 
 #### Tầng 2: Điểm lịch sử theo từng chặng và Baseline lịch sử
@@ -797,7 +797,7 @@ Việc này cho biết thành phần nào thật sự đem lại giá trị, đ�
 | Nhóm | Chỉ số gợi ý |
 |---|---|
 | Kết nối | Tỷ lệ kết nối thành công, CST, TTFM. Không mô hình hóa đổ chuông nên TTFM phụ thuộc nhiều vào tham số giả lập |
-| Chất lượng | RTT, loss, jitter theo trung vị và phân vị 95, drop rate, tỷ lệ cuộc gọi kém theo KPI của Data Contract. Ngưỡng mạng kém của VIA (320 ms, 1,2%, 12 ms) đến từ Skype và khác ngưỡng của Data Contract v0.4.0 (300 ms, 3%, 30 ms), nên báo cáo phải nêu rõ đang dùng ngưỡng nào |
+| Chất lượng | RTT, loss, jitter theo trung vị và phân vị 95, drop rate, tỷ lệ cuộc gọi kém theo KPI của Data Contract. Ngưỡng mạng kém của VIA (320 ms, 1,2%, 12 ms) đến từ Skype và khác ngưỡng nội bộ cũ (300 ms, 3%, 30 ms), nên báo cáo phải nêu rõ đang dùng ngưỡng nào |
 | Chất lượng danh sách | Khoảng cách so với lựa chọn tốt nhất; thời gian phục hồi khi loại bỏ một TURN; cặp thực tế có đúng là cặp dẫn đầu không, với lưu ý ở mục 2.5 |
 | Chất lượng top-k | Phân bố kích thước top-k theo nhóm; tỷ lệ chạm trần; trong giả lập, top-k có chứa lựa chọn tốt nhất không (VIA báo trên 90%) |
 | Chất lượng dự đoán | Độ phủ đường chưa dùng; sai số trên tập giữ lại, theo số lần đường xuất hiện khi học; mức chênh so với cặp tốt nhất. Số chặng tách được chỉ để chẩn đoán |
@@ -873,7 +873,7 @@ Lộ trình bám theo mốc mentor giao: tuần 1 là 04 đến 10/11, báo cáo
 | GeoIP sai vị trí hoặc ISP | Kết quả mâu thuẫn trong cùng một nhóm | Dùng ISP và đo đạc làm tín hiệu chính; xem xét độ tin cậy của nguồn GeoIP |
 | Dồn tải vào TURN tốt nhất | Một TURN tăng tải rồi xấu đi theo chu kỳ | Mục 5.9 |
 | Mô hình quá phức tạp so với lượng dữ liệu | Khó giải thích, chênh lệch nhỏ so với baseline | Bắt đầu đơn giản; mỗi thành phần phải chứng minh giá trị |
-| Lệch với Hiệp do Data Contract | Spec và Data Contract v0.4.0 còn theo giả định khác mục 11, như gọi mù, hai bước và `k = 4` | Đối chiếu Data Contract với mục 11 trước khi chốt |
+| Lệch với Hiệp do Data Contract | Đã xử lý: v0.4.0 (gọi mù, hai bước, `k = 4`) bị thay bằng v0.5.0 và đã xóa khỏi main | Khi sửa contract, đối chiếu lại với mục 11 |
 
 ---
 
