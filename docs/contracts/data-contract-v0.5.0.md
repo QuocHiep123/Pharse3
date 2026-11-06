@@ -4,7 +4,7 @@
 > Nguồn gốc: đề xuất của Đoàn ([`docs/w2-data-contract/`](../w2-data-contract/)), phản hồi của Hiệp ở issue [#1](https://github.com/QuocHiep123/Pharse3/issues/1), và quyết định ở issues [#3](https://github.com/QuocHiep123/Pharse3/issues/3) – [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
 > **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/data_contract_v0.5.0_de_xuat.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml) (sau thu thập, 34 bảng).
 
-**Khảo sát nguồn dữ liệu và câu hỏi cho từng bên:** [KHAO_SAT_NGUON_DU_LIEU.md](../w2-data-contract/KHAO_SAT_NGUON_DU_LIEU.md). **Bộ lọc 10 kịch bản và mẫu bằng chứng insight:** [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md).
+**Bộ lọc 10 kịch bản và mẫu bằng chứng insight:** [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md).
 
 **Chốt ở đây nghĩa là gì.** Hiệp và Đoàn dùng cùng một interface dữ liệu để chạy simulator. Chốt **không** có nghĩa là BE, WebRTC core hay mentor đã xác nhận field production thu được. Mọi mục ở phần 3 là *assumption của simulator*.
 

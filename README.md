@@ -8,7 +8,7 @@
 |---|---|
 | **Trạng thái contract** | [Data Contract v0.5.0](docs/contracts/data-contract-v0.5.0.md) · `simulator_ready` · nguồn production chờ xác minh |
 | **Phân công** | **Hiệp**: simulator, raw synthetic, pipeline, dashboard · **Đoàn**: thuật toán Selector, interface, đề xuất contract |
-| **Đọc tiếp** | [Khảo sát nguồn dữ liệu](docs/w2-data-contract/KHAO_SAT_NGUON_DU_LIEU.md) · [Định nghĩa metric](docs/w2-data-contract/metric_config_v0.5.0.yaml) · [W1 của Hiệp](docs/W1_HIEP.md) · [Quyết định cho simulator](docs/w2-data-contract/README.md) · [KPI MVP](docs/w2-data-contract/KPI_MVP_v0.5.0.md) · [Hướng giải quyết của Đoàn](docs/w2-data-contract/Huong_giai_quyet_Smart_TURN_Selector.md) |
+| **Đọc tiếp** | [Định nghĩa metric](docs/w2-data-contract/metric_config_v0.5.0.yaml) · [Quyết định cho simulator](docs/w2-data-contract/README.md) · [KPI MVP](docs/w2-data-contract/KPI_MVP_v0.5.0.md) · [Hướng giải quyết của Đoàn](docs/w2-data-contract/Huong_giai_quyet_Smart_TURN_Selector.md) |
 
 ---
 
