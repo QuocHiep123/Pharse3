@@ -6,7 +6,7 @@
 
 1. **World config có version:** tập user và TURN giả lập, vùng Bắc/Trung/Nam, ISP, quốc gia không có TURN, độ trễ/loss/jitter và sự cố theo thời gian. Mỗi con số ghi nguồn là giả định hoặc lab; không gán thành số production.
 2. **Một generator có seed:** cùng config + seed → cùng ID, event và outcome. Truth về từng chặng nằm riêng với raw quan sát. Có profile `obs_base` không probe và `obs_active` có probe.
-3. **Một policy thay thế được:** Geo Baseline hoặc static config trả hai danh sách TURN. Config simulator đặt tổng tối đa 8 mục URL/transport mỗi bên; chưa coi đó là xác nhận của mentor. Ghi header decision, danh sách từng bên, và cặp được xét nếu có.
+3. **Một policy thay thế được:** Geo Baseline hoặc static config trả hai danh sách TURN. Mentor xác nhận tối đa 8 TURN server mỗi bên. Ghi header decision, danh sách từng bên, và cặp được xét nếu có.
 4. **Trace một cuộc gọi:** từ `call_id` xem được quyết định lúc đó, danh sách client thực áp dụng, cặp ICE đã chọn, stats và báo cáo kết thúc. Có ca bình thường, ca TURN lỗi/thiếu telemetry. Ca setup thất bại vẫn nằm trong cohort.
 5. **Báo cáo kiểm tra:** event nối đúng khóa, không dùng dữ liệu tương lai, thống kê coverage, kết quả KPI có `unknown` khi thiếu chứng cứ, và danh sách giả định cần Đoàn/mentor xác nhận.
 
@@ -48,4 +48,4 @@ Nếu chưa có thuật toán, BE ghi decision `static_config`; không tự bị
 
 ## Phần cần xác nhận sau khi có nguồn thật
 
-Mentor xác nhận ý nghĩa “8 TURN”, cách đo từng chặng và quyền biến thiên danh sách. BE xác nhận thời điểm biết Callee và khóa nối. WebRTC core/client xác nhận getStats, network context, ICE event và clock trên từng nền tảng. Các câu hỏi được theo dõi ở [#5](https://github.com/QuocHiep123/Pharse3/issues/5), [#6](https://github.com/QuocHiep123/Pharse3/issues/6), [#7](https://github.com/QuocHiep123/Pharse3/issues/7), [#8](https://github.com/QuocHiep123/Pharse3/issues/8). Khi chưa có câu trả lời, giữ chúng thành assumption/config của simulator.
+Mentor xác nhận cách đo từng chặng và quyền biến thiên danh sách. BE xác nhận thời điểm biết Callee và khóa nối. WebRTC core/client xác nhận getStats, network context, ICE event và clock trên từng nền tảng. Các câu hỏi được theo dõi ở [#5](https://github.com/QuocHiep123/Pharse3/issues/5), [#6](https://github.com/QuocHiep123/Pharse3/issues/6), [#7](https://github.com/QuocHiep123/Pharse3/issues/7), [#8](https://github.com/QuocHiep123/Pharse3/issues/8). Khi chưa có câu trả lời, giữ chúng thành assumption/config của simulator.

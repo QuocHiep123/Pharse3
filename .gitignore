@@ -16,3 +16,9 @@ WebRTC-QoE Dataset/
 
 # local-only explainer
 docs/contracts/data-contract-explained.md
+
+# Obsidian (keep shared config, ignore per-user state)
+docs/.obsidian/workspace*.json
+docs/.obsidian/cache
+docs/.obsidian/plugins/
+docs/.claudian/

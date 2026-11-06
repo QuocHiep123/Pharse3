@@ -88,5 +88,5 @@
 
   <rect x="50" y="713" width="1340" height="83" rx="15" fill="#e8f6ec" stroke="#9fd3ae" stroke-width="1.5"/>
   <text class="tag" x="77" y="745" style="fill:#15803d">ĐÃ CHỐT VỚI ĐOÀN · DATA CONTRACT V0.5.0 CHO SIMULATOR</text>
-  <text class="body" x="77" y="776">Chờ xác nhận nguồn production: mentor (8 mục, đo chặng) · BE (biết Callee) · WebRTC core (getStats) · hạ tầng TURN (log)</text>
+  <text class="body" x="77" y="776">Chờ xác nhận nguồn production: mentor (đo chặng; 8 TURN server đã xác nhận) · BE (biết Callee) · WebRTC core (getStats) · hạ tầng TURN (log)</text>
 </svg>

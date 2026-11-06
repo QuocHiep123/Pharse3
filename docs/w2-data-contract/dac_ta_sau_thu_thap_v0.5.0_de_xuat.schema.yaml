@@ -421,7 +421,7 @@ $defs:
     additionalProperties: false
     x-moved-columns: [{column: segment_key, to: Feature Engineering}]
   list_entry:
-    title: 'Một mục trong danh sách đã cấp: một URL trên một server với một giao thức'
+    title: 'Một mục trong danh sách đã cấp: một TURN server, kèm transport được cấu hình'
     type: object
     properties:
       entry_id: {type: string, description: Khóa trong một danh sách, x-change: new}

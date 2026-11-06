@@ -2,7 +2,7 @@
 
 Sản phẩm W1 của Hiệp: khảo sát nguồn dữ liệu **TURN / Selector / SDK / Call** và trả lời mỗi bảng của [Data Contract v0.5.0](../contracts/data-contract-v0.5.0.md) lấy từ đâu, đã kiểm chứng đến mức nào, còn phải hỏi ai.
 
-> **Tình trạng chung (06/11/2026):** chưa có log thật, danh sách field hay mẫu `getStats` từ hệ thống Call. Bằng chứng duy nhất đã kiểm chứng là (1) lab ICE trên Chromium 156 + coturn 4.6.1 một máy, và (2) đọc mã nguồn coturn (`prom_server.c`, bản 4.6.1 và `master`). Mọi thứ còn lại là **giả định của simulator**. Chưa có số liệu nào ở đây dùng để khẳng định kết quả production.
+> **Tình trạng chung (06/11/2026):** chưa có log thật, danh sách field hay mẫu `getStats` từ hệ thống Call. Bằng chứng duy nhất đã kiểm chứng là (1) lab ICE (đã xóa khỏi main, xem lịch sử git) trên Chromium 156 + coturn 4.6.1 một máy, và (2) đọc mã nguồn coturn (`prom_server.c`, bản 4.6.1 và `master`). Mọi thứ còn lại là **giả định của simulator**. Chưa có số liệu nào ở đây dùng để khẳng định kết quả production.
 
 ## 1. Tóm tắt theo nguồn
 
@@ -77,7 +77,7 @@ Kết quả trên dữ liệu synthetic **không** dùng để khẳng định t
 
 ### Mentor
 
-1. "8 TURN mỗi bên" là 8 máy hay 8 mục URL/transport? Bắt buộc đủ 8 hay tối đa 8? (A1) Hiện simulator giả định tối đa 8 mục.
+1. "8 TURN mỗi bên" đã được mentor xác nhận là 8 TURN server. Còn hỏi: bắt buộc đủ 8 hay tối đa 8? (A1) Hiện simulator giả định tối đa 8.
 2. Công ty đo từng chặng thế nào: đo trực tiếp, RTT probe, giá trị suy ra hay số đầu cuối? Có mẫu log thật không? (A2)
 3. Khi thu thật, danh sách có được biến thiên không? Không có thì dữ liệu không dự đoán được đường chưa dùng. (A7)
 4. "Latency P50/P95" của TURN trong đề: xác nhận là RTT qua TURN.
