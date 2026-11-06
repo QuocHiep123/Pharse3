@@ -1316,7 +1316,7 @@ $defs:
     x-source-level: D
     x-producer: simulator
     x-change: new
-    x-notes: ['Tính từ truth_leg_5m tại thời điểm quyết định. Chỉ synthetic: production không có truth nên không có bảng này.', 'Chỉ package đánh giá và báo cáo đọc. Policy và feature không bao giờ đọc (I12, I13, I34). Trang dashboard live không đọc; nếu hiển thị kết quả oracle thì ở trang riêng ghi rõ synthetic-only và chỉ số tổng hợp.', 'Trả lời các chỉ số của đề: top-k có chứa lựa chọn tốt nhất không, khoảng cách so với cặp tốt nhất (regret), độ phủ đường chưa dùng.']
+    x-notes: ['Tính từ truth_leg_5m tại thời điểm quyết định. Chỉ synthetic: production không có truth nên không có bảng này.', 'Package đánh giá, báo cáo và dashboard được đọc. Policy, feature và health không bao giờ đọc (I12, I13, I34). Trang dashboard dùng bảng này phải ghi rõ synthetic-only và gắn data_source = synthetic.', 'Trả lời các chỉ số của đề: top-k có chứa lựa chọn tốt nhất không, khoảng cách so với cặp tốt nhất (regret), độ phủ đường chưa dùng.']
     type: object
     allOf:
       - {$ref: '#/$defs/derived_meta'}

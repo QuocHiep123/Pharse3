@@ -81,7 +81,7 @@ Kết quả trên dữ liệu synthetic **không** dùng để khẳng định t
 2. Công ty đo từng chặng thế nào: đo trực tiếp, RTT probe, giá trị suy ra hay số đầu cuối? Có mẫu log thật không? (A2)
 3. Khi thu thật, danh sách có được biến thiên không? Không có thì dữ liệu không dự đoán được đường chưa dùng. (A7)
 4. "Latency P50/P95" của TURN trong đề: xác nhận là RTT qua TURN.
-5. Có được dùng dữ liệu thật từ hệ thống Call không, ở mức nào? Đề ưu tiên dữ liệu thật; hiện tạm giả lập vì chưa có.
+5. Mentor đã chỉ đạo giả lập trước; cần thống nhất tiêu chí "output đủ tốt" để chuyển sang dữ liệu thật (xem mục 8.5 của tài liệu hướng giải quyết), và dữ liệu thật nào được cấp khi đó.
 
 ### BE
 

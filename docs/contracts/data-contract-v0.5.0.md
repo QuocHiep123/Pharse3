@@ -53,7 +53,7 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 | D15 | Synthetic | Mọi raw synthetic có `data_source=synthetic`, `sim_run_id`; truth nằm bảng riêng, không chép thành quan sát | #2 |
 | D16 | Version | v0.5.0 là thay đổi **phá vỡ tương thích**; giữ nhãn `simulator_ready` cho tới khi hai bên duyệt và nguồn production được xác minh | #1 mục 5 |
 | D17 | Latency của TURN | Theo đề mentor, Latency P50/P95 của TURN là **RTT qua TURN** (từ `getStats`), không phải thời gian cấp phát (`alloc_ms` đã bỏ vì cần hook SDK). Gán cho một TURN chỉ khi đường `relay_same`; RTT của đường `relay_relay` chỉ dùng xếp hạng tương đối | Đề mentor, [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md) |
-| D18 | Đáp án tối ưu của simulator | `sim_decision_oracle` (chỉ synthetic, đọc `truth_leg_5m`) cho top-k có chứa cặp tốt nhất không, regret của cặp dẫn đầu, cặp thực tế và danh sách. Policy, feature, health không đọc (I34). Dashboard live không đọc; trang riêng synthetic-only nếu Hiệp xác nhận | Đề mentor (Algorithm Quality), #2 |
+| D18 | Đáp án tối ưu của simulator | `sim_decision_oracle` (chỉ synthetic, đọc `truth_leg_5m`) cho top-k có chứa cặp tốt nhất không, regret của cặp dẫn đầu, cặp thực tế và danh sách. Policy, feature, health không đọc (I34). Dashboard được đọc, ở trang ghi rõ synthetic-only | Đề mentor (Algorithm Quality), #2 |
 | D19 | Định nghĩa metric | 30 metric ở [`metric_config_v0.5.0.yaml`](../w2-data-contract/metric_config_v0.5.0.yaml): Call Quality, TURN Performance, Service Health, Algorithm Quality. Cùng một phiên bản dùng ở simulator, pipeline và dashboard | Đề mentor, #7, #8 |
 | D20 | Sự cố và phục hồi | `fact_call` có `failure_phase` (pre/post allocation, mid call), `n_ice_restarts`, `detected_to_ice_recovery_ms`; `fault_to_recovery_ms` chỉ synthetic. Kịch bản 1–10 thành bộ lọc trong KPI_MVP | Đề mentor (kịch bản 8, 10) |
 
@@ -69,7 +69,7 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 | A6 | Log TURN nối được với call (`credential_ref`/`server_session_id`) | **Hạ tầng TURN** | `match_method=ambiguous`; chỉ thống kê theo TURN |
 | A7 | Khi thu thật, danh sách có biến thiên (khám phá) | **Mentor** | Dữ liệu không dự đoán được đường chưa dùng |
 | A8 | Inventory TURN đủ để kết luận `not_deployed` | **Hạ tầng** | Giữ `no_turn_observed`/`unknown` |
-| A9 | Dữ liệu thật từ hệ thống Call chưa có; đề tài chạy bằng dữ liệu giả lập có version (đề mentor ưu tiên dữ liệu thật) | **Mentor** | Khi có log thật, chạy lại pipeline với `data_source = production`; schema không đổi |
+| A9 | Mentor chỉ đạo giả lập trước; nếu output đủ tốt thì mới sang dữ liệu thật. Dữ liệu giả lập có version | **Mentor** (tiêu chí "đủ tốt") | Khi có log thật, chạy lại pipeline với `data_source = production`; schema không đổi |
 
 Số liệu lab ICE (Chromium 156 + coturn 4.6.1, một máy) là bằng chứng về **cơ chế**, không phải tham số production. Kết quả synthetic không dùng để kết luận chất lượng production.
 

@@ -74,7 +74,7 @@ Một metric đưa lên dashboard phải có một dòng `metric_config` với `
 - **TURN xếp hạng so với TURN ICE dùng:** `lead_pair_match_rate`, `rank_used_distribution`. Trong simulator giả định candidate về kịp, tỷ lệ gần 100 % khi TURN khỏe, nên không coi đây là thành tích.
 - **Độ tin cậy:** `interval_coverage` so tỷ lệ khoảng chứa giá trị thật với mức công bố (ví dụ 95 %).
 - **Chỉ synthetic (`sim_decision_oracle`):** `oracle_in_topk_rate` (VIA báo trên 90 %), `decision_regret` (lead, actual, list), và `policy_comparison_delta` giữa Geo Baseline và Smart Selector trên cùng world và seed.
-- Bảng `sim_decision_oracle` đọc truth nên **không** vào policy, feature hay dashboard live (I34). Hiển thị trên dashboard chỉ ở trang riêng ghi rõ synthetic và chỉ số tổng hợp. Điều này nới nhẹ câu "dashboard không đọc network truth" ở issue #2; cần Hiệp xác nhận.
+- Bảng `sim_decision_oracle` đọc truth nên **không** vào policy, feature hay health (I34). **Dashboard được đọc** để hiển thị regret và top-k có chứa cặp tốt nhất, với điều kiện: trang ghi rõ synthetic-only, mọi biểu đồ gắn `data_source = synthetic`, và không dùng kết quả này để khẳng định cải thiện production. Các trang production-ready (Call Quality, TURN Performance, Service Health) không phụ thuộc bảng này.
 
 ## Mười kịch bản bắt buộc thành bộ lọc
 
