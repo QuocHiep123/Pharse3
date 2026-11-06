@@ -2,7 +2,7 @@
 
 Tài liệu này phân tích đề bài, đánh giá các tài liệu đã tìm, chỉ ra phần còn thiếu và gợi ý hướng đi. Tài liệu không đưa ra công thức hay tham số chốt sẵn. Data Contract không thiết kế ở đây; mục 8.4 chỉ tóm tắt dữ liệu theo vòng đời, còn đề xuất nằm ở [De_xuat_Data_Contract_v0.5.0_cho_Hiep.md](De_xuat_Data_Contract_v0.5.0_cho_Hiep.md).
 
-**Cập nhật 05/11.** Tài liệu đã bổ sung hai điều: kết quả lab ICE trên Chromium 156 và coturn (lab ICE (đã xóa khỏi main, xem lịch sử git)), và quyết định về hướng thuật toán: baseline giữ 8 TURN, thuật toán cải tiến dùng top-k theo khoảng tin cậy của VIA. Các số từ lab là bằng chứng về cơ chế trên một máy, không phải chất lượng production.
+**Cập nhật 05/11.** Tài liệu đã bổ sung hai điều: kết quả lab ICE trên Chromium 156 và coturn (lab ICE (đã xóa khỏi main, xem nhánh `archive/pre-cleanup` (`docs/w2-data-contract/lab_ice/`))), và quyết định về hướng thuật toán: baseline giữ 8 TURN, thuật toán cải tiến dùng top-k theo khoảng tin cậy của VIA. Các số từ lab là bằng chứng về cơ chế trên một máy, không phải chất lượng production.
 
 **Chốt phạm vi 05/11.** Đoàn đã trả lời 14 câu hỏi ở mục 11. Các phần dưới đây đã được chỉnh theo: chỉ dùng dữ liệu giả lập, chỉ xét đường qua relay, bám bài toán của VIA và không làm thêm ngoài đề bài. Bảng tổng hợp phạm vi nằm ở mục 2.5.
 
@@ -54,7 +54,7 @@ Quy ước tên gọi dùng xuyên suốt:
 | Thành phần | Nội dung |
 |---|---|
 | Đầu vào | Ngữ cảnh Caller và Callee (quốc gia, vùng, ISP, loại mạng), tình trạng TURN, lịch sử kết nối. Selector biết ngữ cảnh cả hai bên ngay khi trả danh sách |
-| Đầu ra | Hai danh sách có thứ tự, kèm lý do, độ tin cậy và phiên bản thuật toán. Baseline trả đúng 8 mục mỗi bên. Thuật toán cải tiến trả số mục theo top-k, tối đa 8 |
+| Đầu ra | Hai danh sách có thứ tự, kèm lý do, độ tin cậy và phiên bản thuật toán. Baseline trả đúng 8 TURN server mỗi bên. Thuật toán cải tiến trả số server theo top-k, tối đa 8 |
 | Ràng buộc từ đề bài | Việt Nam có nhiều TURN theo 3 miền và ISP; quốc tế chỉ có TURN ở một số nơi; phải có health filtering, fallback, diversity và confidence |
 | Mục tiêu | Kết nối thành công, thiết lập nhanh, chất lượng cuộc gọi tốt, và giải thích được từng quyết định |
 | Ràng buộc về kết luận | Kết quả trên dữ liệu giả lập không được dùng để khẳng định cải thiện production |
@@ -71,7 +71,7 @@ Quy ước tên gọi dùng xuyên suốt:
 | Thứ tự TURN trong libwebrtc (`basic_port_allocator.cc`) | Độ ưu tiên giảm dần theo vị trí trong danh sách cấu hình | Vị trí trong danh sách là một quyết định thật, không chỉ để hiển thị |
 | So sánh kết nối trong libwebrtc (`basic_ice_controller.cc`) | Xét trạng thái, nomination, chi phí mạng, rồi ưu tiên; RTT chỉ là bước phân định cuối và cần tốt hơn ít nhất 10 ms khi đổi đường | Không nên giả định ICE tự chọn TURN có RTT thấp nhất |
 | Dừng thu candidate trong libwebrtc (`p2p_transport_channel.cc`, `stop_gather_on_strongly_connected`, mặc định bật) | Khi có một kết nối đủ tốt đầu tiên, phiên thu candidate dừng và candidate về sau bị bỏ | TURN cấp phát chậm có thể biến mất khỏi danh sách thực tế, dù Selector đã xếp nó ở đầu. MVP không mô hình hóa điều này (mục 2.5) |
-| Giới hạn số cặp (RFC 8445, mục 6.1.2.5) | Mặc định tối đa 100 cặp, phải cấu hình được | Với tối đa 8 mục mỗi bên và chỉ xét relay, số cặp tối đa là 64, nằm trong giới hạn |
+| Giới hạn số cặp (RFC 8445, mục 6.1.2.5) | Mặc định tối đa 100 cặp, phải cấu hình được | Với tối đa 8 server mỗi bên và chỉ xét relay, số cặp tối đa là 64, nằm trong giới hạn |
 | Nhịp kiểm tra (RFC 8445, mục 14.2) | Mặc định 50 ms | libwebrtc có nhịp riêng, xem kết quả đo bên dưới |
 
 **Kết quả đo trong lab:**
@@ -315,7 +315,7 @@ Bản PDF của ba tài liệu nằm ở máy của Đoàn, gửi riêng khi c�
 | Quốc gia không có TURN | Một phần | VIA về ghép chặng | Tập ứng viên thay thế |
 | Joint Ranking Caller và Callee | Khá tốt cho một cặp | VIA, kết quả lab | Chuyển từ top-k cặp sang hai danh sách |
 | Historical Scoring | Khá tốt | VIA, CFA | Xử lý ít mẫu và thay đổi theo thời gian |
-| Danh sách 8 mục cho baseline; danh sách theo top-k cho thuật toán cải tiến | Một phần | RFC 8445, libwebrtc và kết quả lab (về ràng buộc), VIA (về top-k) | Quy tắc dựng danh sách, mục 6.3 |
+| Danh sách 8 server cho baseline; danh sách theo top-k cho thuật toán cải tiến | Một phần | RFC 8445, libwebrtc và kết quả lab (về ràng buộc), VIA (về top-k) | Quy tắc dựng danh sách, mục 6.3 |
 | TURN Health | Thiếu | RFC 8656 mục 7.4 | Mô hình trạng thái và ngưỡng |
 | Confidence | Một phần | VIA về khoảng tin cậy | Định nghĩa khi dữ liệu ít, khi top-k phình to |
 | Fallback và phân bổ dự phòng | Một phần | Nghiên cứu IETF, kết quả lab | Dự phòng theo miền lỗi và đặt sớm trong danh sách |
@@ -330,7 +330,7 @@ Bản PDF của ba tài liệu nằm ở máy của Đoàn, gửi riêng khi c�
 
 ### 5.1. Từ chọn một đường sang dựng danh sách
 
-**Vì sao thiếu:** VIA chọn một đường cho một cuộc gọi. Xếp theo điểm rồi lấy 8 mục đầu có nguy cơ cao trả về các TURN cùng miền, cùng ISP, cùng hỏng một lúc.
+**Vì sao thiếu:** VIA chọn một đường cho một cuộc gọi. Xếp theo điểm rồi lấy 8 server đầu có nguy cơ cao trả về các TURN cùng miền, cùng ISP, cùng hỏng một lúc.
 
 **Nguồn có thể bổ sung, không bắt buộc trong MVP:**
 
@@ -342,7 +342,7 @@ Bản PDF của ba tài liệu nằm ở máy của Đoàn, gửi riêng khi c�
 
 ### 5.2. Hành vi ICE trên trình duyệt thật
 
-**Đã làm được:** lab trên Chromium 156 và coturn đã trả lời phần lớn câu hỏi, xem mục 2.2 và lab ICE (đã xóa khỏi main, xem lịch sử git).
+**Đã làm được:** lab trên Chromium 156 và coturn đã trả lời phần lớn câu hỏi, xem mục 2.2 và lab ICE (đã xóa khỏi main, xem nhánh `archive/pre-cleanup` (`docs/w2-data-contract/lab_ice/`)).
 
 **Chưa đo, không làm thêm trong MVP và cần ghi vào giới hạn của báo cáo:**
 
@@ -552,7 +552,7 @@ flowchart TD
 
 - **Đại lượng dùng để lấy top-k.** Bám VIA: làm riêng RTT, loss và jitter, bắt đầu từ RTT. Tỷ lệ kết nối dùng làm điều kiện lọc. MVP không cần đại lượng tổng hợp.
 - **Cách tính khoảng tin cậy.** Bắt đầu như VIA: trung bình cộng trừ 1,96 sai số chuẩn. VIA dùng trên dữ liệu rất lớn, nên khi ít mẫu phải lùi về nhóm thô hơn (mục 5.5). RTT phân phối lệch, nên có thể tính trên thang log nếu kiểm tra độ phủ cho thấy khoảng bị lệch. Đường không ước lượng được thì không có khoảng tin cậy, nên cần quy tắc riêng: để ngoài top-k, hoặc coi là lựa chọn khám phá.
-- **Trần của top-k** và cách xử lý khi tập lựa chọn lớn, nhất là ở Việt Nam. Giới hạn 8 mục mỗi bên cũng là một trần.
+- **Trần của top-k** và cách xử lý khi tập lựa chọn lớn, nhất là ở Việt Nam. Giới hạn 8 server mỗi bên cũng là một trần.
 - **Nhịp làm mới.** VIA làm mới top-k mỗi 24 giờ và chọn trong nhóm theo từng cuộc gọi.
 
 ### 6.4. Tám tầng xây dựng
@@ -562,14 +562,14 @@ Mỗi tầng được so sánh với tầng trước để biết tầng đó c�
 #### Tầng 1: Geo Baseline
 
 - **Câu hỏi:** nếu không dùng lịch sử, cách chọn hợp lý nhất là gì?
-- **Hướng gợi ý:** trả đúng 8 mục mỗi bên, chọn theo khoảng cách, miền và quốc gia, có giới hạn đa dạng tối thiểu. Baseline cần đủ tốt để việc thắng nó có ý nghĩa.
+- **Hướng gợi ý:** trả đúng 8 server mỗi bên, chọn theo khoảng cách, miền và quốc gia, có giới hạn đa dạng tối thiểu. Baseline cần đủ tốt để việc thắng nó có ý nghĩa.
 - **Cần tự quyết:** khoảng cách đường chim bay hay khoảng cách theo tuyến; ưu tiên cùng ISP ra sao; thứ tự đặt TURN khác miền lỗi; server nào bật thêm TCP hoặc TLS dự phòng. Tọa độ TURN lấy từ danh mục tự xây.
 - **Xong khi:** chạy được đủ 10 kịch bản và giải thích được từng kết quả.
 
 #### Tầng 2: Điểm lịch sử theo từng chặng và Baseline lịch sử
 
 - **Câu hỏi:** một nhóm mạng đến một TURN cho chất lượng thế nào?
-- **Hướng gợi ý:** học theo chặng thay vì theo đường đầy đủ, vì số cặp nhóm mạng và TURN nhỏ hơn rất nhiều so với số đường đầy đủ. Tách riêng khả năng kết nối, tốc độ thiết lập và chất lượng media, vì mỗi loại có cách tổng hợp khác nhau. Xếp theo điểm này cho từng bên, lấy 8 mục, ta có Baseline lịch sử.
+- **Hướng gợi ý:** học theo chặng thay vì theo đường đầy đủ, vì số cặp nhóm mạng và TURN nhỏ hơn rất nhiều so với số đường đầy đủ. Tách riêng khả năng kết nối, tốc độ thiết lập và chất lượng media, vì mỗi loại có cách tổng hợp khác nhau. Xếp theo điểm này cho từng bên, lấy 8 server, ta có Baseline lịch sử.
 - **Cần tự quyết:** độ dài cửa sổ thời gian, cách giảm trọng số dữ liệu cũ, có dùng trung vị và phân vị cao hay chỉ dùng trung bình; từ bao nhiêu mẫu thì dùng lịch sử trực tiếp thay cho ghép chặng.
 - **Lưu ý:** thuật toán đọc feature chặng và backbone. Chặng là số ước lượng từ đầu cuối, vì getStats không đo từng chặng; backbone đo bằng probe, thiếu probe thì chỉ ước lượng được khi có mẫu dùng chung TURN. Chặng là tham số để dự đoán đường, nên đánh giá bằng sai số dự đoán đường, không phải bằng số chặng tách được.
 - **Xong khi:** có sai số dự đoán trên dữ liệu thuộc giai đoạn sau, và so sánh được Baseline lịch sử với Geo Baseline.
@@ -769,8 +769,8 @@ Trong báo cáo nên nói rõ từng kết quả nằm ở mức nào.
 
 **So sánh chính:**
 
-- Geo Baseline, 8 mục
-- Baseline lịch sử, 8 mục
+- Geo Baseline, 8 server
+- Baseline lịch sử, 8 server
 - Thuật toán cải tiến, số mục theo top-k
 - Chiến lược biết trước (chỉ làm được trong giả lập, dùng làm giới hạn trên)
 
@@ -778,8 +778,8 @@ Trong báo cáo nên nói rõ từng kết quả nằm ở mức nào.
 
 | Biến thể | Trả lời câu hỏi |
 |---|---|
-| Thuật toán cải tiến, đệm đủ 8 mục | So với Baseline lịch sử: riêng cách xếp hạng đem lại bao nhiêu |
-| Thuật toán cải tiến, đệm đủ 8 mục, so với bản theo top-k | Độ dài danh sách ảnh hưởng thế nào, nhất là khi TURN chết sau cấp phát |
+| Thuật toán cải tiến, đệm đủ 8 server | So với Baseline lịch sử: riêng cách xếp hạng đem lại bao nhiêu |
+| Thuật toán cải tiến, đệm đủ 8 server, so với bản theo top-k | Độ dài danh sách ảnh hưởng thế nào, nhất là khi TURN chết sau cấp phát |
 
 **Tắt từng thành phần:**
 
@@ -815,7 +815,7 @@ Lộ trình bám theo mốc mentor giao: tuần 1 là 04 đến 10/11, báo cáo
 | Tuần | Câu hỏi chính | Việc chính | Có thể demo |
 |---|---|---|---|
 | Tuần 1 (04 đến 10/11) | Luật chơi là gì? Dữ liệu có gì? | Lab ICE trên Chromium đã xong. Đọc VIA và các phần RFC; chốt câu hỏi (mục 11); thiết kế input, output và cùng Hiệp thống nhất Data Contract | Kết quả lab và bản phác thảo kiến trúc |
-| Tuần 2 (11 đến 17/11) | Lịch sử có thắng địa lý không? | Geo Baseline và Baseline lịch sử, cùng 8 mục; danh mục TURN và giả lập; mô hình ICE | So sánh hai baseline ở cả Việt Nam và quốc tế |
+| Tuần 2 (11 đến 17/11) | Lịch sử có thắng địa lý không? | Geo Baseline và Baseline lịch sử, cùng 8 server; danh mục TURN và giả lập; mô hình ICE | So sánh hai baseline ở cả Việt Nam và quốc tế |
 | Tuần 3 (18 đến 24/11) | Tối ưu hai đầu có lợi hơn không? | Chấm điểm cặp kèm khoảng tin cậy; top-k; xử lý nội địa, quốc tế, khác ISP và quốc gia không có TURN | Giải thích từng kịch bản 1 đến 7, kèm top-k |
 | Tuần 4 (25/11 đến 01/12) | Danh sách có chịu được sự cố không? | Dựng danh sách từ top-k; Health, confidence, fallback; bản chọn cặp tốt nhất trong top-k; API; tích hợp với Dashboard | MVP ngày 02/12: kịch bản 8, 9 và luồng quyết định đến Dashboard |
 | Tuần 5 (02 đến 08/12) | Kết quả có đáng tin không? | So sánh theo mục 9.2, phân tích ca kết nối kém, kiểm tra thế giới có giả định khác nhau, Network Change; thử khám phá trong giả lập; đối chiếu với điều kiện "có ý nghĩa" ở mục 8.5 | Bảng so sánh đầy đủ |
@@ -883,7 +883,7 @@ Lộ trình bám theo mốc mentor giao: tuần 1 là 04 đến 10/11, báo cáo
 
 | Thứ tự | Tài liệu | Phần cần tập trung | Mức đã kiểm chứng trong đợt này |
 |---|---|---|---|
-| 0 | Kết quả lab ICE (đã xóa khỏi main, xem lịch sử git) | Toàn bộ | Đo trên Chromium 156 và coturn, trên một máy |
+| 0 | Kết quả lab ICE (đã xóa khỏi main, xem nhánh `archive/pre-cleanup` (`docs/w2-data-contract/lab_ice/`)) | Toàn bộ | Đo trên Chromium 156 và coturn, trên một máy |
 | 1 | [VIA](https://cs.cmu.edu/~junchenj/via.pdf) | Mục 3.1, 3.2 về số đo giữa các relay, 4, đặc biệt 4.4 về ghép chặng và top-k, 4.5 về chọn trong nhóm; 5.1, 5.3, 5.4 | Đã đọc phần chính của toàn văn |
 | 2 | MSR-TR-2016-57, bản PDF gửi riêng khi cần | Mục 1.2, 3, 4 | Đã đọc toàn văn |
 | 3 | [RFC 8445](https://www.rfc-editor.org/rfc/rfc8445.txt) | Các mục ở mục 3.4 | Đã đối chiếu số mục và các đoạn liên quan |

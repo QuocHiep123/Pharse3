@@ -1,6 +1,6 @@
 # Data Contract v0.5.0 — bản chốt cho simulator
 
-> **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** v0.4.0 (phá vỡ tương thích; bản cũ đã xóa, xem lịch sử git).
+> **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** v0.4.0 (phá vỡ tương thích; bản cũ đã xóa khỏi main, xem nhánh `archive/pre-cleanup`).
 > Nguồn gốc: đề xuất của Đoàn ([`docs/w2-data-contract/`](../w2-data-contract/)), phản hồi của Hiệp ở issue [#1](https://github.com/QuocHiep123/Pharse3/issues/1), và quyết định ở issues [#3](https://github.com/QuocHiep123/Pharse3/issues/3) – [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
 > **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/data_contract_v0.5.0_de_xuat.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml) (sau thu thập, 34 bảng).
 

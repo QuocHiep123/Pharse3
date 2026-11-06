@@ -983,7 +983,7 @@ $defs:
     x-change: changed
     x-review: S3
     x-removed-columns: [{column: k, replaced_by: 'requested_max_list_size, returned_list_size, topk_pair_count'}, {column: candidates, replaced_by: entries}, {column: chosen_rank, replaced_by: selector_decision_pair.is_lead}, {column: 'candidates[].propensity', replaced_by: 'action_propensity, propensity_method'}, {column: 'candidates[].est_leg_ms, est_path_ms', replaced_by: selector_decision_pair}]
-    x-notes: ['Header chung nằm ở selector_decision_request; I25 kiểm tra các field chung', '8 mục = 8 TURN server mỗi bên; transport là thuộc tính của mục', 'Trả bao nhiêu mục là quy tắc của policy; thiếu lựa chọn hợp lệ thì fallback_type = insufficient_candidates, không nhân bản server', Quy tắc khi chưa có Selector ở x-rules.decision_without_selector]
+    x-notes: ['Header chung nằm ở selector_decision_request; I25 kiểm tra các field chung', '8 TURN server mỗi bên; transport là thuộc tính của mục', 'Trả bao nhiêu mục là quy tắc của policy; thiếu lựa chọn hợp lệ thì fallback_type = insufficient_candidates, không nhân bản server', Quy tắc khi chưa có Selector ở x-rules.decision_without_selector]
     x-deferred-columns: [{column: decision_mode, reason: Tạm thời chưa chạy bóng}]
     type: object
     allOf:
@@ -1204,7 +1204,7 @@ $defs:
     x-producer: client_sdk
     x-change: unchanged
     x-notes: [current_rtt_ms gần như luôn trống với cặp không được chọn; danh sách 8 tạo đến 64 dòng mỗi attempt, allocation_never_checked_rate tính từ bảng này chỉ là chẩn đoán]
-    x-deferred-reason: 'Lab chỉ thấy 1 trên 32 cặp có RTT trong 90 giây, trong khi danh sách 8 mục tạo đến 64 dòng mỗi lần thử. Cặp được chọn đã có ở ice_event'
+    x-deferred-reason: 'Lab chỉ thấy 1 trên 32 cặp có RTT trong 90 giây, trong khi danh sách 8 server tạo đến 64 dòng mỗi lần thử. Cặp được chọn đã có ở ice_event'
     type: object
     allOf:
       - {$ref: '#/$defs/event_envelope'}

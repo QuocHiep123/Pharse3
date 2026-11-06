@@ -532,7 +532,7 @@ Cặp được mô hình cân nhắc. **Một dòng:** Một decision_id × cặ
 
 **Trạng thái:** hoãn. Cặp candidate, chỉ để chẩn đoán. **Một dòng:** Một cặp trong một attempt · **Nguồn ghi:** client_sdk · **Mức nguồn:** B · **Phạm vi:** relay_or_failed
 
-**Lý do hoãn:** Lab chỉ thấy 1 trên 32 cặp có RTT trong 90 giây, trong khi danh sách 8 mục tạo đến 64 dòng mỗi lần thử. Cặp được chọn đã có ở ice_event
+**Lý do hoãn:** Lab chỉ thấy 1 trên 32 cặp có RTT trong 90 giây, trong khi danh sách 8 server tạo đến 64 dòng mỗi lần thử. Cặp được chọn đã có ở ice_event
 
 | Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
 |---|---|---|---|---|

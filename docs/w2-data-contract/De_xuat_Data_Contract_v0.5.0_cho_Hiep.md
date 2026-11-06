@@ -4,7 +4,7 @@
 
 > **Trạng thái (06/11/2026):** đây là bản đề xuất gốc, giữ làm lý do thay đổi. Bản chốt nằm ở [data-contract-v0.5.0.md](../contracts/data-contract-v0.5.0.md) và hai YAML; khi khác nhau thì tin bản chốt. Một số số liệu trong tài liệu này đã cũ: contract hiện có 20 bảng thu thập và 34 bảng sau thu thập, `fact_call`, `fact_call_endpoint`, `fact_pair_evaluation` đã đủ cột, và “8 TURN” đã được mentor xác nhận là 8 TURN server.
 
-**Đối chiếu với:** Data Contract v0.4.0, design spec W1 và ERD v0.4.0 (đều đã xóa khỏi main, xem lịch sử git: nhánh `docs/w1-design-and-data-contract`, commit `e4d84f8`).
+**Đối chiếu với:** Data Contract v0.4.0, design spec W1 và ERD v0.4.0 (đều đã xóa khỏi main, xem nhánh `archive/pre-cleanup`).
 
 **File kèm:**
 
@@ -566,7 +566,7 @@ undetermined_rate    = |U| / N = unclassifiable_rate + outcome_unknown_rate
 | Phần | Lý do | Mở lại khi |
 |---|---|---|
 | `candidate_observation` | Chưa dùng thời điểm nhận candidate và không sửa SDK. Trong lab, thời điểm nhận candidate tương quan rất cao với độ trễ, nhưng chưa đo trên mạng thật | Feature chặng ước lượng không đủ tốt; đây là nguồn trực tiếp duy nhất theo từng TURN |
-| `ice_candidate_pair` | `current_rtt_ms` gần như luôn trống với cặp không được chọn; danh sách 8 mục tạo đến 64 dòng mỗi attempt | Cần chẩn đoán sâu |
+| `ice_candidate_pair` | `current_rtt_ms` gần như luôn trống với cặp không được chọn; danh sách 8 server tạo đến 64 dòng mỗi attempt | Cần chẩn đoán sâu |
 | Chuỗi trạng thái RTP theo cửa sổ | Nhu cầu đến từ việc phát hiện gián đoạn, không có trong đề bài hay VIA. Giới hạn: gián đoạn tự phục hồi không thấy được trong dữ liệu | Có yêu cầu về gián đoạn; nội dung giữ ở `x-deferred-rules` của file đi kèm |
 | Cột thí nghiệm, `decision_mode`, `shadow_req_count`, `arm`, I15 | Tạm thời chưa thử nghiệm trên traffic thật | Có thử nghiệm |
 | `caller_signaling_rtt_ms`, `callee_signaling_rtt_ms`, `n_devices_rung` | Chưa mô hình hóa đổ chuông và tín hiệu | Mở lại cuộc đua candidate |
@@ -755,8 +755,8 @@ Các chi tiết dưới đây mang nhãn `x-review` và đang mở để Hiệp 
 | W3C webrtc-stats, W3C WebRTC | Đã đọc đặc tả; chưa thử trên từng trình duyệt |
 | RFC 8656, RFC 8445 | Đã đọc các mục được trích |
 | Exporter coturn | Đã đọc `prom_server.c` bản 4.6.1 và `master`; chưa có bản công ty đang chạy |
-| Số liệu lab | Trích từ `KET_QUA.md` (đã xóa khỏi main, xem lịch sử git); xem giới hạn ở mục 1.3 |
-| Trường getStats về kết nối | `lab_ice.js` (đã xóa khỏi main) đọc được trên Chromium 156, dùng data channel |
+| Số liệu lab | Trích từ `KET_QUA.md` (đã xóa khỏi main, xem nhánh `archive/pre-cleanup` (`docs/w2-data-contract/lab_ice/`)); xem giới hạn ở mục 1.3 |
+| Trường getStats về kết nối | `lab_ice.js` (đã xóa khỏi main, xem nhánh `archive/pre-cleanup`) đọc được trên Chromium 156, dùng data channel |
 | Trường getStats về media, `url`, `address`, `iceRole`, bộ đếm tích lũy, bộ đếm theo cặp | Mới theo đặc tả, chưa đo |
 | Mobile, Firefox, Safari | Chưa kiểm tra |
 | Probe, credential theo cuộc gọi, GeoIP, nguồn giám sát máy chủ | Chưa có bằng chứng, là giả định về khả năng thu |
