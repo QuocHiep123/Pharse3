@@ -1,5 +1,7 @@
 # TURN Intelligence — Thiết kế Simulator, Data Pipeline & Dashboard
 
+> **Lưu ý:** spec này đồng bộ với Data Contract v0.4.0. Với [v0.5.0](../../contracts/data-contract-v0.5.0.md): tối đa 8 mục/bên thay cho `k=4`, bỏ `refined`, cặp dẫn đầu thay cho rank×rank. Khi khác nhau thì tin v0.5.0.
+
 - **Ngày:** 2026-11-04 · **Owner:** Đặng Quốc Hiệp · **Đối tác:** Đặng Đỉnh Đoàn (thuật toán + API)
 - **Trạng thái:** Draft v0.4, đồng bộ với Data Contract v0.4.0, chờ Hiệp và Đoàn duyệt
 - **Research nền:** `docs/research/01..07-*.md`. Riêng 05–07 (media qua BE/SFU) **chỉ áp dụng Pattern 1** (một PeerConnection A → TURN(A) → TURN(B) → B, BE chỉ làm signaling, xác nhận 2026-11-04); các pattern có media server ở giữa là phương án dự phòng, chưa dùng (xem §17)

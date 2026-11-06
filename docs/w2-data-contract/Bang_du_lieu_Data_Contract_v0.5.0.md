@@ -122,10 +122,36 @@ Cấu hình client đã áp dụng. **Một dòng:** Một lần áp dụng cấ
 | `config_source` | enum: selector, static_config, static_fallback, cache, unknown | có |  |  |
 | `is_fallback_config` | boolean |  |  |  |
 | `applied_entries` | mảng object applied_entry |  |  | **Mới.** Chỉ khi cấu hình không tra được qua applied_decision_id |
+| `decision_device_id` | string |  |  | device_id trong khóa của selector_decision; khác device_id client thực khi danh sách ban đầu dùng '-' |
 
 - **Cột hoãn:** `ice_trickle`: Giả định có trickle ICE theo WebRTC chuẩn
 
 ### 1.3. getStats và ICE
+
+#### `endpoint_network_context`
+
+Context mạng của endpoint tại mỗi network epoch. **Một dòng:** Một call_id × side × device_id × network_epoch × context_version · **Nguồn ghi:** signaling (BE ghi snapshot từ client report và GeoIP lúc nhận; simulator tự tạo) · **Mức nguồn:** A
+
+| Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
+|---|---|---|---|---|
+| `call_id` | uuid | có | PK |  |
+| `side` | enum: caller, callee | có | PK |  |
+| `device_id` | string | có | PK |  |
+| `network_epoch` | integer (≥ 0) | có | PK |  |
+| `context_version` | integer (≥ 1) | có | PK |  |
+| `epoch_start_ts` | date-time |  |  |  |
+| `observed_ts` | date-time | có |  |  |
+| `country` | string | có |  | ISO country hoặc unknown |
+| `city` | string | có |  |  |
+| `vn_region` | enum: north, central, south, unknown |  |  |  |
+| `isp` | string | có |  |  |
+| `asn` | integer |  |  |  |
+| `network_type` | enum: wifi, 4g, 5g, ethernet, unknown | có |  |  |
+| `geo_source` | enum: ip_geo, sdk_claimed, both, unknown | có |  |  |
+| `context_status` | enum: complete, partial, unknown | có |  |  |
+| `network_type_source` | enum: client_report, synthetic, unknown | có |  |  |
+| `epoch_clock_source` | enum: client, synthetic, unknown | có |  | Đồng hồ của epoch_start_ts; observed_ts luôn theo BE producer |
+| `missing_reason` | string |  |  |  |
 
 #### `ice_event`
 
@@ -331,6 +357,20 @@ Probe giữa các TURN. **Một dòng:** Một cặp TURN có hướng × cửa 
 | `missing_reason` | string |  |  |  |
 
 ### 1.6. Decision Log
+
+#### `selector_decision_request`
+
+Header chung của một quyết định Selector hoặc cấu hình tĩnh. **Một dòng:** Một decision_id, dùng chung cho danh sách hai bên và dự đoán cặp · **Nguồn ghi:** signaling · **Mức nguồn:** A
+
+| Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
+|---|---|---|---|---|
+| `decision_id` | uuid | có | PK |  |
+| `call_id` | uuid | có |  |  |
+| `parent_decision_id` | uuid |  |  |  |
+| `phase` | enum: initial, restart | có |  |  |
+| `request_ts` | date-time | có |  |  |
+| `policy_version` | string | có |  |  |
+| `info_level` | enum: full, caller_only, country_only, none | có |  |  |
 
 #### `selector_decision`
 
@@ -1109,10 +1149,75 @@ Danh mục user. **Một dòng:** Một user_hash · **Mức nguồn:** B
 | `app_version_callee` | string |  |  |  |
 | `device_class_caller` | string |  |  |  |
 | `device_class_callee` | string |  |  |  |
+| `cohort_name` | string | có |  |  |
+| `pair_group` | enum: VN_VN, VN_INTL, INTL_INTL |  |  | Null khi chưa đủ địa lý hai bên |
+| `initiated_ts` | date-time | có |  |  |
+| `answer_received_at_be` | date-time |  |  |  |
+| `end_ts` | date-time |  |  |  |
+| `answered` | enum: true, false, unknown | có |  |  |
+| `ice_connected` | enum: true, false, unknown | có |  |  |
+| `dtls_connected` | enum: true, false, unknown | có |  |  |
+| `media_connected` | enum: true, false, unknown | có |  |  |
+| `setup_failure_observed` | boolean |  |  |  |
+| `dropped` | boolean |  |  |  |
+| `end_reason` | enum: normal_hangup, invite_undelivered, not_answered, rejected, cancelled_by_caller, ice_failed, media_setup_failed, dropped_network, dropped_turn, app_crash, unknown | có |  |  |
+| `outcome_version` | integer (≥ 0) |  |  | Null khi outcome thiếu |
+| `outcome_provenance` | enum: event, placeholder |  |  |  |
+| `n_ice_attempts` | integer (≥ 0) |  |  |  |
+| `n_network_changes` | integer (≥ 0) |  |  |  |
+| `cst_technical_ms` | number (≥ 0) |  |  | Max CST cục bộ hai endpoint khi cả hai measured |
+| `cst_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |  |  |
+| `ttfm_post_answer_ms` | number (≥ 0) |  |  | Max TTFM cục bộ hai endpoint khi cả hai measured |
+| `ttfm_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |  |  |
+| `quality_poor` | enum: true, false, unknown | có |  | unknown khi không đủ telemetry |
+| `quality_rule_version` | string |  |  |  |
+| `stats_expected_endpoint_count` | integer (≥ 0) |  |  |  |
+| `stats_observed_endpoint_count` | integer (≥ 0) | có |  |  |
+| `stats_endpoint_coverage` | number (≥ 0) |  |  |  |
+| `caller_decision_id` | uuid |  |  |  |
+| `callee_decision_id` | uuid |  |  |  |
+| `first_connected_attempt_seq` | integer (≥ 0) |  |  |  |
 
 - **Cột hoãn:** `arm`: Hoãn cùng các cột thí nghiệm
 - **Cột bỏ:** `joint_propensity`: action_propensity
 - **Cột bỏ:** `turn_identity_method`: turn_identity_status_*, turn_identity_method_*
+
+#### `fact_call_endpoint`
+
+Một dòng cho một endpoint tham gia cuộc gọi, gồm metric tổng hợp và tham chiếu lịch sử. **Một dòng:** Một call_id × side × device_id · **Nguồn ghi:** pipeline · **Mức nguồn:** D
+
+| Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
+|---|---|---|---|---|
+| `call_id` | uuid | có | PK |  |
+| `side` | enum: caller, callee | có | PK |  |
+| `device_id` | string | có | PK |  |
+| `country` | string |  |  |  |
+| `vn_region` | enum: north, central, south, unknown |  |  |  |
+| `city` | string |  |  |  |
+| `isp` | string |  |  |  |
+| `asn` | integer |  |  |  |
+| `network_type_initial` | enum: wifi, 4g, 5g, ethernet, unknown |  |  |  |
+| `context_source` | string |  |  |  |
+| `network_epoch_refs` | mảng integer (≥ 0) | có |  | Join call_stats_epoch bằng call_id/side/device_id/network_epoch |
+| `attempt_refs` | mảng integer (≥ 0) | có |  | Join ice_attempt_endpoint bằng call_id/attempt_seq/side/device_id |
+| `first_connected_attempt_seq` | integer (≥ 0) |  |  |  |
+| `first_connected_turn_id` | string |  |  | Chỉ khi identity được xác nhận; không thay cho toàn bộ history |
+| `first_connected_transport` | enum: udp, tcp, tls |  |  |  |
+| `turn_identity_status` | enum: identified, ambiguous, unmapped, unknown | có |  |  |
+| `turn_availability_status` | enum: local_turn_available, no_healthy_turn, no_turn_observed, unknown |  |  | Tra dim_turn/dim_turn_endpoint theo country và turn_health_1m tại as_of của decision; thiếu thì unknown |
+| `used_fallback_turn` | enum: true, false, unknown |  |  | true khi TURN thực tế không thuộc country của endpoint; chỉ xét khi turn_identity_status = identified |
+| `answer_local_ts` | date-time |  |  | answer_clicked_at_client hoặc answer_observed_at_peer của chính endpoint |
+| `first_media_received_ts` | date-time |  |  |  |
+| `cst_technical_ms` | number (≥ 0) |  |  | checking_to_connected_ms của attempt thành công đầu tiên |
+| `cst_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |  |  |
+| `ttfm_post_answer_ms` | number (≥ 0) |  |  | first_media_received_ts trừ answer_local_ts trên cùng đồng hồ endpoint |
+| `ttfm_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |  |  |
+| `rtt_ms` | object metric_observation | có |  |  |
+| `packet_loss_pct` | object | có |  |  |
+| `jitter_ms` | object metric_observation | có |  |  |
+| `quality_assessment_status` | enum: assessed, partially_assessed, unclassifiable, not_applicable | có |  |  |
+| `quality_poor` | enum: true, false, unknown | có |  |  |
+| `quality_rule_version` | string |  |  |  |
 
 #### `metric_config`
 
@@ -1129,6 +1234,15 @@ Metadata của một metric. **Một dòng:** Một metric × phiên bản đị
 | `unit` | string |  |  |  |
 | `denominator` | string |  |  |  |
 | `min_coverage_ref` | string |  |  | Tham số có version; bản này không chọn giá trị |
+| `scope` | enum: outcome_all_calls, telemetry_observed | có |  |  |
+| `cohort_rule` | string | có |  | Quy tắc chọn call_session |
+| `numerator_rule` | string | có |  | Công thức và cách xử lý unknown |
+| `denominator_rule` | string | có |  | Outcome dùng toàn cohort; telemetry dùng eligible observation count |
+| `missingness_rule` | string | có |  | Không thay null hoặc unknown bằng false |
+| `coverage_rule` | string | có |  | Công thức coverage và cách xử lý mẫu số bằng 0 |
+| `source_tables` | mảng string | có |  |  |
+| `stratification_rule` | string | có |  | Cách tách P2P |
+| `compare_guardrail` | string | có |  | Điều kiện so sánh khi coverage của hai nhóm khác nhau |
 
 ### 2.4. Giả lập
 
@@ -1207,6 +1321,7 @@ Hồ sơ một lần chạy. **Một dòng:** Một lần chạy · **Nguồn gh
 | `completed_at` | date-time |  |  |  |
 | `observation_profile` | enum: obs_base, obs_active, obs_infra | có |  | **Mới.** |
 | `ice_model_version` | string |  |  | **Mới.** Chỉ để truy nguyên dữ liệu synthetic |
+| `inventory_scope` | object |  |  | Issue #5. Khai báo country có TURN và country không có TURN trong thế giới giả lập, để dựng scenario VN-quốc tế không có TURN |
 
 #### `benchmark_manifest`
 

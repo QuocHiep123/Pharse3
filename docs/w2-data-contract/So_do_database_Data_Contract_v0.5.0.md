@@ -57,12 +57,14 @@ Bảng do pipeline dựng dùng `derived_meta` thay cho `event_envelope`.
 | Contract, Call logs | [`call_session`](Bang_du_lieu_Data_Contract_v0.5.0.md#call_session) | Một cuộc gọi | call_id | Dùng |
 | Contract, Call logs | [`client_applied_config`](Bang_du_lieu_Data_Contract_v0.5.0.md#client_applied_config) | Một lần áp dụng cấu hình trên một PC và generation | applied_config_id | Dùng |
 | Contract, getStats và ICE | [`ice_event`](Bang_du_lieu_Data_Contract_v0.5.0.md#ice_event) | Một sự kiện quan sát trên một endpoint | event_id | Dùng |
+| Contract, Call logs | [`endpoint_network_context`](Bang_du_lieu_Data_Contract_v0.5.0.md#endpoint_network_context) | Một call_id × side × device_id × network_epoch × context_version | call_id, side, device_id, network_epoch, context_version | Dùng (#6) |
 | Contract, getStats và ICE | [`call_stats_epoch`](Bang_du_lieu_Data_Contract_v0.5.0.md#call_stats_epoch) | Một call_id × endpoint_side × device_id × media_kind × network_epoch × sequence_no | call_id, endpoint_side, device_id, media_kind, network_epoch, sequence_no | Dùng |
 | Contract, getStats và ICE | [`call_stats_5s`](Bang_du_lieu_Data_Contract_v0.5.0.md#call_stats_5s) | Một call_id × endpoint_side × device_id × media_kind × window_idx | call_id, endpoint_side, device_id, media_kind, window_idx | Dùng |
 | Contract, TURN metrics | [`turn_health_1m`](Bang_du_lieu_Data_Contract_v0.5.0.md#turn_health_1m) | Một turn_id × minute_ts | turn_id, minute_ts | Dùng |
 | Contract, TURN metrics | [`turn_allocation`](Bang_du_lieu_Data_Contract_v0.5.0.md#turn_allocation) | Một session allocation trong log của một TURN, với kết quả cuối | turn_id, server_session_id | Dùng |
 | Contract, Probe | [`turn_probe`](Bang_du_lieu_Data_Contract_v0.5.0.md#turn_probe) | Một cặp TURN có hướng × cửa sổ đo × phương pháp × giao thức | src_turn_id, dst_turn_id, window_start_ts, method_version, protocol | Dùng |
 | Contract, Decision Log | [`selector_decision`](Bang_du_lieu_Data_Contract_v0.5.0.md#selector_decision) | Một decision_id × side × device_id | decision_id, side, device_id | Dùng |
+| Contract, Decision Log | [`selector_decision_request`](Bang_du_lieu_Data_Contract_v0.5.0.md#selector_decision_request) | Một decision_id (header cấp call) | decision_id | Dùng |
 | Contract, Decision Log | [`selector_decision_pair`](Bang_du_lieu_Data_Contract_v0.5.0.md#selector_decision_pair) | Một decision_id × cặp × metric | decision_id, turn_caller, turn_callee, transport_caller, transport_callee, metric | Dùng |
 | Contract, Đầu vào Outcome Log | [`call_outcome`](Bang_du_lieu_Data_Contract_v0.5.0.md#call_outcome) | Một cuộc gọi | call_id | Dùng |
 | Contract, Đầu vào Outcome Log | [`client_call_report`](Bang_du_lieu_Data_Contract_v0.5.0.md#client_call_report) | Một call_id × side × device_id | call_id, side, device_id | Dùng |
@@ -88,7 +90,8 @@ Bảng do pipeline dựng dùng `derived_meta` thay cho `event_envelope`.
 | Feature Engineering | [`feat_callee_prior`](Bang_du_lieu_Data_Contract_v0.5.0.md#feat_callee_prior) | Một snapshot × segment Caller × nơi Callee | snapshot_id, caller_segment_key, callee_country, callee_vn_region | Hoãn |
 | Feature Engineering | [`feat_turn_alloc_latency`](Bang_du_lieu_Data_Contract_v0.5.0.md#feat_turn_alloc_latency) | Một snapshot × segment × TURN × transport | snapshot_id, segment_key, turn_id, transport | Hoãn |
 | Feature Engineering | [`feat_estimated_user_turn_rtt`](Bang_du_lieu_Data_Contract_v0.5.0.md#feat_estimated_user_turn_rtt) | Một snapshot × segment × TURN × transport × đại lượng | snapshot_id, segment_level, segment_key, turn_id, client_turn_transport, estimand | Hoãn |
-| Labeled Data và Evaluation | [`fact_call`](Bang_du_lieu_Data_Contract_v0.5.0.md#fact_call) | Một call_id trong cohort | call_id | Chưa đủ cột |
+| Labeled Data và Evaluation | [`fact_call`](Bang_du_lieu_Data_Contract_v0.5.0.md#fact_call) | Một call_id trong cohort | call_id | Grain chốt; cột KPI đã thêm, đánh giá theo cặp còn mở (#8) |
+| Labeled Data và Evaluation | [`fact_call_endpoint`](Bang_du_lieu_Data_Contract_v0.5.0.md#fact_call_endpoint) | Một call_id × side × device_id | call_id, side, device_id | Dùng (#8) |
 | Labeled Data và Evaluation | [`metric_config`](Bang_du_lieu_Data_Contract_v0.5.0.md#metric_config) | Một metric × phiên bản định nghĩa | metric_name, metric_definition_version | Dùng |
 | Giả lập | [`truth_leg_5m`](Bang_du_lieu_Data_Contract_v0.5.0.md#truth_leg_5m) | Một ts_bucket × chặng × hướng × mạng |  | Dùng |
 | Giả lập | [`incident_truth`](Bang_du_lieu_Data_Contract_v0.5.0.md#incident_truth) | Một sự cố | incident_id | Dùng |
@@ -232,6 +235,38 @@ erDiagram
 ```
 
 `ctx`, `entries`, `filtered_out` là `json`; cấu trúc của chúng nằm ở mục 1.9 của file giải thích.
+
+### 3.1b. Bảng bổ sung sau phản hồi #5–#8
+
+```mermaid
+erDiagram
+    call_session ||--o{ endpoint_network_context : "call_id, side, device_id, network_epoch"
+    call_session ||--|| selector_decision_request : "call_id"
+    selector_decision_request ||--|{ selector_decision : "decision_id"
+    call_session ||--|| fact_call : "call_id"
+    fact_call ||--o{ fact_call_endpoint : "call_id"
+    endpoint_network_context {
+        uuid call_id PK,FK
+        enum side PK
+        varchar device_id PK
+        int network_epoch PK
+        int context_version PK
+        datetime observed_ts
+        varchar country "null"
+        varchar isp "null"
+        enum network_type "null"
+    }
+    fact_call_endpoint {
+        uuid call_id PK,FK
+        enum side PK
+        varchar device_id PK
+        enum turn_availability_status "null"
+        enum used_fallback_turn "tristate"
+        enum turn_identity_status
+    }
+```
+
+Chi tiết cột nằm ở [Bang_du_lieu](Bang_du_lieu_Data_Contract_v0.5.0.md). `turn_availability_status` và `used_fallback_turn` theo issue #5; `inventory_scope` nằm ở `run_manifest`.
 
 ### 3.2. getStats và sự kiện ICE
 

@@ -1,9 +1,11 @@
 # Data Contract v0.4.0 — TURN Selector Intelligence
 
+> **Đã được thay thế bởi [v0.5.0](data-contract-v0.5.0.md)** (thay đổi phá vỡ tương thích). Giữ lại làm lịch sử. Các điểm sai đã biết của v0.4.0: `k=4` và rank×rank (nay tối đa 8 mục, cặp dẫn đầu), `chosen_rank`, `connected` gộp ICE/media, ánh xạ `url` trên remote candidate (W3C: `url`/`relayProtocol` không có trên remote candidate), `selector_decision.decision_id` không phải PK đơn, luồng vẽ Selector tự ghi Decision Log (BE ghi).
+
 - **Ngày:** 2026-11-04 · **Soạn:** Hiệp · **Duyệt:** Hiệp + Đoàn (bắt buộc cả hai)
 - **Trạng thái:** v0.4.0 — **FROZEN**. v0.3.0 và v0.4.0 chỉ **bổ sung** so với v0.2.0 (v0.3.0: kiến trúc hai mặt phẳng §0.2; v0.4.0: sẵn sàng cho production §0.3). v0.4.0 cũng gồm các **sửa lỗi theo audit độc lập**: một số định nghĩa được làm rõ hoặc sửa vì bản cũ mơ hồ hoặc sai. Thay đổi về nghĩa: poor chia thành ba nhánh rời nhau và tính cả cuộc gọi đã bắt máy mà không bao giờ nối được (§13.2); guardrail `ice_fail_rate` → `setup_fail_rate`; KPI chỉ tính cuộc gọi 1-1 (I21). Chi tiết ở changelog
 - **Thay thế hoàn toàn:** v0.1.0 (xem lịch sử git). Mọi định nghĩa của v0.1 không xuất hiện ở đây coi như **đã bị hủy**
-- **Spec:** `docs/superpowers/specs/2026-11-04-turn-intelligence-design.md` · **Giải thích dễ hiểu:** `data-contract-explained.md`
+- **Spec:** `docs/superpowers/specs/2026-11-04-turn-intelligence-design.md` · **Giải thích dễ hiểu:** file local, không nằm trong repo
 - **Dạng máy đọc** (sinh ra lúc implement): `contracts/models.py` (Pydantic v2, nguồn gốc) → `contracts/schemas/*.json` (JSON Schema 2020-12) + `contracts/ddl/*.sql` (PostgreSQL) + `contracts/kpi.yaml` (KPI Dictionary §13)
 
 > Tài liệu này là **nguồn sự thật duy nhất** cho schema, bất biến, KPI và luật đánh giá. Nếu code và tài liệu khác nhau, sửa code, hoặc mở PR sửa tài liệu và tăng version.

@@ -489,11 +489,10 @@ Feature không thuộc contract thu thập, nhưng raw phải đủ để tính 
 
 ### 11.3. Labeled Data
 
-Labeled Data chỉ nối Decision Log với Outcome Log rồi gắn nhãn, không tạo thêm dự đoán. File đi kèm mới ghi nguồn và khóa nối, chưa định nghĩa cột, vì còn ba câu:
+Labeled Data chỉ nối Decision Log với Outcome Log rồi gắn nhãn, không tạo thêm dự đoán. Để tính KPI ITT trong simulator, chốt `fact_call` có một dòng trên mỗi `call_id` thuộc cohort. File đi kèm vẫn chưa định nghĩa đủ cột; đánh giá dự đoán theo cặp cần bảng hoặc view riêng, vì còn hai câu:
 
-1. Một dòng là gì: mỗi quyết định, mỗi bên hay mỗi cặp?
-2. Cuộc gọi thiết lập thất bại không có cặp thực tế, vậy nhãn gắn vào cặp dẫn đầu thế nào?
-3. Dự đoán và kết quả có cùng đại lượng không? Ví dụ RTT dự đoán là `media_rtcp_rtt` hay `ice_stun_rtt`.
+1. Cuộc gọi thiết lập thất bại không có cặp thực tế, vậy nhãn gắn vào cặp dẫn đầu thế nào?
+2. Dự đoán và kết quả có cùng đại lượng không? Ví dụ RTT dự đoán là `media_rtcp_rtt` hay `ice_stun_rtt`.
 
 Các cột từ `fact_call` như `pcr_group`, `poor_category`, `action_propensity`, `propensity_decision_id`, `rank_used_*`, `lead_pair_matched` sẽ chuyển sang đặc tả này. Hai bên khác decision thì `action_propensity` để null. Các cột KPI theo §8.4 cũng cần được liệt kê khi viết đặc tả.
 
@@ -697,7 +696,7 @@ Việc xác nhận diễn ra trước khi đưa contract cho BE và WebRTC core 
 
 ### 15.3. Schema kèm theo và các chi tiết cần góp ý
 
-File contract có 18 bảng, trong đó 2 bảng hoãn. File đi kèm có 31 bảng, trong đó 3 bảng hoãn và `fact_call` chưa đủ cột. Mỗi bảng nằm trong `$defs`, có grain, khóa, mức nguồn thu; `x-change` cho biết phần thay đổi; cột không có trong `required` là nullable. `x-deferred-columns`, `x-moved-columns`, `x-removed-columns` ghi rõ cột đi đâu. Để kiểm tra một bản ghi, validate với `{"$ref": "#/$defs/<tên bảng>"}`.
+File contract có 18 bảng, trong đó 2 bảng hoãn. File đi kèm có 31 bảng, trong đó 3 bảng hoãn và `fact_call` chưa đủ cột. Mỗi bảng nằm trong `$defs`, có grain, khóa, mức nguồn thu; `x-change` cho biết phần thay đổi. Cột không có trong `required` có thể vắng mặt; chỉ nhận `null` khi type/schema cho phép. `x-deferred-columns`, `x-moved-columns`, `x-removed-columns` ghi rõ cột đi đâu. Để kiểm tra một bản ghi, validate với `{"$ref": "#/$defs/<tên bảng>"}`.
 
 Các chi tiết dưới đây mang nhãn `x-review` và đang mở để Hiệp góp ý.
 

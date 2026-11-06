@@ -15,6 +15,7 @@ x-spec:
   based_on: 0.4.0, commit e4d84f8, nhánh docs/w1-design-and-data-contract
   contract_schema: data_contract_v0.5.0_de_xuat.schema.yaml
   proposal_document: De_xuat_Data_Contract_v0.5.0_cho_Hiep.md
+  kpi_document: KPI_MVP_v0.5.0.md
   status: Bản chuyển tiếp để không mất nội dung khi tách contract thu thập. Giữ nguyên nghĩa của bản đề xuất trước,
     chỉ sửa chỗ buộc phải đổi theo ranh giới mới. Đặc tả đầy đủ của từng lớp viết sau.
 x-layers:
@@ -24,6 +25,12 @@ x-layers:
   Evaluation: KPI và so sánh
   Giả lập: Truth ẩn và hồ sơ lần chạy
   API và vận hành Selector: Giao tiếp giữa BE và Selector
+x-analytic-conventions:
+  optional_vs_null: Thiếu field optional nghĩa là producer hoặc pipeline chưa phát hành field ở phiên bản này; field có mặt và null nghĩa là không áp dụng hoặc chưa có giá trị. Unknown là một trạng thái có nghĩa, không thay bằng 0 hoặc false.
+  cohort_base: fact_call bắt đầu từ call_session one_to_one, left join outcome_log phiên bản hiện hành; không loại call thiếu outcome hoặc telemetry.
+  endpoint_history: fact_call_endpoint có một dòng mỗi call_id × side × device_id; network_epoch_refs trỏ call_stats_epoch và attempt_refs trỏ ice_attempt_endpoint. Báo cáo theo network/TURN trên toàn lịch sử phải join các bảng này, không gán toàn call cho TURN đầu hoặc cuối.
+  temporal_turn_lookup: dim_turn và dim_turn_endpoint là SCD2. Join turn_id với bản ghi có valid_from ≤ thời điểm quan sát < valid_to; valid_to null nghĩa là vô hạn. Nếu không có đúng một bản ghi phù hợp thì identity là ambiguous/unmapped, không chọn bản ghi mới nhất tùy tiện.
+  source_separation: Synthetic và production không gộp vào một KPI; báo riêng data_source và sim_run_id khi giả lập.
 x-rules:
   path_type:
     relay_same: Hai candidate là relay, hai máy TURN được xác định và trùng nhau
@@ -303,6 +310,7 @@ $defs:
   e_gate_status: {type: string, enum: [passed, failed, not_evaluated, not_applicable], x-change: new}
   e_validation_status: {type: string, enum: [not_validated, validated, rejected], x-change: new}
   e_estimand: {type: string, enum: [network_rtt, transaction_time, candidate_total_time], x-change: new}
+  e_turn_availability_status: {type: string, enum: [local_turn_available, no_healthy_turn, no_turn_observed, unknown], description: 'Issue #5. Trạng thái TURN khả dụng theo country của endpoint tại lúc quyết định. no_turn_observed không đồng nghĩa not_deployed; chỉ kết luận not_deployed khi inventory_scope đã xác nhận đầy đủ.', x-change: new}
   e_turn_identity_status: {type: string, enum: [identified, ambiguous, unmapped, unknown], x-change: new}
   e_turn_identity_method: {type: string, enum: [ip, hostname, server_evidence, none], x-contract-ref: §8.6, description: ambiguous chuyển sang turn_identity_status, x-change: changed}
   e_identity_check: {type: string, enum: [match, mismatch, not_evaluable], description: Kết quả I19, x-change: new}
@@ -321,6 +329,8 @@ $defs:
   e_dq_status: {type: string, enum: [pass, fail, warn, not_evaluable], x-contract-ref: §8.5, description: 'not_evaluable: chưa đủ bằng chứng', x-change: changed}
   e_observation_state: {type: string, enum: [measured, not_measured, stale, lost, ambiguous, not_applicable], description: Trạng thái của một quan sát, x-change: new}
   e_metric_mode: {type: string, enum: [active, reporting_only], description: Cấu hình bộ KPI, x-change: new}
+  e_metric_scope: {type: string, enum: [outcome_all_calls, telemetry_observed], description: Outcome dùng toàn cohort; quality chỉ dùng phần có phép đo}
+  e_metric_assessment: {type: string, enum: [measured, not_measured, lost, stale, ambiguous, not_applicable], description: Trạng thái của một lần tính metric}
 
   # ---------- Object dùng chung ----------
   event_envelope:
@@ -348,6 +358,26 @@ $defs:
       pipeline_run_id: {type: string}
       dt: {type: string, format: date}
     required: [contract_version, data_source, pipeline_run_id, dt]
+    allOf:
+      - {if: {required: [data_source], properties: {data_source: {const: synthetic}}}, then: {required: [sim_run_id], properties: {sim_run_id: {not: {type: 'null'}}}}}
+  metric_observation:
+    title: Một metric chất lượng của một endpoint trên các cửa sổ quan sát được
+    type: object
+    properties:
+      value: {type: [number, 'null'], minimum: 0, description: Giá trị gộp; null khi không đo được}
+      p50: {type: [number, 'null'], minimum: 0}
+      p95: {type: [number, 'null'], minimum: 0}
+      sample_count: {type: integer, minimum: 0, description: Số mẫu hợp lệ; 0 là không có mẫu, không phải giá trị metric bằng 0}
+      eligible_count: {type: [integer, 'null'], minimum: 0, description: Số cửa sổ đủ điều kiện theo phạm vi thu thập; null nếu không biết}
+      measurement_coverage: {type: [number, 'null'], minimum: 0, maximum: 1, description: sample_count / eligible_count khi mẫu số dương}
+      assessment: {$ref: '#/$defs/e_metric_assessment'}
+      metric_definition_version: {type: string}
+      source_table: {type: string}
+    required: [sample_count, eligible_count, measurement_coverage, assessment, metric_definition_version, source_table]
+    allOf:
+      - {if: {required: [assessment], properties: {assessment: {const: measured}}}, then: {properties: {sample_count: {minimum: 1}}}}
+      - {if: {required: [assessment], properties: {assessment: {enum: [not_measured, lost, stale, ambiguous, not_applicable]}}}, then: {properties: {value: {type: 'null'}, p50: {type: 'null'}, p95: {type: 'null'}}}}
+    additionalProperties: false
   ctx:
     title: Bối cảnh một bên lúc quyết định (§4). Field chưa biết ghi unknown
     type: object
@@ -976,10 +1006,10 @@ $defs:
       snapshot_id: {type: string}
       caller_segment_key: {type: string}
       callee_country: {type: string}
-      callee_vn_region: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      callee_vn_region: {$ref: '#/$defs/e_vn_region', description: unknown khi chưa biết; khóa chính không nhận null}
       n: {type: integer, minimum: 0}
       share: {type: number, minimum: 0, maximum: 1}
-    required: [snapshot_id, caller_segment_key, callee_country, n, share]
+    required: [snapshot_id, caller_segment_key, callee_country, callee_vn_region, n, share]
     additionalProperties: false
   feat_turn_alloc_latency:
     title: Độ trễ allocation
@@ -1051,30 +1081,61 @@ $defs:
   fact_call:
     title: Một dòng mỗi cuộc gọi
     x-kind: derived
-    x-status: pending
-    x-grain: Một call_id trong cohort
+    x-status: active
+    x-grain: Một call_id trong cohort one_to_one; bắt đầu từ call_session và left join outcome_log phiên bản hiện hành
     x-contract-ref: §8.4
     x-primary-key: [call_id]
-    x-foreign-keys: [{columns: [call_id], references: call_session}]
+    x-foreign-keys: [{columns: [call_id], references: call_session}, {columns: [caller_decision_id], references: selector_decision_request}, {columns: [callee_decision_id], references: selector_decision_request}]
     x-source-level: D
     x-producer: pipeline
     x-change: changed
     x-removed-columns: [{column: joint_propensity, replaced_by: action_propensity}, {column: turn_identity_method, replaced_by: 'turn_identity_status_*, turn_identity_method_*'}]
     x-deferred-columns: [{column: arm, reason: Hoãn cùng các cột thí nghiệm}]
-    x-notes: [Các cột KPI theo §8.4 của v0.4.0 chưa liệt kê; viết cùng đặc tả Labeled Data và Evaluation, Cuộc gọi không còn gọi mù nên bỏ blind_cost_ms]
+    x-notes: [Giữ call thiếu outcome với outcome_status = missing và trạng thái unknown, Không dùng một timestamp first_media chung vì đồng hồ hai endpoint khác nhau, CST và TTFM ở cấp call chỉ có khi cả hai endpoint đủ phép đo; lấy max của duration cục bộ, Mọi giá trị quality thiếu giữ null; coverage và mẫu nằm ở fact_call_endpoint, Cuộc gọi không còn gọi mù nên bỏ blind_cost_ms]
     type: object
     allOf:
       - {$ref: '#/$defs/derived_meta'}
       - {if: {required: [turn_identity_status_caller], properties: {turn_identity_status_caller: {enum: [ambiguous, unmapped, unknown]}}}, then: {properties: {actual_turn_id_caller: {type: 'null'}}}}
       - {if: {required: [turn_identity_status_callee], properties: {turn_identity_status_callee: {enum: [ambiguous, unmapped, unknown]}}}, then: {properties: {actual_turn_id_callee: {type: 'null'}}}}
+      - {if: {required: [outcome_status], properties: {outcome_status: {const: missing}}}, then: {properties: {outcome_version: {type: 'null'}, answered: {const: unknown}, ice_connected: {const: unknown}, dtls_connected: {const: unknown}, media_connected: {const: unknown}, end_reason: {const: unknown}, dropped: {type: 'null'}}}}
+      - {if: {required: [cst_assessment], properties: {cst_assessment: {const: measured}}}, then: {required: [cst_technical_ms], properties: {cst_technical_ms: {type: number}}}}
+      - {if: {required: [ttfm_assessment], properties: {ttfm_assessment: {const: measured}}}, then: {required: [ttfm_post_answer_ms], properties: {ttfm_post_answer_ms: {type: number}}}}
     properties:
       call_id: {type: string, format: uuid}
+      cohort_name: {type: string, const: one_to_one}
+      pair_group: {anyOf: [{$ref: '#/$defs/e_pair_group'}, {type: 'null'}], description: Null khi chưa đủ địa lý hai bên}
+      initiated_ts: {type: string, format: date-time}
+      answer_received_at_be: {type: [string, 'null'], format: date-time}
+      end_ts: {type: [string, 'null'], format: date-time}
+      answered: {$ref: '#/$defs/e_tristate'}
+      ice_connected: {$ref: '#/$defs/e_tristate'}
+      dtls_connected: {$ref: '#/$defs/e_tristate'}
+      media_connected: {$ref: '#/$defs/e_tristate'}
+      setup_failure_observed: {type: [boolean, 'null']}
+      dropped: {type: [boolean, 'null']}
+      end_reason: {$ref: '#/$defs/e_end_reason'}
+      outcome_version: {type: [integer, 'null'], minimum: 0, description: Null khi outcome thiếu}
+      outcome_provenance: {anyOf: [{$ref: '#/$defs/e_outcome_provenance'}, {type: 'null'}]}
+      n_ice_attempts: {type: [integer, 'null'], minimum: 0}
+      n_network_changes: {type: [integer, 'null'], minimum: 0}
+      cst_technical_ms: {type: [number, 'null'], minimum: 0, description: Max CST cục bộ hai endpoint khi cả hai measured}
+      cst_assessment: {$ref: '#/$defs/e_metric_assessment'}
+      ttfm_post_answer_ms: {type: [number, 'null'], minimum: 0, description: Max TTFM cục bộ hai endpoint khi cả hai measured}
+      ttfm_assessment: {$ref: '#/$defs/e_metric_assessment'}
+      quality_poor: {$ref: '#/$defs/e_tristate', description: unknown khi không đủ telemetry}
+      quality_rule_version: {type: [string, 'null']}
+      stats_expected_endpoint_count: {type: [integer, 'null'], minimum: 0}
+      stats_observed_endpoint_count: {type: integer, minimum: 0}
+      stats_endpoint_coverage: {type: [number, 'null'], minimum: 0, maximum: 1}
+      caller_decision_id: {type: [string, 'null'], format: uuid}
+      callee_decision_id: {type: [string, 'null'], format: uuid}
+      first_connected_attempt_seq: {type: [integer, 'null'], minimum: 0}
       local_hour_vn: {type: [integer, 'null'], minimum: 0, description: Suy từ initiated_ts}
       pcr_group: {anyOf: [{$ref: '#/$defs/e_pcr_group'}, {type: 'null'}], description: Null khi cohort chưa chốt, x-change: new, x-review: S9}
       poor_category: {anyOf: [{$ref: '#/$defs/e_poor_category'}, {type: 'null'}], x-change: changed}
       quality_assessment_status: {anyOf: [{$ref: '#/$defs/e_quality_assessment_status'}, {type: 'null'}]}
       outcome_status: {$ref: '#/$defs/e_outcome_status', x-change: new}
-      policy_version: {type: [string, 'null']}
+      policy_version: {type: [string, 'null'], description: Chỉ khi hai endpoint dùng cùng một policy_version; khác nhau thì null và đọc theo decision_id từng bên}
       action_propensity: {type: [number, 'null'], minimum: 0, maximum: 1, description: Của hành động trong decision mà attempt nối đầu tiên dùng; hai bên khác decision thì null, x-change: new, x-review: S9}
       propensity_decision_id: {type: [string, 'null'], format: uuid, x-change: new, x-review: S9}
       rank_used_caller: {type: [integer, 'null'], minimum: 0}
@@ -1094,28 +1155,86 @@ $defs:
       app_version_callee: {type: [string, 'null']}
       device_class_caller: {type: [string, 'null']}
       device_class_callee: {type: [string, 'null']}
-    required: [call_id, outcome_status, turn_identity_status_caller, turn_identity_status_callee, identity_check_caller, identity_check_callee]
+    required: [call_id, cohort_name, initiated_ts, answered, ice_connected, dtls_connected, media_connected, end_reason, outcome_status, cst_assessment, ttfm_assessment, quality_poor, stats_observed_endpoint_count, turn_identity_status_caller, turn_identity_status_callee, identity_check_caller, identity_check_callee]
+    unevaluatedProperties: false
+  fact_call_endpoint:
+    title: Một dòng cho một endpoint tham gia cuộc gọi, gồm metric tổng hợp và tham chiếu lịch sử
+    x-kind: derived
+    x-status: active
+    x-grain: Một call_id × side × device_id
+    x-primary-key: [call_id, side, device_id]
+    x-foreign-keys: [{columns: [call_id], references: fact_call}]
+    x-source-level: D
+    x-producer: pipeline
+    x-change: new
+    x-notes: [Đầu caller có thể lập từ call_session; đầu callee chỉ tạo khi biết device_id, Country/ISP/Network là bối cảnh đầu tiên biết được và không ghi đè khi đổi mạng, network_epoch_refs trỏ call_stats_epoch và attempt_refs trỏ ice_attempt_endpoint để drill-down; không gộp các epoch thành một đường TURN, Mỗi metric có sample_count/eligible_count/coverage riêng, Thiếu stats không đồng nghĩa quality tốt]
+    type: object
+    allOf:
+      - {$ref: '#/$defs/derived_meta'}
+    properties:
+      call_id: {type: string, format: uuid}
+      side: {$ref: '#/$defs/e_side'}
+      device_id: {type: string}
+      country: {type: [string, 'null']}
+      vn_region: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      city: {type: [string, 'null']}
+      isp: {type: [string, 'null']}
+      asn: {type: [integer, 'null']}
+      network_type_initial: {anyOf: [{$ref: '#/$defs/e_network_type'}, {type: 'null'}]}
+      context_source: {type: [string, 'null']}
+      network_epoch_refs: {type: array, uniqueItems: true, items: {type: integer, minimum: 0}, description: Join call_stats_epoch bằng call_id/side/device_id/network_epoch}
+      attempt_refs: {type: array, uniqueItems: true, items: {type: integer, minimum: 0}, description: Join ice_attempt_endpoint bằng call_id/attempt_seq/side/device_id}
+      first_connected_attempt_seq: {type: [integer, 'null'], minimum: 0}
+      first_connected_turn_id: {type: [string, 'null'], description: Chỉ khi identity được xác nhận; không thay cho toàn bộ history}
+      first_connected_transport: {anyOf: [{$ref: '#/$defs/e_transport'}, {type: 'null'}]}
+      turn_identity_status: {$ref: '#/$defs/e_turn_identity_status'}
+      turn_availability_status: {$ref: '#/$defs/e_turn_availability_status', description: 'Tra dim_turn/dim_turn_endpoint theo country và turn_health_1m tại as_of của decision; thiếu thì unknown'}
+      used_fallback_turn: {$ref: '#/$defs/e_tristate', description: 'true khi TURN thực tế không thuộc country của endpoint; chỉ xét khi turn_identity_status = identified'}
+      answer_local_ts: {type: [string, 'null'], format: date-time, description: answer_clicked_at_client hoặc answer_observed_at_peer của chính endpoint}
+      first_media_received_ts: {type: [string, 'null'], format: date-time}
+      cst_technical_ms: {type: [number, 'null'], minimum: 0, description: checking_to_connected_ms của attempt thành công đầu tiên, cùng clock_session_id}
+      cst_assessment: {$ref: '#/$defs/e_metric_assessment'}
+      ttfm_post_answer_ms: {type: [number, 'null'], minimum: 0, description: first_media_received_ts trừ answer_local_ts trên cùng đồng hồ endpoint}
+      ttfm_assessment: {$ref: '#/$defs/e_metric_assessment'}
+      rtt_ms: {$ref: '#/$defs/metric_observation'}
+      packet_loss_pct: {allOf: [{$ref: '#/$defs/metric_observation'}, {properties: {value: {maximum: 100}, p50: {maximum: 100}, p95: {maximum: 100}}}]}
+      jitter_ms: {$ref: '#/$defs/metric_observation'}
+      quality_assessment_status: {$ref: '#/$defs/e_quality_assessment_status'}
+      quality_poor: {$ref: '#/$defs/e_tristate'}
+      quality_rule_version: {type: [string, 'null']}
+    required: [call_id, side, device_id, network_epoch_refs, attempt_refs, turn_identity_status, cst_assessment, ttfm_assessment, rtt_ms, packet_loss_pct, jitter_ms, quality_assessment_status, quality_poor]
+    unevaluatedProperties: false
   metric_config:
     title: Metadata của một metric
     x-kind: manifest
+    x-status: active
     x-grain: Một metric × phiên bản định nghĩa
     x-primary-key: [metric_name, metric_definition_version]
     x-source-level: A
     x-producer: contracts/kpi.yaml
     x-change: new
-    x-notes: [active không biến dữ liệu thiếu thành đủ; metric unknown không được coi là đạt, Trạng thái từng lần tính dùng e_metric_assessment]
+    x-notes: [active không biến dữ liệu thiếu thành đủ; metric unknown không được coi là đạt, Outcome dùng toàn cohort; quality chỉ tổng hợp trên mẫu đo và luôn hiển thị coverage, Synthetic và production phải báo cáo tách, Không so sánh hai nhóm địa lý hoặc P2P/relay như đại diện toàn cohort khi coverage khác nhau hoặc không biết]
     type: object
     properties:
       metric_name: {type: string}
       metric_definition_version: {type: string}
       detector_version: {type: [string, 'null']}
       mode: {$ref: '#/$defs/e_metric_mode'}
+      scope: {$ref: '#/$defs/e_metric_scope'}
+      cohort_rule: {type: string, description: Quy tắc chọn call_session, gồm call_type và cutoff}
+      numerator_rule: {type: string, description: Công thức và cách xử lý unknown}
+      denominator_rule: {type: string, description: Outcome dùng toàn cohort; telemetry dùng eligible observation count}
+      missingness_rule: {type: string, description: Không thay null hoặc unknown bằng false, 0 hay good}
+      coverage_rule: {type: string, description: Công thức coverage và cách xử lý mẫu số bằng 0}
+      source_tables: {type: array, minItems: 1, uniqueItems: true, items: {type: string}}
+      stratification_rule: {type: string, description: Cách tách P2P, relay, failed và nhóm địa lý}
+      compare_guardrail: {type: string, description: Điều kiện so sánh khi coverage của hai nhóm khác nhau}
       applies_to_sources: {type: [array, 'null'], items: {type: string}}
       applies_to_platforms: {type: [array, 'null'], items: {$ref: '#/$defs/e_platform'}}
       unit: {type: [string, 'null']}
       denominator: {type: [string, 'null']}
       min_coverage_ref: {type: [string, 'null'], description: Tham số có version; bản này không chọn giá trị}
-    required: [metric_name, metric_definition_version, mode]
+    required: [metric_name, metric_definition_version, mode, scope, cohort_rule, numerator_rule, denominator_rule, missingness_rule, coverage_rule, source_tables, stratification_rule, compare_guardrail]
     additionalProperties: false
 
   # ---------- Giả lập ----------
@@ -1216,6 +1335,7 @@ $defs:
       completed_at: {type: [string, 'null'], format: date-time}
       observation_profile: {$ref: '#/$defs/e_observation_profile', x-change: new}
       ice_model_version: {type: [string, 'null'], description: Chỉ để truy nguyên dữ liệu synthetic, x-change: new}
+      inventory_scope: {type: object, description: 'Issue #5. Khai báo country có TURN và country không có TURN trong thế giới giả lập, để dựng scenario VN-quốc tế không có TURN', properties: {countries_with_turn: {type: array, items: {type: string}}, countries_without_turn: {type: array, items: {type: string}}, complete: {type: boolean}}, required: [countries_with_turn, countries_without_turn, complete], x-change: new}
     required: [sim_run_id, run_kind, simulator_version, git_commit, config_hash, contract_version, topology_version, network_profile_version, scenario_version, root_seeds, policy_version, connection_mode, ice_transport_policy, initial_snapshot_hash, burn_in_days, environment_dir, started_at, observation_profile]
     additionalProperties: false
   benchmark_manifest:
