@@ -166,7 +166,7 @@ flowchart LR
 | [#5](https://github.com/QuocHiep123/Pharse3/issues/5) | Quốc gia không có TURN | Đã vào schema |
 | [#6](https://github.com/QuocHiep123/Pharse3/issues/6) | Network context theo epoch | Đã vào schema |
 | [#7](https://github.com/QuocHiep123/Pharse3/issues/7) | KPI telemetry-aware | Định nghĩa đã có |
-| [#8](https://github.com/QuocHiep123/Pharse3/issues/8) | `fact_call`, `fact_call_endpoint` | Grain đã chốt, cột còn thiếu |
+| [#8](https://github.com/QuocHiep123/Pharse3/issues/8) | `fact_call`, `fact_call_endpoint` | Schema đủ cột (+ `fact_pair_evaluation`); còn dashboard và test |
 
 Việc đóng issue **không** có nghĩa mentor hay Đoàn đã duyệt toàn bộ contract.
 
