@@ -2,7 +2,9 @@
 
 > **Trạng thái:** `simulator_ready` · **Production:** `pending_source_verification` · **Thay thế:** [v0.4.0](data-contract.md) (phá vỡ tương thích).
 > Nguồn gốc: đề xuất của Đoàn ([`docs/w2-data-contract/`](../w2-data-contract/)), phản hồi của Hiệp ở issue [#1](https://github.com/QuocHiep123/Pharse3/issues/1), và quyết định ở issues [#3](https://github.com/QuocHiep123/Pharse3/issues/3) – [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
-> **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/data_contract_v0.5.0_de_xuat.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml) (sau thu thập, 33 bảng).
+> **Khi tài liệu này khác YAML thì tin YAML:** [`data_contract_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/data_contract_v0.5.0_de_xuat.schema.yaml) (thu thập, 20 bảng) và [`dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml`](../w2-data-contract/dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml) (sau thu thập, 34 bảng).
+
+**Khảo sát nguồn dữ liệu và câu hỏi cho từng bên:** [KHAO_SAT_NGUON_DU_LIEU.md](../w2-data-contract/KHAO_SAT_NGUON_DU_LIEU.md). **Bộ lọc 10 kịch bản và mẫu bằng chứng insight:** [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md).
 
 **Chốt ở đây nghĩa là gì.** Hiệp và Đoàn dùng cùng một interface dữ liệu để chạy simulator. Chốt **không** có nghĩa là BE, WebRTC core hay mentor đã xác nhận field production thu được. Mọi mục ở phần 3 là *assumption của simulator*.
 
@@ -50,6 +52,10 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 | D14 | `pcr_itt` | Hai cận: `low=K/N`, `high=(K+U_quality+U_outcome)/N`; `N=0` thì undefined | Đoàn §11.4, #3 |
 | D15 | Synthetic | Mọi raw synthetic có `data_source=synthetic`, `sim_run_id`; truth nằm bảng riêng, không chép thành quan sát | #2 |
 | D16 | Version | v0.5.0 là thay đổi **phá vỡ tương thích**; giữ nhãn `simulator_ready` cho tới khi hai bên duyệt và nguồn production được xác minh | #1 mục 5 |
+| D17 | Latency của TURN | Theo đề mentor, Latency P50/P95 của TURN là **RTT qua TURN** (từ `getStats`), không phải thời gian cấp phát (`alloc_ms` đã bỏ vì cần hook SDK). Gán cho một TURN chỉ khi đường `relay_same`; RTT của đường `relay_relay` chỉ dùng xếp hạng tương đối | Đề mentor, [KPI_MVP](../w2-data-contract/KPI_MVP_v0.5.0.md) |
+| D18 | Đáp án tối ưu của simulator | `sim_decision_oracle` (chỉ synthetic, đọc `truth_leg_5m`) cho top-k có chứa cặp tốt nhất không, regret của cặp dẫn đầu, cặp thực tế và danh sách. Policy, feature, health không đọc (I34). Dashboard được đọc, ở trang ghi rõ synthetic-only | Đề mentor (Algorithm Quality), #2 |
+| D19 | Định nghĩa metric | 30 metric ở [`metric_config_v0.5.0.yaml`](../w2-data-contract/metric_config_v0.5.0.yaml): Call Quality, TURN Performance, Service Health, Algorithm Quality. Cùng một phiên bản dùng ở simulator, pipeline và dashboard | Đề mentor, #7, #8 |
+| D20 | Sự cố và phục hồi | `fact_call` có `failure_phase` (pre/post allocation, mid call), `n_ice_restarts`, `detected_to_ice_recovery_ms`; `fault_to_recovery_ms` chỉ synthetic. Kịch bản 1–10 thành bộ lọc trong KPI_MVP | Đề mentor (kịch bản 8, 10) |
 
 ## 3. Assumption chờ xác nhận
 
@@ -63,6 +69,7 @@ Quy tắc phân lớp: một cột là **raw** khi có đúng một nguồn ghi 
 | A6 | Log TURN nối được với call (`credential_ref`/`server_session_id`) | **Hạ tầng TURN** | `match_method=ambiguous`; chỉ thống kê theo TURN |
 | A7 | Khi thu thật, danh sách có biến thiên (khám phá) | **Mentor** | Dữ liệu không dự đoán được đường chưa dùng |
 | A8 | Inventory TURN đủ để kết luận `not_deployed` | **Hạ tầng** | Giữ `no_turn_observed`/`unknown` |
+| A9 | Mentor chỉ đạo giả lập trước; nếu output đủ tốt thì mới sang dữ liệu thật. Dữ liệu giả lập có version | **Mentor** (tiêu chí "đủ tốt") | Khi có log thật, chạy lại pipeline với `data_source = production`; schema không đổi |
 
 Số liệu lab ICE (Chromium 156 + coturn 4.6.1, một máy) là bằng chứng về **cơ chế**, không phải tham số production. Kết quả synthetic không dùng để kết luận chất lượng production.
 
@@ -102,7 +109,7 @@ Bảng được sinh từ YAML. *Nguồn*: A = service tự tạo; B = thu có �
 | `candidate_observation` | event | Một candidate quan sát được, hoặc một dòng not_observed cho một mục cấu hình trong một chu kỳ thu | `observation_id` | B | 25 | new | deferred |
 | `ice_candidate_pair` | event | Một cặp trong một attempt | `call_id`, `attempt_seq`, `pair_id` | B | 17 | unchanged | deferred |
 
-### 4.2. Lớp sau thu thập — 33 bảng (3 hoãn)
+### 4.2. Lớp sau thu thập — 34 bảng (3 hoãn)
 
 | Bảng | Loại | Grain | Khóa chính | Nguồn | Cột | Thay đổi | Trạng thái |
 |---|---|---|---|---|---|---|---|
@@ -126,9 +133,10 @@ Bảng được sinh từ YAML. *Nguồn*: A = service tự tạo; B = thu có �
 | `feat_callee_prior` | feature | Một snapshot × segment Caller × nơi Callee | `snapshot_id`, `caller_segment_key`, `callee_country`, `callee_vn_region` | D | 6 | unchanged | deferred |
 | `feat_turn_alloc_latency` | feature | Một snapshot × segment × TURN × transport | `snapshot_id`, `segment_key`, `turn_id`, `transport` | D | 12 | changed | deferred |
 | `feat_estimated_user_turn_rtt` | feature | Một snapshot × segment × TURN × transport × đại lượng | `snapshot_id`, `segment_level`, `segment_key`, `turn_id`, `client_turn_transport`, `estimand` | D | 19 | new | deferred |
-| `fact_call` | derived | Một call_id trong cohort one_to_one; bắt đầu từ call_session và left join outcome_log phiên bản hiện hành | `call_id` | D | 85 | changed | active |
+| `fact_call` | derived | Một call_id trong cohort one_to_one; bắt đầu từ call_session và left join outcome_log phiên bản hiện hành | `call_id` | D | 93 | changed | active |
 | `fact_call_endpoint` | derived | Một call_id × side × device_id | `call_id`, `side`, `device_id` | D | 30 | new | active |
 | `fact_pair_evaluation` | derived | Một decision_id × metric × cặp (TURN và transport hai phía), bản hiện hành tại cutoff | `decision_id`, `metric`, `turn_caller`, `transport_caller`, `turn_callee`, `transport_callee` | D | 26 | new | active |
+| `sim_decision_oracle` | hidden | Một decision_id × metric | `decision_id`, `metric` | D | 22 | new | active |
 | `metric_config` | manifest | Một metric × phiên bản định nghĩa | `metric_name`, `metric_definition_version` | A | 18 | new | active |
 | `truth_leg_5m` | hidden | Một ts_bucket × chặng × hướng × mạng |  | D | 10 | unchanged | active |
 | `incident_truth` | hidden | Một sự cố | `incident_id` | D | 8 | unchanged | active |
@@ -146,7 +154,7 @@ Chi tiết cột của ba bảng dùng cho dashboard và đánh giá. Kiểu và
 
 #### `fact_call`
 
-**Một dòng:** Một call_id trong cohort one_to_one; bắt đầu từ call_session và left join outcome_log phiên bản hiện hành. **Khóa chính:** `call_id`. 90 cột.
+**Một dòng:** Một call_id trong cohort one_to_one; bắt đầu từ call_session và left join outcome_log phiên bản hiện hành. **Khóa chính:** `call_id`. 98 cột.
 
 | Nhóm | Cột | Kiểu | Bắt buộc |
 |---|---|---|---|
@@ -200,6 +208,12 @@ Chi tiết cột của ba bảng dùng cho dashboard và đánh giá. Kiểu và
 | Đường thực tế và danh tính TURN | `call_path_scope` | enum: p2p, relay, failed, unknown | có |
 | Đường thực tế và danh tính TURN | `path_type` | enum: relay_relay, relay_same, relay_unresolved, relay_direct, p2p_host, p2p_srflx, unknown |  |
 | Đường thực tế và danh tính TURN | `path_attribution_status` | enum: single_path, mixed, unknown |  |
+| Phục hồi và sự cố | `n_ice_restarts` | integer |  |
+| Phục hồi và sự cố | `n_selected_pair_changes` | integer |  |
+| Phục hồi và sự cố | `failure_phase` | enum: none, pre_allocation, post_allocation, mid_call, unknown | có |
+| Phục hồi và sự cố | `detected_to_ice_recovery_ms` | number |  |
+| Phục hồi và sự cố | `recovery_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |
+| Phục hồi và sự cố | `fault_to_recovery_ms` | number |  |
 | Quyết định và policy | `caller_decision_id` | uuid |  |
 | Quyết định và policy | `callee_decision_id` | uuid |  |
 | Quyết định và policy | `policy_version` | string |  |
@@ -217,6 +231,8 @@ Chi tiết cột của ba bảng dùng cho dashboard và đánh giá. Kiểu và
 | Quyết định và policy | `policy_version_callee` | string |  |
 | Quyết định và policy | `fallback_type_caller` | enum: data_backoff, health_missing, selector_error, insufficient_candidates |  |
 | Quyết định và policy | `fallback_type_callee` | enum: data_backoff, health_missing, selector_error, insufficient_candidates |  |
+| Quyết định và policy | `confidence_level_caller` | enum: high, medium, low |  |
+| Quyết định và policy | `confidence_level_callee` | enum: high, medium, low |  |
 | Quyết định và policy | `returned_list_size_caller` | integer |  |
 | Quyết định và policy | `returned_list_size_callee` | integer |  |
 | Quyết định và policy | `lead_turn_caller` | string |  |
@@ -388,6 +404,7 @@ Danh sách đầy đủ ở `x-invariants` trong hai YAML.
 | I19 | `match` / `mismatch` / `not_evaluable` |
 | I32 | `fact_call` đúng một dòng mỗi `call_id` tại cutoff (bản `fact_version` lớn nhất đã ingest) |
 | I33 | `fact_pair_evaluation`: `label_status = observed` chỉ khi cặp là cặp thực tế và `observed_metric_name = metric`; cặp không dùng không có nhãn phản thực |
+| I34 | `sim_decision_oracle` chỉ synthetic, không vào đầu vào policy/feature/health; mọi regret ≥ 0 |
 | I23 | `ice_failed` và `media_setup_failed` tách nhau theo `ice_connected`/`media_connected` |
 
 ## 8. Thay đổi phá vỡ so với v0.4.0

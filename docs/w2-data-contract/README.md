@@ -6,7 +6,8 @@ Tài liệu này chốt **interface dữ liệu để Hiệp và Đoàn cùng ch
 
 1. [Đề xuất và lý do thay đổi](De_xuat_Data_Contract_v0.5.0_cho_Hiep.md).
 2. [Schema raw](data_contract_v0.5.0_de_xuat.schema.yaml) và [schema lớp sau thu thập](dac_ta_sau_thu_thap_v0.5.0_de_xuat.schema.yaml).
-3. [Sơ đồ bảng](So_do_database_Data_Contract_v0.5.0.md), [giải thích field](Bang_du_lieu_Data_Contract_v0.5.0.md), [hướng thuật toán](Huong_giai_quyet_Smart_TURN_Selector.md), [lab ICE](lab_ice/KET_QUA.md).
+3. [Khảo sát nguồn dữ liệu](KHAO_SAT_NGUON_DU_LIEU.md), [định nghĩa metric](metric_config_v0.5.0.yaml) và [KPI MVP](KPI_MVP_v0.5.0.md) (4 nhóm chỉ số, 10 kịch bản thành bộ lọc).
+4. [Sơ đồ bảng](So_do_database_Data_Contract_v0.5.0.md), [giải thích field](Bang_du_lieu_Data_Contract_v0.5.0.md), [hướng thuật toán](Huong_giai_quyet_Smart_TURN_Selector.md), [lab ICE](lab_ice/KET_QUA.md).
 
 Sơ đồ và bảng được sinh từ YAML; khi đổi schema, sửa YAML trước rồi sinh lại hai tài liệu đó.
 

@@ -94,6 +94,7 @@ Bảng do pipeline dựng dùng `derived_meta` thay cho `event_envelope`.
 | Labeled Data và Evaluation | [`fact_call_endpoint`](Bang_du_lieu_Data_Contract_v0.5.0.md#fact_call_endpoint) | Một call_id × side × device_id | call_id, side, device_id | Dùng (#8) |
 | Labeled Data và Evaluation | [`fact_pair_evaluation`](Bang_du_lieu_Data_Contract_v0.5.0.md#fact_pair_evaluation) | Một decision_id × metric × cặp, bản hiện hành | decision_id, metric, turn_caller, transport_caller, turn_callee, transport_callee | Dùng (#8) |
 | Labeled Data và Evaluation | [`metric_config`](Bang_du_lieu_Data_Contract_v0.5.0.md#metric_config) | Một metric × phiên bản định nghĩa | metric_name, metric_definition_version | Dùng |
+| Giả lập | [`sim_decision_oracle`](Bang_du_lieu_Data_Contract_v0.5.0.md#sim_decision_oracle) | Một decision_id × metric (đáp án tối ưu theo truth, chỉ synthetic) | decision_id, metric | Dùng (I34) |
 | Giả lập | [`truth_leg_5m`](Bang_du_lieu_Data_Contract_v0.5.0.md#truth_leg_5m) | Một ts_bucket × chặng × hướng × mạng |  | Dùng |
 | Giả lập | [`incident_truth`](Bang_du_lieu_Data_Contract_v0.5.0.md#incident_truth) | Một sự cố | incident_id | Dùng |
 | Giả lập | [`dirt_log`](Bang_du_lieu_Data_Contract_v0.5.0.md#dirt_log) | Một event bị tiêm lỗi |  | Dùng |

@@ -1208,6 +1208,14 @@ Danh mục user. **Một dòng:** Một user_hash · **Mức nguồn:** B
 | `used_fallback_turn_caller` | enum: true, false, unknown |  |  |  |
 | `used_fallback_turn_callee` | enum: true, false, unknown |  |  |  |
 | `quality_assessed_endpoint_count` | integer (≥ 0) | có |  | Số endpoint có quality_assessment_status = assessed; cùng mẫu số stats_expected_endpoint_count |
+| `confidence_level_caller` | enum: high, medium, low |  |  | Lọc kịch bản Historical Cold-start |
+| `confidence_level_callee` | enum: high, medium, low |  |  |  |
+| `n_ice_restarts` | integer (≥ 0) |  |  | Số lần restart_requested; null khi nền tảng không báo |
+| `n_selected_pair_changes` | integer (≥ 0) |  |  | Tổng lần tăng selected_pair_changes; không phải lần nào cũng là đổi đường |
+| `failure_phase` | enum: none, pre_allocation, post_allocation, mid_call, unknown | có |  |  |
+| `detected_to_ice_recovery_ms` | number (≥ 0) |  |  | Từ lúc client phát hiện disconnected/failed đến khi ICE nối lại; từ ice_event, cùng clock_session_id. Max khi nhiều lần phục hồi |
+| `recovery_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |  |  |
+| `fault_to_recovery_ms` | number (≥ 0) |  |  | Chỉ synthetic hoặc thí nghiệm có kiểm soát (biết mốc fault từ incident_truth); production luôn null |
 
 - **Cột hoãn:** `arm`: Hoãn cùng các cột thí nghiệm
 - **Cột bỏ:** `joint_propensity`: action_propensity
@@ -1309,6 +1317,35 @@ Metadata của một metric. **Một dòng:** Một metric × phiên bản đị
 | `compare_guardrail` | string | có |  | Điều kiện so sánh khi coverage của hai nhóm khác nhau |
 
 ### 2.4. Giả lập
+
+#### `sim_decision_oracle`
+
+Đáp án tối ưu của simulator cho một quyết định, chỉ dùng để đánh giá. **Một dòng:** Một decision_id × metric · **Nguồn ghi:** simulator · **Mức nguồn:** D
+
+| Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
+|---|---|---|---|---|
+| `call_id` | uuid | có |  |  |
+| `decision_id` | uuid | có | PK |  |
+| `metric` | string | có | PK | Đại lượng truth, ví dụ truth_rtt_ms, truth_loss_pct, truth_jitter_ms hoặc truth_success |
+| `unit` | string | có |  |  |
+| `lower_is_better` | boolean | có |  |  |
+| `truth_version` | string | có |  |  |
+| `truth_cutoff_ts` | date-time | có |  |  |
+| `eligible_pair_count` | integer (≥ 0) | có |  | Số cặp (TURN, transport) hai phía còn available theo truth tại thời điểm quyết định |
+| `oracle_turn_caller` | string |  |  |  |
+| `oracle_transport_caller` | enum: udp, tcp, tls |  |  |  |
+| `oracle_turn_callee` | string |  |  |  |
+| `oracle_transport_callee` | enum: udp, tcp, tls |  |  |  |
+| `oracle_value` | number |  |  | Null khi không có cặp nào available |
+| `oracle_in_lists` | enum: true, false, unknown | có |  | Cặp tối ưu có thể tạo được từ hai danh sách đã trả (cả hai mục có mặt) |
+| `oracle_in_topk` | enum: true, false, unknown | có |  | Cặp tối ưu thuộc top-k của policy; unknown khi static_config |
+| `best_in_lists_value` | number |  |  | Giá trị truth tốt nhất trong các cặp tạo được từ hai danh sách |
+| `list_regret` | number |  |  | best_in_lists_value trừ oracle_value theo hướng tốt hơn; ≥ 0 |
+| `lead_value` | number |  |  | Giá trị truth của cặp dẫn đầu |
+| `lead_regret` | number |  |  |  |
+| `actual_value` | number |  |  | Giá trị truth của cặp ICE thực tế; null khi chưa xác định hoặc call thất bại |
+| `actual_regret` | number |  |  |  |
+| `actual_pair_matches_oracle` | enum: true, false, unknown | có |  |  |
 
 #### `truth_leg_5m`
 
