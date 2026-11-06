@@ -1177,6 +1177,37 @@ Danh mục user. **Một dòng:** Một user_hash · **Mức nguồn:** B
 | `caller_decision_id` | uuid |  |  |  |
 | `callee_decision_id` | uuid |  |  |  |
 | `first_connected_attempt_seq` | integer (≥ 0) |  |  |  |
+| `as_of_ts` | date-time | có |  | Cutoff của lần dựng. Bảng giữ bản hiện hành (fact_version lớn nhất đã ingest tại cutoff); lịch sử các bản nằm ở log của pipeline |
+| `fact_version` | integer (≥ 1) | có |  | Tăng khi dữ liệu đến muộn làm đổi dòng |
+| `call_path_scope` | enum: p2p, relay, failed, unknown | có |  |  |
+| `path_type` | enum: relay_relay, relay_same, relay_unresolved, relay_direct, p2p_host, p2p_srflx, unknown |  |  | Từ outcome_log/ice_attempt; null khi không có selected path |
+| `path_attribution_status` | enum: single_path, mixed, unknown |  |  |  |
+| `observation_profile` | enum: obs_base, obs_active, obs_infra |  |  | Synthetic lấy từ run_manifest; production null hoặc theo cấu hình thu |
+| `connection_mode` | enum: post_answer, pre_connect |  |  |  |
+| `ice_transport_policy` | enum: relay, all |  |  | Cấu hình, không chứng minh đường thực tế |
+| `decision_source_caller` | string |  |  | api, static_config, static_fallback hoặc cache từ selector_decision |
+| `decision_source_callee` | string |  |  |  |
+| `policy_version_caller` | string |  |  |  |
+| `policy_version_callee` | string |  |  |  |
+| `fallback_type_caller` | enum: data_backoff, health_missing, selector_error, insufficient_candidates |  |  |  |
+| `fallback_type_callee` | enum: data_backoff, health_missing, selector_error, insufficient_candidates |  |  |  |
+| `returned_list_size_caller` | integer (≥ 0) |  |  |  |
+| `returned_list_size_callee` | integer (≥ 0) |  |  |  |
+| `lead_turn_caller` | string |  |  | turn_id của cặp dẫn đầu phía caller; null khi static_config |
+| `lead_turn_callee` | string |  |  |  |
+| `country_caller` | string |  |  | Bối cảnh đầu tiên biết được; lịch sử đổi mạng ở fact_call_endpoint |
+| `country_callee` | string |  |  |  |
+| `vn_region_caller` | enum: north, central, south, unknown |  |  |  |
+| `vn_region_callee` | enum: north, central, south, unknown |  |  |  |
+| `isp_caller` | string |  |  |  |
+| `isp_callee` | string |  |  |  |
+| `network_type_caller` | enum: wifi, 4g, 5g, ethernet, unknown |  |  |  |
+| `network_type_callee` | enum: wifi, 4g, 5g, ethernet, unknown |  |  |  |
+| `turn_availability_status_caller` | enum: local_turn_available, no_healthy_turn, no_turn_observed, unknown |  |  |  |
+| `turn_availability_status_callee` | enum: local_turn_available, no_healthy_turn, no_turn_observed, unknown |  |  |  |
+| `used_fallback_turn_caller` | enum: true, false, unknown |  |  |  |
+| `used_fallback_turn_callee` | enum: true, false, unknown |  |  |  |
+| `quality_assessed_endpoint_count` | integer (≥ 0) | có |  | Số endpoint có quality_assessment_status = assessed; cùng mẫu số stats_expected_endpoint_count |
 
 - **Cột hoãn:** `arm`: Hoãn cùng các cột thí nghiệm
 - **Cột bỏ:** `joint_propensity`: action_propensity
@@ -1218,6 +1249,39 @@ Một dòng cho một endpoint tham gia cuộc gọi, gồm metric tổng hợp 
 | `quality_assessment_status` | enum: assessed, partially_assessed, unclassifiable, not_applicable | có |  |  |
 | `quality_poor` | enum: true, false, unknown | có |  |  |
 | `quality_rule_version` | string |  |  |  |
+
+#### `fact_pair_evaluation`
+
+Đánh giá một dự đoán cặp so với kết quả quan sát. **Một dòng:** Một decision_id × metric × cặp (TURN và transport hai phía), bản hiện hành tại cutoff · **Nguồn ghi:** pipeline · **Mức nguồn:** D
+
+| Cột | Kiểu | Bắt buộc | Khóa | Ghi chú |
+|---|---|---|---|---|
+| `call_id` | uuid | có |  |  |
+| `decision_id` | uuid | có | PK |  |
+| `metric` | string | có | PK | Đại lượng dự đoán, ví dụ media_rtcp_rtt_ms hoặc connection_success |
+| `unit` | string |  |  |  |
+| `turn_caller` | string | có | PK |  |
+| `transport_caller` | enum: udp, tcp, tls | có | PK |  |
+| `turn_callee` | string | có | PK |  |
+| `transport_callee` | enum: udp, tcp, tls | có | PK |  |
+| `is_lead` | boolean | có |  |  |
+| `in_topk` | boolean | có |  |  |
+| `est_value` | number |  |  |  |
+| `interval_low` | number |  |  |  |
+| `interval_high` | number |  |  |  |
+| `interval_kind` | enum: mean_ci, prediction, other |  |  |  |
+| `interval_level` | number (≥ 0) |  |  |  |
+| `estimator_version` | string |  |  |  |
+| `actual_pair_matches` | enum: true, false, unknown | có |  | true khi cặp thực tế (hai TURN identified và transport) trùng cặp này; unknown khi chưa xác định |
+| `label_status` | enum: observed, not_observable, setup_failed, identity_unresolved, not_actual_pair | có |  |  |
+| `observed_metric_name` | string |  |  | Tên đại lượng đo được; phải bằng metric khi observed |
+| `observed_value` | number |  |  |  |
+| `observed_sample_count` | integer (≥ 0) |  |  |  |
+| `observed_coverage` | number (≥ 0) |  |  |  |
+| `in_interval` | enum: true, false, unknown | có |  | observed_value nằm trong [interval_low, interval_high]; unknown khi không có nhãn hoặc khoảng |
+| `error_value` | number |  |  | observed_value trừ est_value |
+| `label_rule_version` | string | có |  |  |
+| `as_of_ts` | date-time | có |  |  |
 
 #### `metric_config`
 

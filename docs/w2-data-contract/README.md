@@ -35,7 +35,7 @@ Giá trị `null` và field **vắng mặt** khác nhau trong JSON Schema. “Kh
 - Mentor chưa cung cấp log thật, cách đo từng chặng, hoặc xác nhận “8 TURN” là 8 mục cấu hình. Các giá trị này hiện là **assumption của simulator**.
 - BE và client chưa xác nhận thời điểm biết Callee, network context lấy ở đâu, khóa nối TURN allocation với call, và getStats có mặt trên nền tảng nào. Theo dõi [#3](https://github.com/QuocHiep123/Pharse3/issues/3) (telemetry tối thiểu) và [#6](https://github.com/QuocHiep123/Pharse3/issues/6) (network context). Quy tắc country không có TURN (`turn_availability_status`, `inventory_scope`) đã đưa vào schema theo [#5](https://github.com/QuocHiep123/Pharse3/issues/5).
 - Ngưỡng KPI, trạng thái coverage và định nghĩa chất lượng cần đối chiếu telemetry có thể thu. Theo dõi [#7](https://github.com/QuocHiep123/Pharse3/issues/7).
-- Schema downstream `fact_call` còn thiếu cột; đánh giá dự đoán theo cặp chưa hoàn tất. Quyết định grain ở trên giúp làm simulator, chưa hoàn tất toàn bộ downstream. Theo dõi [#8](https://github.com/QuocHiep123/Pharse3/issues/8).
+- `fact_call` đã đủ cột và có `fact_pair_evaluation` cho đánh giá dự đoán theo cặp ([#8](https://github.com/QuocHiep123/Pharse3/issues/8)). Còn lại: dashboard dùng các bảng này và test dữ liệu 6 loại cuộc gọi.
 - Các nhãn `x-review` và bảng hoãn trong YAML vẫn cần kiểm tra. Bản để BE/WebRTC thu thật cần xác nhận nguồn, event mẫu, đơn vị, khóa join, nền tảng, hành vi thiếu và cập nhật spec/ERD/schema đồng bộ. Downstream còn mở không cản trở sinh raw synthetic theo profile đã chốt.
 
 ## Bài kiểm tra bàn giao một cuộc gọi

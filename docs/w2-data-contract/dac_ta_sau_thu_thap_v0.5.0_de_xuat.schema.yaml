@@ -77,7 +77,7 @@ x-feature-engineering:
     so với cặp tốt nhất.
   unestimable: Đường không ước lượng được thì không có khoảng tin cậy, nên top-k cần quy tắc riêng.
 x-labeled-data:
-  definition: Nối Decision Log với Outcome Log rồi gắn nhãn; không tạo thêm dự đoán. Chưa định nghĩa cột.
+  definition: 'Nối Decision Log với Outcome Log rồi gắn nhãn; không tạo thêm dự đoán. Hai bảng: fact_call (KPI, một dòng mỗi call) và fact_pair_evaluation (dự đoán cặp so với quan sát).'
   sources:
   - selector_decision
   - selector_decision_pair
@@ -96,10 +96,10 @@ x-labeled-data:
   - 'fact_call: pcr_group, poor_category, quality_assessment_status, action_propensity, propensity_decision_id,
     rank_used_*, lead_pair_matched'
   - x-metrics
-  open_questions:
-  - 'Một dòng là gì: mỗi quyết định, mỗi bên hay mỗi cặp?'
-  - Cuộc gọi thiết lập thất bại không có cặp thực tế, vậy nhãn gắn vào cặp dẫn đầu thế nào?
-  - Dự đoán và kết quả có cùng đại lượng không, ví dụ media_rtcp_rtt hay ice_stun_rtt?
+  resolved_questions:
+  - 'Một dòng là gì: fact_call một dòng mỗi call_id (KPI); fact_pair_evaluation một dòng mỗi decision_id x metric x cặp (calibration). Không ép nhiều cặp vào một dòng call.'
+  - 'Cuộc gọi setup thất bại không có cặp thực tế: nhãn gắn vào cặp dẫn đầu chỉ cho metric connection_success (label_status = setup_failed), không gán RTT hoặc loss.'
+  - 'Dự đoán và kết quả cùng đại lượng: yêu cầu observed_metric_name = metric. media_rtcp_rtt_ms và ice_stun_rtt_ms là hai metric khác nhau, không quy đổi ngầm.'
 x-metrics:
   cohort: Bắt đầu từ call_session có call_type = one_to_one đã chốt cohort, rồi left join outcome. Cuộc gọi đang
     diễn ra để báo cáo tạm. Trong giả lập, policy lấy từ run_manifest.policy_version, vì arm đã hoãn. Phạm vi dữ
@@ -243,6 +243,16 @@ x-invariants:
   enforced_by: pipeline
   rule: Hoãn cùng chuỗi RTP theo cửa sổ. Số A + N + U bằng độ dài chuỗi; hai chuỗi của một dòng có cùng độ dài;
     rtp_no_receive_window_count, rtp_recv_active_window_count, rtp_recv_unknown_window_count khớp chuỗi nhận.
+- id: I32
+  level: FAIL
+  status: active
+  enforced_by: pipeline
+  rule: 'fact_call có đúng một dòng mỗi call_id tại cutoff (bản có fact_version lớn nhất đã ingest). Call thiếu outcome vẫn có dòng, outcome_status = missing.'
+- id: I33
+  level: FAIL
+  status: active
+  enforced_by: pipeline
+  rule: 'fact_pair_evaluation: label_status = observed chỉ khi actual_pair_matches = true và observed_metric_name = metric. Cặp không phải cặp thực tế không có observed_value. Tổng số dòng is_lead = true mỗi (decision_id, metric) bằng 1 khi policy có pair.'
 x-deferred-rules:
   rtp_windows:
     A: Delta bộ đếm lớn hơn 0 trên hai snapshot hợp lệ của cùng đối tượng. Chỉ chứng minh có ít nhất một gói.
@@ -310,6 +320,8 @@ $defs:
   e_gate_status: {type: string, enum: [passed, failed, not_evaluated, not_applicable], x-change: new}
   e_validation_status: {type: string, enum: [not_validated, validated, rejected], x-change: new}
   e_estimand: {type: string, enum: [network_rtt, transaction_time, candidate_total_time], x-change: new}
+  e_call_path_scope: {type: string, enum: [p2p, relay, failed, unknown], description: 'Issue #7. Phạm vi đường của cuộc gọi suy từ bằng chứng ICE (không suy từ ice_transport_policy). failed = đã bắt máy nhưng ICE hoặc media không đạt; unknown = chưa đủ bằng chứng.', x-change: new}
+  e_label_status: {type: string, enum: [observed, not_observable, setup_failed, identity_unresolved, not_actual_pair], description: 'Trạng thái nhãn của một cặp dự đoán. observed: cặp này là cặp thực tế và metric đo được cùng đại lượng. not_actual_pair: cặp được cân nhắc nhưng không được dùng, không có nhãn phản thực. setup_failed: cuộc gọi thất bại, nhãn chỉ cho metric thành công. identity_unresolved: chưa xác định TURN thực tế. not_observable: thiếu telemetry hoặc khác đại lượng.', x-change: new}
   e_turn_availability_status: {type: string, enum: [local_turn_available, no_healthy_turn, no_turn_observed, unknown], description: 'Issue #5. Trạng thái TURN khả dụng theo country của endpoint tại lúc quyết định. no_turn_observed không đồng nghĩa not_deployed; chỉ kết luận not_deployed khi inventory_scope đã xác nhận đầy đủ.', x-change: new}
   e_turn_identity_status: {type: string, enum: [identified, ambiguous, unmapped, unknown], x-change: new}
   e_turn_identity_method: {type: string, enum: [ip, hostname, server_evidence, none], x-contract-ref: §8.6, description: ambiguous chuyển sang turn_identity_status, x-change: changed}
@@ -1155,7 +1167,38 @@ $defs:
       app_version_callee: {type: [string, 'null']}
       device_class_caller: {type: [string, 'null']}
       device_class_callee: {type: [string, 'null']}
-    required: [call_id, cohort_name, initiated_ts, answered, ice_connected, dtls_connected, media_connected, end_reason, outcome_status, cst_assessment, ttfm_assessment, quality_poor, stats_observed_endpoint_count, turn_identity_status_caller, turn_identity_status_callee, identity_check_caller, identity_check_callee]
+      as_of_ts: {type: string, format: date-time, description: 'Cutoff của lần dựng. Bảng giữ bản hiện hành (fact_version lớn nhất đã ingest tại cutoff); lịch sử các bản nằm ở log của pipeline', x-change: new}
+      fact_version: {type: integer, minimum: 1, description: Tăng khi dữ liệu đến muộn làm đổi dòng, x-change: new}
+      call_path_scope: {$ref: '#/$defs/e_call_path_scope'}
+      path_type: {anyOf: [{$ref: '#/$defs/e_path_type'}, {type: 'null'}], description: Từ outcome_log/ice_attempt; null khi không có selected path}
+      path_attribution_status: {anyOf: [{$ref: '#/$defs/e_path_attribution_status'}, {type: 'null'}]}
+      observation_profile: {anyOf: [{$ref: '#/$defs/e_observation_profile'}, {type: 'null'}], description: 'Synthetic lấy từ run_manifest; production null hoặc theo cấu hình thu'}
+      connection_mode: {anyOf: [{$ref: '#/$defs/e_connection_mode'}, {type: 'null'}]}
+      ice_transport_policy: {anyOf: [{$ref: '#/$defs/e_ice_transport_policy'}, {type: 'null'}], description: 'Cấu hình, không chứng minh đường thực tế'}
+      decision_source_caller: {type: [string, 'null'], description: 'api, static_config, static_fallback hoặc cache từ selector_decision'}
+      decision_source_callee: {type: [string, 'null']}
+      policy_version_caller: {type: [string, 'null']}
+      policy_version_callee: {type: [string, 'null']}
+      fallback_type_caller: {anyOf: [{$ref: '#/$defs/e_fallback_type'}, {type: 'null'}]}
+      fallback_type_callee: {anyOf: [{$ref: '#/$defs/e_fallback_type'}, {type: 'null'}]}
+      returned_list_size_caller: {type: [integer, 'null'], minimum: 0, maximum: 8}
+      returned_list_size_callee: {type: [integer, 'null'], minimum: 0, maximum: 8}
+      lead_turn_caller: {type: [string, 'null'], description: 'turn_id của cặp dẫn đầu phía caller; null khi static_config'}
+      lead_turn_callee: {type: [string, 'null']}
+      country_caller: {type: [string, 'null'], description: Bối cảnh đầu tiên biết được; lịch sử đổi mạng ở fact_call_endpoint}
+      country_callee: {type: [string, 'null']}
+      vn_region_caller: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      vn_region_callee: {anyOf: [{$ref: '#/$defs/e_vn_region'}, {type: 'null'}]}
+      isp_caller: {type: [string, 'null']}
+      isp_callee: {type: [string, 'null']}
+      network_type_caller: {anyOf: [{$ref: '#/$defs/e_network_type'}, {type: 'null'}]}
+      network_type_callee: {anyOf: [{$ref: '#/$defs/e_network_type'}, {type: 'null'}]}
+      turn_availability_status_caller: {anyOf: [{$ref: '#/$defs/e_turn_availability_status'}, {type: 'null'}]}
+      turn_availability_status_callee: {anyOf: [{$ref: '#/$defs/e_turn_availability_status'}, {type: 'null'}]}
+      used_fallback_turn_caller: {$ref: '#/$defs/e_tristate'}
+      used_fallback_turn_callee: {$ref: '#/$defs/e_tristate'}
+      quality_assessed_endpoint_count: {type: integer, minimum: 0, description: 'Số endpoint có quality_assessment_status = assessed; cùng mẫu số stats_expected_endpoint_count'}
+    required: [call_id, cohort_name, as_of_ts, fact_version, call_path_scope, quality_assessed_endpoint_count, initiated_ts, answered, ice_connected, dtls_connected, media_connected, end_reason, outcome_status, cst_assessment, ttfm_assessment, quality_poor, stats_observed_endpoint_count, turn_identity_status_caller, turn_identity_status_callee, identity_check_caller, identity_check_callee]
     unevaluatedProperties: false
   fact_call_endpoint:
     title: Một dòng cho một endpoint tham gia cuộc gọi, gồm metric tổng hợp và tham chiếu lịch sử
@@ -1203,6 +1246,51 @@ $defs:
       quality_poor: {$ref: '#/$defs/e_tristate'}
       quality_rule_version: {type: [string, 'null']}
     required: [call_id, side, device_id, network_epoch_refs, attempt_refs, turn_identity_status, cst_assessment, ttfm_assessment, rtt_ms, packet_loss_pct, jitter_ms, quality_assessment_status, quality_poor]
+    unevaluatedProperties: false
+  fact_pair_evaluation:
+    title: Đánh giá một dự đoán cặp so với kết quả quan sát
+    x-kind: derived
+    x-status: active
+    x-grain: Một decision_id × metric × cặp (TURN và transport hai phía), bản hiện hành tại cutoff
+    x-primary-key: [decision_id, metric, turn_caller, transport_caller, turn_callee, transport_callee]
+    x-foreign-keys: [{columns: [call_id], references: fact_call}, {columns: [decision_id], references: selector_decision_request}]
+    x-source-level: D
+    x-producer: pipeline
+    x-change: new
+    x-notes: ['Trả lời hai câu mở của Labeled Data. Một: cuộc gọi setup thất bại không có cặp thực tế, nên nhãn gắn vào cặp dẫn đầu chỉ cho metric thành công (connection_success), không gán RTT/loss. Hai: dự đoán và quan sát phải cùng đại lượng; khác thì label_status = not_observable, không quy đổi ngầm.', 'Chỉ cặp thực tế mới có nhãn. Cặp được cân nhắc nhưng không dùng có label_status = not_actual_pair và observed_value = null; không điền nhãn phản thực.', 'Dùng cho calibration của khoảng tin cậy (in_interval) và so với baseline; nguồn production giống synthetic nếu data_source phân biệt.']
+    type: object
+    allOf:
+      - {$ref: '#/$defs/derived_meta'}
+      - {if: {required: [label_status], properties: {label_status: {const: observed}}}, then: {required: [observed_value, observed_metric_name], properties: {observed_value: {type: number}, actual_pair_matches: {const: 'true'}}}}
+      - {if: {required: [label_status], properties: {label_status: {enum: [not_actual_pair, not_observable, identity_unresolved]}}}, then: {properties: {observed_value: {type: 'null'}, in_interval: {const: unknown}}}}
+    properties:
+      call_id: {type: string, format: uuid}
+      decision_id: {type: string, format: uuid}
+      metric: {type: string, description: 'Đại lượng dự đoán, ví dụ media_rtcp_rtt_ms hoặc connection_success'}
+      unit: {type: string}
+      turn_caller: {type: string}
+      transport_caller: {$ref: '#/$defs/e_transport'}
+      turn_callee: {type: string}
+      transport_callee: {$ref: '#/$defs/e_transport'}
+      is_lead: {type: boolean}
+      in_topk: {type: boolean}
+      est_value: {type: [number, 'null']}
+      interval_low: {type: [number, 'null']}
+      interval_high: {type: [number, 'null']}
+      interval_kind: {anyOf: [{$ref: '#/$defs/e_interval_kind'}, {type: 'null'}]}
+      interval_level: {type: [number, 'null'], minimum: 0, maximum: 1}
+      estimator_version: {type: [string, 'null']}
+      actual_pair_matches: {$ref: '#/$defs/e_tristate', description: 'true khi cặp thực tế (hai TURN identified và transport) trùng cặp này; unknown khi chưa xác định'}
+      label_status: {$ref: '#/$defs/e_label_status'}
+      observed_metric_name: {type: [string, 'null'], description: 'Tên đại lượng đo được; phải bằng metric khi observed'}
+      observed_value: {type: [number, 'null']}
+      observed_sample_count: {type: [integer, 'null'], minimum: 0}
+      observed_coverage: {type: [number, 'null'], minimum: 0, maximum: 1}
+      in_interval: {$ref: '#/$defs/e_tristate', description: 'observed_value nằm trong [interval_low, interval_high]; unknown khi không có nhãn hoặc khoảng'}
+      error_value: {type: [number, 'null'], description: observed_value trừ est_value}
+      label_rule_version: {type: string}
+      as_of_ts: {type: string, format: date-time}
+    required: [call_id, decision_id, metric, turn_caller, transport_caller, turn_callee, transport_callee, is_lead, in_topk, actual_pair_matches, label_status, in_interval, label_rule_version, as_of_ts]
     unevaluatedProperties: false
   metric_config:
     title: Metadata của một metric
