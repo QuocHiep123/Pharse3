@@ -140,6 +140,187 @@ Bảng được sinh từ YAML. *Nguồn*: A = service tự tạo; B = thu có �
 | `select_response` | api | Một response của Selector |  | A | 21 | changed | active |
 | `service_health_1m` | event | Một minute_ts × service × instance | `minute_ts`, `service`, `instance` | A | 13 | unchanged | active |
 
+### 4.3. Bảng fact (Labeled Data và Evaluation)
+
+Chi tiết cột của ba bảng dùng cho dashboard và đánh giá. Kiểu và ràng buộc đầy đủ ở YAML. Cột ngoài “Bắt buộc” được phép vắng mặt; `null` chỉ hợp lệ khi kiểu cho phép. Thiếu dữ liệu biểu diễn bằng `unknown`/`null` kèm trạng thái, không phải `0`/`false`.
+
+#### `fact_call`
+
+**Một dòng:** Một call_id trong cohort one_to_one; bắt đầu từ call_session và left join outcome_log phiên bản hiện hành. **Khóa chính:** `call_id`. 90 cột.
+
+| Nhóm | Cột | Kiểu | Bắt buộc |
+|---|---|---|---|
+| Khóa, phiên bản, nguồn | `call_id` | uuid | có |
+| Khóa, phiên bản, nguồn | `cohort_name` | string | có |
+| Khóa, phiên bản, nguồn | `as_of_ts` | date-time | có |
+| Khóa, phiên bản, nguồn | `fact_version` | integer | có |
+| Khóa, phiên bản, nguồn | `contract_version` | string | có |
+| Khóa, phiên bản, nguồn | `data_source` | enum: synthetic, lab_zenodo, lab_controlled, public_reference, production | có |
+| Khóa, phiên bản, nguồn | `sim_run_id` | string |  |
+| Khóa, phiên bản, nguồn | `pipeline_run_id` | string | có |
+| Khóa, phiên bản, nguồn | `dt` | date | có |
+| Thời gian | `initiated_ts` | date-time | có |
+| Thời gian | `answer_received_at_be` | date-time |  |
+| Thời gian | `end_ts` | date-time |  |
+| Thời gian | `local_hour_vn` | integer |  |
+| KPI, chất lượng, telemetry | `cst_technical_ms` | number |  |
+| KPI, chất lượng, telemetry | `cst_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |
+| KPI, chất lượng, telemetry | `ttfm_post_answer_ms` | number |  |
+| KPI, chất lượng, telemetry | `ttfm_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |
+| KPI, chất lượng, telemetry | `quality_poor` | enum: true, false, unknown | có |
+| KPI, chất lượng, telemetry | `quality_rule_version` | string |  |
+| KPI, chất lượng, telemetry | `stats_expected_endpoint_count` | integer |  |
+| KPI, chất lượng, telemetry | `stats_observed_endpoint_count` | integer | có |
+| KPI, chất lượng, telemetry | `stats_endpoint_coverage` | number |  |
+| KPI, chất lượng, telemetry | `pcr_group` | enum: K, G, U_quality, U_outcome |  |
+| KPI, chất lượng, telemetry | `poor_category` | enum: setup_fail, drop, quality, poor_unattributed, none |  |
+| KPI, chất lượng, telemetry | `quality_assessment_status` | enum: assessed, partially_assessed, unclassifiable, not_applicable |  |
+| KPI, chất lượng, telemetry | `quality_assessed_endpoint_count` | integer | có |
+| Outcome | `answered` | enum: true, false, unknown | có |
+| Outcome | `ice_connected` | enum: true, false, unknown | có |
+| Outcome | `dtls_connected` | enum: true, false, unknown | có |
+| Outcome | `media_connected` | enum: true, false, unknown | có |
+| Outcome | `setup_failure_observed` | boolean |  |
+| Outcome | `dropped` | boolean |  |
+| Outcome | `end_reason` | enum: normal_hangup, invite_undelivered, not_answered, rejected, cancelled_by_caller, ice_failed, media_setup_failed, dropped_network, dropped_turn, app_crash, unknown | có |
+| Outcome | `outcome_version` | integer |  |
+| Outcome | `outcome_provenance` | enum: event, placeholder |  |
+| Outcome | `outcome_status` | enum: complete, partial, missing | có |
+| Đường thực tế và danh tính TURN | `n_ice_attempts` | integer |  |
+| Đường thực tế và danh tính TURN | `n_network_changes` | integer |  |
+| Đường thực tế và danh tính TURN | `first_connected_attempt_seq` | integer |  |
+| Đường thực tế và danh tính TURN | `actual_turn_id_caller` | string |  |
+| Đường thực tế và danh tính TURN | `actual_turn_id_callee` | string |  |
+| Đường thực tế và danh tính TURN | `turn_identity_status_caller` | enum: identified, ambiguous, unmapped, unknown | có |
+| Đường thực tế và danh tính TURN | `turn_identity_status_callee` | enum: identified, ambiguous, unmapped, unknown | có |
+| Đường thực tế và danh tính TURN | `turn_identity_method_caller` | enum: ip, hostname, server_evidence, none |  |
+| Đường thực tế và danh tính TURN | `turn_identity_method_callee` | enum: ip, hostname, server_evidence, none |  |
+| Đường thực tế và danh tính TURN | `identity_check_caller` | enum: match, mismatch, not_evaluable | có |
+| Đường thực tế và danh tính TURN | `identity_check_callee` | enum: match, mismatch, not_evaluable | có |
+| Đường thực tế và danh tính TURN | `call_path_scope` | enum: p2p, relay, failed, unknown | có |
+| Đường thực tế và danh tính TURN | `path_type` | enum: relay_relay, relay_same, relay_unresolved, relay_direct, p2p_host, p2p_srflx, unknown |  |
+| Đường thực tế và danh tính TURN | `path_attribution_status` | enum: single_path, mixed, unknown |  |
+| Quyết định và policy | `caller_decision_id` | uuid |  |
+| Quyết định và policy | `callee_decision_id` | uuid |  |
+| Quyết định và policy | `policy_version` | string |  |
+| Quyết định và policy | `action_propensity` | number |  |
+| Quyết định và policy | `propensity_decision_id` | uuid |  |
+| Quyết định và policy | `rank_used_caller` | integer |  |
+| Quyết định và policy | `rank_used_callee` | integer |  |
+| Quyết định và policy | `lead_pair_matched` | enum: true, false, unknown |  |
+| Quyết định và policy | `observation_profile` | enum: obs_base, obs_active, obs_infra |  |
+| Quyết định và policy | `connection_mode` | enum: post_answer, pre_connect |  |
+| Quyết định và policy | `ice_transport_policy` | enum: relay, all |  |
+| Quyết định và policy | `decision_source_caller` | string |  |
+| Quyết định và policy | `decision_source_callee` | string |  |
+| Quyết định và policy | `policy_version_caller` | string |  |
+| Quyết định và policy | `policy_version_callee` | string |  |
+| Quyết định và policy | `fallback_type_caller` | enum: data_backoff, health_missing, selector_error, insufficient_candidates |  |
+| Quyết định và policy | `fallback_type_callee` | enum: data_backoff, health_missing, selector_error, insufficient_candidates |  |
+| Quyết định và policy | `returned_list_size_caller` | integer |  |
+| Quyết định và policy | `returned_list_size_callee` | integer |  |
+| Quyết định và policy | `lead_turn_caller` | string |  |
+| Quyết định và policy | `lead_turn_callee` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `pair_group` | enum: VN_VN, VN_INTL, INTL_INTL |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `platform_caller` | enum: ios, android, web, desktop, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `platform_callee` | enum: ios, android, web, desktop, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `app_version_caller` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `app_version_callee` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `device_class_caller` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `device_class_callee` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `country_caller` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `country_callee` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `vn_region_caller` | enum: north, central, south, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `vn_region_callee` | enum: north, central, south, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `isp_caller` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `isp_callee` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `network_type_caller` | enum: wifi, 4g, 5g, ethernet, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `network_type_callee` | enum: wifi, 4g, 5g, ethernet, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `turn_availability_status_caller` | enum: local_turn_available, no_healthy_turn, no_turn_observed, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `turn_availability_status_callee` | enum: local_turn_available, no_healthy_turn, no_turn_observed, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `used_fallback_turn_caller` | enum: true, false, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `used_fallback_turn_callee` | enum: true, false, unknown |  |
+
+#### `fact_call_endpoint`
+
+**Một dòng:** Một call_id × side × device_id. **Khóa chính:** `call_id`, `side`, `device_id`. 35 cột.
+
+| Nhóm | Cột | Kiểu | Bắt buộc |
+|---|---|---|---|
+| Khóa, phiên bản, nguồn | `call_id` | uuid | có |
+| Khóa, phiên bản, nguồn | `contract_version` | string | có |
+| Khóa, phiên bản, nguồn | `data_source` | enum: synthetic, lab_zenodo, lab_controlled, public_reference, production | có |
+| Khóa, phiên bản, nguồn | `sim_run_id` | string |  |
+| Khóa, phiên bản, nguồn | `pipeline_run_id` | string | có |
+| Khóa, phiên bản, nguồn | `dt` | date | có |
+| Thời gian | `answer_local_ts` | date-time |  |
+| Thời gian | `first_media_received_ts` | date-time |  |
+| KPI, chất lượng, telemetry | `cst_technical_ms` | number |  |
+| KPI, chất lượng, telemetry | `cst_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |
+| KPI, chất lượng, telemetry | `ttfm_post_answer_ms` | number |  |
+| KPI, chất lượng, telemetry | `ttfm_assessment` | enum: measured, not_measured, lost, stale, ambiguous, not_applicable | có |
+| KPI, chất lượng, telemetry | `rtt_ms` | metric_observation | có |
+| KPI, chất lượng, telemetry | `packet_loss_pct` | object | có |
+| KPI, chất lượng, telemetry | `jitter_ms` | metric_observation | có |
+| KPI, chất lượng, telemetry | `quality_assessment_status` | enum: assessed, partially_assessed, unclassifiable, not_applicable | có |
+| KPI, chất lượng, telemetry | `quality_poor` | enum: true, false, unknown | có |
+| KPI, chất lượng, telemetry | `quality_rule_version` | string |  |
+| Đường thực tế và danh tính TURN | `network_epoch_refs` | array | có |
+| Đường thực tế và danh tính TURN | `attempt_refs` | array | có |
+| Đường thực tế và danh tính TURN | `first_connected_attempt_seq` | integer |  |
+| Đường thực tế và danh tính TURN | `first_connected_turn_id` | string |  |
+| Đường thực tế và danh tính TURN | `first_connected_transport` | enum: udp, tcp, tls |  |
+| Đường thực tế và danh tính TURN | `turn_identity_status` | enum: identified, ambiguous, unmapped, unknown | có |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `side` | enum: caller, callee | có |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `device_id` | string | có |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `country` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `vn_region` | enum: north, central, south, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `city` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `isp` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `asn` | integer |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `network_type_initial` | enum: wifi, 4g, 5g, ethernet, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `context_source` | string |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `turn_availability_status` | enum: local_turn_available, no_healthy_turn, no_turn_observed, unknown |  |
+| Địa lý, mạng, thiết bị, TURN khả dụng | `used_fallback_turn` | enum: true, false, unknown |  |
+
+#### `fact_pair_evaluation`
+
+**Một dòng:** Một decision_id × metric × cặp (TURN và transport hai phía), bản hiện hành tại cutoff. **Khóa chính:** `decision_id`, `metric`, `turn_caller`, `transport_caller`, `turn_callee`, `transport_callee`. 31 cột.
+
+| Nhóm | Cột | Kiểu | Bắt buộc |
+|---|---|---|---|
+| Khóa, phiên bản, nguồn | `call_id` | uuid | có |
+| Khóa, phiên bản, nguồn | `decision_id` | uuid | có |
+| Khóa, phiên bản, nguồn | `label_rule_version` | string | có |
+| Khóa, phiên bản, nguồn | `as_of_ts` | date-time | có |
+| Khóa, phiên bản, nguồn | `contract_version` | string | có |
+| Khóa, phiên bản, nguồn | `data_source` | enum: synthetic, lab_zenodo, lab_controlled, public_reference, production | có |
+| Khóa, phiên bản, nguồn | `sim_run_id` | string |  |
+| Khóa, phiên bản, nguồn | `pipeline_run_id` | string | có |
+| Khóa, phiên bản, nguồn | `dt` | date | có |
+| KPI, chất lượng, telemetry | `observed_metric_name` | string |  |
+| KPI, chất lượng, telemetry | `observed_value` | number |  |
+| KPI, chất lượng, telemetry | `observed_sample_count` | integer |  |
+| KPI, chất lượng, telemetry | `observed_coverage` | number |  |
+| KPI, chất lượng, telemetry | `in_interval` | enum: true, false, unknown | có |
+| KPI, chất lượng, telemetry | `error_value` | number |  |
+| Đường thực tế và danh tính TURN | `actual_pair_matches` | enum: true, false, unknown | có |
+| Đường thực tế và danh tính TURN | `label_status` | enum: observed, not_observable, setup_failed, identity_unresolved, not_actual_pair | có |
+| Quyết định và policy | `metric` | string | có |
+| Quyết định và policy | `unit` | string |  |
+| Quyết định và policy | `turn_caller` | string | có |
+| Quyết định và policy | `transport_caller` | enum: udp, tcp, tls | có |
+| Quyết định và policy | `turn_callee` | string | có |
+| Quyết định và policy | `transport_callee` | enum: udp, tcp, tls | có |
+| Quyết định và policy | `is_lead` | boolean | có |
+| Quyết định và policy | `in_topk` | boolean | có |
+| Quyết định và policy | `est_value` | number |  |
+| Quyết định và policy | `interval_low` | number |  |
+| Quyết định và policy | `interval_high` | number |  |
+| Quyết định và policy | `interval_kind` | enum: mean_ci, prediction, other |  |
+| Quyết định và policy | `interval_level` | number |  |
+| Quyết định và policy | `estimator_version` | string |  |
+
 ## 5. Khóa nối
 
 | Khóa | Nối | Ghi chú |
