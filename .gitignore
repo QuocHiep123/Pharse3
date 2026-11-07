@@ -22,3 +22,7 @@ docs/.obsidian/workspace*.json
 docs/.obsidian/cache
 docs/.obsidian/plugins/
 docs/.claudian/
+
+# editor cá nhân / worktree
+.obsidian/
+.worktrees/
